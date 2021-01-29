@@ -1,0 +1,14 @@
+# use for all objects
+newmtl  PowerPlant
+
+# Ambient material
+Ka  0.15  0.15  0.15
+
+# Diffuse material
+Kd  0.15  0.15  0.65
+
+# Specular material
+Ks  0.75  0.75  0.75
+
+# Shininess Exponent
+Ns  50.00
