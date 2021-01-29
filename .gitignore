@@ -1,0 +1,12 @@
+
+# -------------- VISUAL STUDIO --------------
+# Directories
+bin
+bin-int
+.vs/
+# Files
+*.user
+*.sln
+*.vcxproj
+*.filters
+#------------------------------------
