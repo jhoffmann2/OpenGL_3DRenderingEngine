@@ -10,6 +10,8 @@ Author: Jordan Hoffmann, jordan.h
 Creation date: 01/29/2021
 End Header --------------------------------------------------------*/ 
 
+##[this readme is intended to be read from github for proper file links](https://github.com/jhoffmann2/CS350/blob/master/README.md)
+
 ## How to use parts of your user interface that is NOT specified in the assignment description.
 Simply launch application and use the imgui.
 ### object window: 
