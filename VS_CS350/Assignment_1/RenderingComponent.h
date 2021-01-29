@@ -1,4 +1,6 @@
 #pragma once
+#include <bitset>
+
 #include "Material.h"
 #include "ObjectComponent.h"
 #include "SolidRender.h"
@@ -17,7 +19,6 @@ public:
   void SetDiffuseTexture(const Texture& t);
   void SetSpecularTexture(const Texture& t);
 
-  void Kill() override;
   void ImGuiEditor() override;
   std::string Name() override;
 
@@ -26,6 +27,15 @@ public:
 
   void SetShader(SHADER shader);
   [[nodiscard]] SHADER GetShader();
+
+
+  enum Flags
+  {
+    RENDER_FLAG_DISABLE_FACE_NORMALS,
+    RENDER_FLAG_DISABLE_VERTEX_NORMALS,
+    RENDER_FLAG_DISABLE_SOLID_RENDERING,
+  };
+  std::bitset<32> flags_;
 
   bool solidRander_ = true;
   bool vnormRender_ = false;

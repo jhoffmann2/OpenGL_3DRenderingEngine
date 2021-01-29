@@ -26,6 +26,7 @@ ChildListComponent::ChildListComponent(const std::vector<Mesh>& meshes, const st
     FaceNormalRender::loadMesh(mesh, 0.01f);
     children_.emplace_back(new GameObject(name));
     auto* rendering = new RenderingComponent(mesh_id);
+    rendering->flags_.set(RenderingComponent::RENDER_FLAG_DISABLE_FACE_NORMALS);
     children_.back()->AddComponent(rendering);
   }
   std::cout << "finished importing children meshes" << std::endl;

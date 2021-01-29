@@ -38,20 +38,20 @@ RenderingComponent::SHADER RenderingComponent::GetShader()
 
 void RenderingComponent::Render()
 {
-  if (solidRander_ && shader_ == SHADER::DEFFERED)
+  if (solidRander_ && shader_ == SHADER::DEFFERED && !flags_[RENDER_FLAG_DISABLE_SOLID_RENDERING])
     SolidRender::draw(meshIndex_, diffuseTexture_, specularTexture_);
 }
 
 void RenderingComponent::DebugRender()
 {
-  if (solidRander_ && shader_ != SHADER::DEFFERED)
+  if (solidRander_ && shader_ != SHADER::DEFFERED && !flags_[RENDER_FLAG_DISABLE_SOLID_RENDERING])
   {
     SolidRender::SetShader(shader_);
     SolidRender::draw(meshIndex_, diffuseTexture_, specularTexture_);
   }
 
-  if (vnormRender_) VertexNormalRender::draw(meshIndex_);
-  if (fnormRender_) FaceNormalRender::draw(meshIndex_);
+  if (vnormRender_ && !flags_[RENDER_FLAG_DISABLE_VERTEX_NORMALS]) VertexNormalRender::draw(meshIndex_);
+  if (fnormRender_ && !flags_[RENDER_FLAG_DISABLE_FACE_NORMALS]) FaceNormalRender::draw(meshIndex_);
 }
 
 
@@ -69,10 +69,6 @@ void RenderingComponent::SetDiffuseTexture(const Texture& t)
 void RenderingComponent::SetSpecularTexture(const Texture& t)
 {
   specularTexture_ = t;
-}
-
-void RenderingComponent::Kill()
-{
 }
 
 void RenderingComponent::ImGuiEditor()
@@ -120,52 +116,60 @@ void RenderingComponent::ImGuiEditor()
 
   ImGui::Separator();
 
-
-  ImGui::Checkbox("Render Object", &solidRander_);
-  if (solidRander_)
+  if (!flags_[RENDER_FLAG_DISABLE_VERTEX_NORMALS])
   {
-    ImGui::Indent(20);
-    ImGui::PushItemWidth(400);
+    ImGui::Checkbox("Render Object", &solidRander_);
+    if (solidRander_)
+    {
+      ImGui::Indent(20);
+      ImGui::PushItemWidth(400);
 
-    ImGui::Combo("Shader", reinterpret_cast<int*>(&shader_),
-      "PhongLighting\0"
-      "PhongShading\0"
-      "BlinnLighting\0"
-      "BlinnShading\0"
-      "FlatEmission\0"
-      "Deferred Phong\0"
-    );
-    if (ImGui::Button("Reload Shaders"))
-      SolidRender::ReloadShaders();
+      ImGui::Combo("Shader", reinterpret_cast<int*>(&shader_),
+        "PhongLighting\0"
+        "PhongShading\0"
+        "BlinnLighting\0"
+        "BlinnShading\0"
+        "FlatEmission\0"
+        "Deferred Phong\0"
+      );
+      if (ImGui::Button("Reload Shaders"))
+        SolidRender::ReloadShaders();
 
-    ImGui::PopItemWidth();
-    ImGui::Unindent(20);
+      ImGui::PopItemWidth();
+      ImGui::Unindent(20);
+    }
   }
-  ImGui::Checkbox("Render Vertex Normals", &vnormRender_);
-  if (vnormRender_)
+  if(!flags_[RENDER_FLAG_DISABLE_VERTEX_NORMALS])
   {
-    ImGui::Indent(20);
-    ImGui::PushItemWidth(400);
+    ImGui::Checkbox("Render Vertex Normals", &vnormRender_);
+    if (vnormRender_)
+    {
+      ImGui::Indent(20);
+      ImGui::PushItemWidth(400);
 
-    static glm::vec4 color = { 1,0,1,1 };
-    ImGui::ColorEdit3("color", glm::data(color));
-    VertexNormalRender::setRGB(color);
+      static glm::vec4 color = { 1,0,1,1 };
+      ImGui::ColorEdit3("color", glm::data(color));
+      VertexNormalRender::setRGB(color);
 
-    ImGui::PopItemWidth();
-    ImGui::Unindent(20);
+      ImGui::PopItemWidth();
+      ImGui::Unindent(20);
+    }
   }
-  ImGui::Checkbox("Render Face Normals", &fnormRender_);
-  if (fnormRender_)
+  if (!flags_[RENDER_FLAG_DISABLE_FACE_NORMALS])
   {
-    ImGui::Indent(20);
-    ImGui::PushItemWidth(400);
+    ImGui::Checkbox("Render Face Normals", &fnormRender_);
+    if (fnormRender_)
+    {
+      ImGui::Indent(20);
+      ImGui::PushItemWidth(400);
 
-    static glm::vec4 color = { 0,1,1,1 };
-    ImGui::ColorEdit3("color", data(color));
-    FaceNormalRender::setRGB(color);
+      static glm::vec4 color = { 0,1,1,1 };
+      ImGui::ColorEdit3("color", data(color));
+      FaceNormalRender::setRGB(color);
 
-    ImGui::PopItemWidth();
-    ImGui::Unindent(20);
+      ImGui::PopItemWidth();
+      ImGui::Unindent(20);
+    }
   }
 }
 
