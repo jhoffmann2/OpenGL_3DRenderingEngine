@@ -5,17 +5,16 @@
 #include "Mesh.h"
 #include "ObjectComponent.h"
 
-class ParentComponent : public ObjectComponent
+class ChildListComponent : public ObjectComponent
 {
 public:
-  ParentComponent();
-  ParentComponent(const std::vector<Mesh>& meshes, const std::vector<std::string>& names);
-  ParentComponent(const std::vector<GameObject*> &children);
+  ChildListComponent();
+  ChildListComponent(const std::vector<Mesh>& meshes, const std::vector<std::string>& names);
+  ChildListComponent(const std::vector<GameObject*> &children);
   void AddChild(GameObject* object);
   const std::vector<GameObject*> &Children() const;
 
   // component functions
-  void PreRender() override;
   void Render() override;
   void Init() override;
   void DebugRender() override;

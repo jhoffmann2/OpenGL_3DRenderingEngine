@@ -95,19 +95,19 @@ int SolidRender::loadMesh(const Mesh& m, SHADER program)
 
 	// assign postion attribute to vertex_buffer
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-	const GLint aposition = glGetAttribLocation(program, "position");
+	const GLint aposition = 0;
 	glVertexAttribPointer(aposition, 4, GL_FLOAT, false, 0, nullptr);
 	glEnableVertexAttribArray(aposition);
 
 	// assign normal attribute to normal_buffer
 	glBindBuffer(GL_ARRAY_BUFFER, normal_buffer);
-	const GLint anormal = glGetAttribLocation(program, "normal");
+	const GLint anormal = 1;
 	glVertexAttribPointer(anormal, 4, GL_FLOAT, false, 0, nullptr);
 	glEnableVertexAttribArray(anormal);
 
 	// assign uv attribute to uv_buffer
 	glBindBuffer(GL_ARRAY_BUFFER, uv_buffer);
-	const GLint auv = glGetAttribLocation(program, "uv_vert");
+	const GLint auv = 2;
 	glVertexAttribPointer(auv, 2, GL_FLOAT, false, 0, nullptr);
 	glEnableVertexAttribArray(auv);
 

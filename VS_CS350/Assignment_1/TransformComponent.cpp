@@ -4,6 +4,8 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 
+
+#include "GameObject.h"
 #include "imgui.h"
 #include "VertexGlobalSystem.h"
 

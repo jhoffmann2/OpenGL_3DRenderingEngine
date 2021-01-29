@@ -62,7 +62,7 @@ VertexNormalRender& VertexNormalRender::Instance()
 	return renderer;
 }
 
-int VertexNormalRender::loadMesh(const Mesh& m)
+int VertexNormalRender::loadMesh(const Mesh& m, float line_length)
 {
 	MeshData data;
 
@@ -76,7 +76,7 @@ int VertexNormalRender::loadMesh(const Mesh& m)
 	for(size_t i = 0; i < m.vertices.size() * 2; i += 2)
 	{
 		vertices[i] = m.vertices[i/2];
-		vertices[i + 1] = m.vertices[i / 2] + (normalize(m.vertex_normals[i / 2]) * 0.2f);
+		vertices[i + 1] = m.vertices[i / 2] + (normalize(m.vertex_normals[i / 2]) * line_length);
 	}
 
 	std::vector<unsigned> lines(m.vertices.size() * 2);

@@ -16,18 +16,7 @@ End Header --------------------------------------------------------*/
 #include ../Include/uv.glsl
 #include ../Include/reflection.glsl
 #include ../Include/refraction.glsl
-
-in vec4 position;
-in vec4 normal;
-in vec2 uv_vert;
-
-layout (std140, binding = 2) uniform VertexGlobals
-{
-	mat4 camToNDC;
-	mat4 worldToCam;
-	mat4 modelToWorld;
-	mat4 modelNToWorldN;
-};
+#include ../Include/MeshProperties.glsl
 
 uniform sampler2D diffuseTexture;
 uniform sampler2D specularTexture;

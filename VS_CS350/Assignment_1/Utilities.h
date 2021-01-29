@@ -92,22 +92,23 @@ template<typename Container>
 class ElementRange
 {
 public:
+  using iterator = decltype(std::declval<Container>().begin());
   ElementRange() = default;
 
   ElementRange(Container& container, size_t beginIdx, size_t endIdx) :
     begin_(container.begin() + beginIdx), end_(container.begin() + endIdx)
   {}
 
-  ElementRange(typename Container::iterator begin, typename Container::iterator end) :
+  ElementRange(iterator begin, iterator end) :
     begin_(begin), end_(end)
   {}
 
-  typename Container::iterator begin() const
+  iterator begin() const
   {
     return begin_;
   }
 
-  typename Container::iterator end() const
+  iterator end() const
   {
     return end_;
   }
@@ -117,14 +118,14 @@ public:
     return end_ - begin_;
   }
 
-  typename Container::iterator::value_type &operator[](size_t index)
+  typename iterator::value_type &operator[](size_t index) const
   {
     return begin_[index];
   }
 
 private:
-  typename Container::iterator begin_;
-  typename Container::iterator end_;
+  iterator begin_;
+  iterator end_;
 };
 
 template<typename Container>

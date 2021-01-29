@@ -51,6 +51,8 @@ private:
   glm::bounds4 ActivePowerPlantBounds();
   void UpdateActivePowerPlants();
   [[nodiscard]] const std::vector<GameObject*>& PowerPlantGroupObjects() const;
+  [[nodiscard]] const std::vector<GameObject*>& LightObjects() const;
+  [[nodiscard]] ElementRange<const std::vector<GameObject*>> ActiveLights() const;
 
   
   GLfloat angleOfRotation;
@@ -63,13 +65,20 @@ private:
   float y_polar = 20;
   float radius = 10.f;
 
+  enum BaseObjects
+  {
+    POWER_PLANT = 0,
+    LIGHTS = 1,
+    BaseObjectsCount
+  };
+
+  int activeLightCount_ = 3;
 
   static constexpr size_t powerPlantGroupCount = 21;
   std::vector<glm::bounds4> powerPlantBounds_;
   glm::mat4 powerPlantTransformation_;
 
   std::vector<GameObject*> objects_;
-  ElementRange<std::vector<GameObject*>> lights_;
 };
 
 

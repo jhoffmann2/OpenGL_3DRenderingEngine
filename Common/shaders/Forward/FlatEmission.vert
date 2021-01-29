@@ -11,18 +11,7 @@ Author: Jordan Hoffmann, jordan.h
 Creation date: 11/03/2020
 End Header --------------------------------------------------------*/ 
 #version 460
-
-in vec4 position;
-in vec4 normal;
-in vec2 uv_vert;
-
-layout (std140, binding = 2) uniform VertexGlobals
-{
-	mat4 camToNDC;
-	mat4 worldToCam;
-	mat4 modelToWorld;
-	mat4 modelNToWorldN;
-};
+#include ../Include/MeshProperties.glsl
 
 void main() {
 	gl_Position = camToNDC * worldToCam * modelToWorld * position;

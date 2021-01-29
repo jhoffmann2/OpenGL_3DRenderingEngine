@@ -64,7 +64,7 @@ FaceNormalRender& FaceNormalRender::Instance()
 	return renderer;
 }
 
-int FaceNormalRender::loadMesh(const Mesh& m)
+int FaceNormalRender::loadMesh(const Mesh& m, float line_length)
 {
 	MeshData data;
 
@@ -79,7 +79,7 @@ int FaceNormalRender::loadMesh(const Mesh& m)
 	{
 		const auto& face = m.faces[i/2];
 		vertices[i] = (m.vertices[face[0]] + m.vertices[face[1]] + m.vertices[face[2]]) / 3.f;
-		vertices[i + 1] = vertices[i] + (normalize(m.face_normals[i / 2]) * 0.2f);
+		vertices[i + 1] = vertices[i] + (normalize(m.face_normals[i / 2]) * line_length);
 	}
 
 	std::vector<unsigned> lines(m.faces.size() * 2);

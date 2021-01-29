@@ -18,6 +18,10 @@ namespace glm
     [[nodiscard]] vec<vcl, vct> center() const;
     [[nodiscard]] vec<vcl, vct> half_size() const;
     [[nodiscard]] vec<vcl, vct> size() const;
+    [[nodiscard]] bool valid() const;
+
+    [[nodiscard]] bool operator==(const bounds& other);
+    [[nodiscard]] bool operator!=(const bounds& other);
 
     vec<vcl, vct> min = vec<vcl, vct>(std::numeric_limits<vct>::max());
     vec<vcl, vct> max = vec<vcl, vct>(std::numeric_limits<vct>::min());
@@ -49,19 +53,40 @@ namespace glm
   template <length_t vcl, typename vct>
   vec<vcl, vct> bounds<vcl, vct>::center() const
   {
-    return half_size() + min;
+    return valid() ? half_size() + min : vec<vcl, vct>(0);
   }
 
   template <length_t vcl, typename vct>
   vec<vcl, vct> bounds<vcl, vct>::half_size() const
   {
-    return 0.5f * size();
+    return valid() ? 0.5f * size() : vec<vcl, vct>(0);
   }
 
   template <length_t vcl, typename vct>
   vec<vcl, vct> bounds<vcl, vct>::size() const
   {
-    return max - min;
+    return valid() ? max - min : vec<vcl, vct>(0);
+  }
+
+  template <length_t vcl, typename vct>
+  bool bounds<vcl, vct>::valid() const
+  {
+    for (size_t i = 0; i < vcl; ++i)
+      if (max[i] < min[i])
+        return false;
+    return true;
+  }
+
+  template <length_t vcl, typename vct>
+  bool bounds<vcl, vct>::operator==(const bounds& other)
+  {
+    return min == other.min && max == other.max;
+  }
+
+  template <length_t vcl, typename vct>
+  bool bounds<vcl, vct>::operator!=(const bounds& other)
+  {
+    return min != other.min || max != other.max;
   }
 
   template <length_t vcl, typename vct>

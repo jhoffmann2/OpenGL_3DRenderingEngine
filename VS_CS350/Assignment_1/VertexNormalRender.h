@@ -25,7 +25,7 @@ class VertexNormalRender {
 public:
   static VertexNormalRender& Instance();
   static void clear(const glm::vec4 &color);
-  static int loadMesh(const Mesh &m);
+  static int loadMesh(const Mesh &m, float line_length = 0.2f);
   static void unloadMesh(int mi);
   static void setModel(const glm::mat4 &M);
   static void setCamera(const Camera &cam);

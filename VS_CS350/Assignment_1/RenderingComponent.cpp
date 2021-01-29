@@ -6,6 +6,7 @@
 #include "SolidRender.h"
 #include "VertexNormalRender.h"
 #include "FaceNormalRender.h"
+#include "GameObject.h"
 #include "imgui.h"
 
 RenderingComponent::~RenderingComponent() = default;

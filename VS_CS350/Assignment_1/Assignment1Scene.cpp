@@ -18,6 +18,7 @@ End Header --------------------------------------------------------*/
 #include <filesystem>
 #include <fstream>
 #include <glm/gtx/color_space.hpp>
+#include <glm/gtx/easing.hpp>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -38,7 +39,8 @@ End Header --------------------------------------------------------*/
 #include "FaceNormalRender.h"
 #include "GBuffer.h"
 #include "MaterialComponent.h"
-#include "ParentComponent.h"
+#include "ChildListComponent.h"
+#include "imgui_internal.h"
 #include "VertexNormalRender.h"
 
 
@@ -73,7 +75,16 @@ Assignment1Scene::Assignment1Scene(int windowWidth, int windowHeight) :
   angleOfRotation(0.0f),
   windowWidth_(windowWidth),
   windowHeight_(windowHeight),
-  cam(cam_pos, -cam_pos, EY, 60.f, static_cast<float>(windowWidth) / windowHeight, 0.01f, 100)
+  cam(
+    cam_pos, 
+    -cam_pos, 
+    EY, 
+    60.f, 
+    static_cast<float>(windowWidth) / 
+          static_cast<float>(windowHeight), 
+    0.01f, 
+    100
+  )
 {
   initMembers();
 }
@@ -101,9 +112,12 @@ glm::bounds4 Assignment1Scene::ActivePowerPlantBounds()
 
 void Assignment1Scene::UpdateActivePowerPlants()
 {
-  for (auto obj : PowerPlantGroupObjects())
+  constexpr size_t lerp_time = 60; // lerp over 120 frames
+  static size_t cur_lerp = lerp_time + 1;
+
+  for (auto* obj : PowerPlantGroupObjects())
   {
-    if(obj->IsActive() && !obj->HasComponent<ParentComponent>())
+    if(obj->IsActive() && !obj->HasComponent<ChildListComponent>())
     {
       std::vector<Mesh> meshes;
       std::vector<std::string> names;
@@ -119,16 +133,57 @@ void Assignment1Scene::UpdateActivePowerPlants()
       MeshTransform(meshes, powerPlantTransformation_);
 
       obj->AddComponent(
-        new ParentComponent(meshes, names)
+        new ChildListComponent(meshes, names)
       );
+      cur_lerp = lerp_time + 1;
       break;
     }
   }
+  
+  static glm::bounds4 prev_bounds;
+  glm::bounds4 cur_bounds = ActivePowerPlantBounds();
+  if(cur_bounds != prev_bounds)
+  {
+    cur_lerp = lerp_time + 1;
+    prev_bounds = cur_bounds;
+  }
+
+  // update the pivot so powerplant is centered;
+  static glm::vec3 destination_pivot;
+  static glm::vec3 start_pivot;
+  auto* transform = objects_[0]->GetComponent<TransformComponent>();
+  if(cur_lerp > lerp_time)
+  {
+    cur_lerp = 1;
+
+    glm::bounds4 bounds = ActivePowerPlantBounds();
+    glm::vec4 center = ActivePowerPlantBounds().center();
+    center.y = bounds.min.y + 0.25f * bounds.size().y; // favor looking toward the ground
+
+    glm::vec3 pivot = -(powerPlantTransformation_ * center);
+    destination_pivot = pivot * transform->GetScale();
+    start_pivot = transform->GetPivot();
+  }
+
+  float t = glm::sineEaseInOut(static_cast<float>(cur_lerp) / lerp_time);
+  transform->SetPivot(mix(start_pivot, destination_pivot, t));
+  ++cur_lerp;
 }
 
 const std::vector<GameObject*>& Assignment1Scene::PowerPlantGroupObjects() const
 {
-  return objects_[0]->GetComponent<ParentComponent>()->Children();
+  return objects_[POWER_PLANT]->GetComponent<ChildListComponent>()->Children();
+}
+
+const std::vector<GameObject*>& Assignment1Scene::LightObjects() const
+{
+  return objects_[LIGHTS]->GetComponent<ChildListComponent>()->Children();
+}
+
+ElementRange<const std::vector<GameObject*>> Assignment1Scene::ActiveLights() const
+{
+  const auto& allLights = LightObjects();
+  return { allLights.begin(), allLights.begin() + activeLightCount_ };
 }
 
 //////////////////////////////////////////////////////
@@ -216,7 +271,7 @@ int Assignment1Scene::Init()
   material.SetSpecularColor(glm::vec3{ 0.3176f });
   material.SetSpecularExponent(20);
   objects_.back()->AddComponent(new MaterialComponent(material));
-  auto* pc = new ParentComponent();
+  auto* pc = new ChildListComponent();
 
   powerPlantTransformation_ = CenterMeshTransform(powerPlantBounds_.back());
   for (size_t i = 1; i <= powerPlantGroupCount; ++i)
@@ -230,7 +285,7 @@ int Assignment1Scene::Init()
 
   // preload section 10
   {
-    auto* obj = PowerPlantGroupObjects()[10];
+    auto* obj = PowerPlantGroupObjects()[9];
     obj->SetActive(true);
     std::vector<Mesh> meshes;
     std::vector<std::string> names;
@@ -246,50 +301,58 @@ int Assignment1Scene::Init()
     MeshTransform(meshes, powerPlantTransformation_);
 
     obj->AddComponent(
-      new ParentComponent(meshes, names)
+      new ChildListComponent(meshes, names)
     );
   }
 
-  for(size_t i = 0; i < LightSystem::lightCount; ++i)
   {
-    std::stringstream name;
-    name << "Light #" << i;
+    objects_.emplace_back(new GameObject("Lights"));
+    auto* pc = new ChildListComponent();
+    objects_.back()->AddComponent(pc);
+    
 
-    objects_.emplace_back(new GameObject(name.str()));
-    objects_.back()->AddComponent(
-      new TransformComponent(
-        {0,0,0},
-        {2,0,0},
-        {EY,0},
-        .02f
-      )
-    );
+    for(size_t i = 0; i < LightSystem::lightCount; ++i)
+    {
+      std::stringstream name;
+      name << "Light #" << i;
 
-    auto* light = new LightComponent(i);
-    const float hue = glm::linearRand(24.f,40.f);
-    light->SetDiffuseColor(rgbColor(glm::vec3{hue, .25f, 1.f}));
-    light->SetSpecularColor(rgbColor(glm::vec3{ hue, .1f, 1.f }));
-    light->SetAmbientColor(rgbColor(glm::vec3{ hue, .25f, 0.2f }));
-    light->SetType(Light::POINT);
-    light->SetActive(true);
-    objects_.back()->AddComponent(light);
+      auto *lightObj = new GameObject(name.str());
+      lightObj->AddComponent(
+        new TransformComponent(
+          {0,0,0},
+          {2,0,0},
+          {EY,0},
+          .02f
+        )
+      );
 
-    auto* rendering = new RenderingComponent(sphere_mesh, SolidRender::FLAT_EMISSION);
-    objects_.back()->AddComponent(rendering);
+      auto* light = new LightComponent(i);
+      const float hue = glm::linearRand(24.f,40.f);
+      light->SetDiffuseColor(rgbColor(glm::vec3{hue, .25f, 1.f}));
+      light->SetSpecularColor(rgbColor(glm::vec3{ hue, .1f, 1.f }));
+      light->SetAmbientColor(rgbColor(glm::vec3{ hue, .25f, 0.2f }));
+      light->SetType(Light::POINT);
+      light->SetActive(true);
+      lightObj->AddComponent(light);
 
-    auto* material = new MaterialComponent(i + 1);
-    material->SetEmissiveColor(rgbColor(glm::vec3{ hue, 0.0f, 1.f }));
-    material->SetAmbientColor(glm::vec3{ 0.f });
-    material->SetDiffuseColor(glm::vec3{ 0.f });
-    material->SetSpecularColor(glm::vec3{ 0.f });
-    material->SetSpecularExponent(20);
-    objects_.back()->AddComponent(material);
+      auto* rendering = new RenderingComponent(sphere_mesh, SolidRender::FLAT_EMISSION);
+      lightObj->AddComponent(rendering);
 
-    objects_.back()->SetActive(false);
+      auto* material = new MaterialComponent(i + 1);
+      material->SetEmissiveColor(rgbColor(glm::vec3{ hue, 0.0f, 1.f }));
+      material->SetAmbientColor(glm::vec3{ 0.f });
+      material->SetDiffuseColor(glm::vec3{ 0.f });
+      material->SetSpecularColor(glm::vec3{ 0.f });
+      material->SetSpecularExponent(20);
+      lightObj->AddComponent(material);
+
+      lightObj->SetActive(false);
+
+      pc->AddChild(lightObj);
+    }
   }
 
-  lights_ = Range(objects_, 1, 4);
-  for(auto *light : lights_)
+  for(auto *light : ActiveLights())
   {
     light->SetActive(true);
   }
@@ -311,16 +374,8 @@ int Assignment1Scene::Init()
 //////////////////////////////////////////////////////
 int Assignment1Scene::Render()
 {
+
   UpdateActivePowerPlants();
-
-  if(ImGui::Begin("debug"))
-  {
-    glm::vec3 pivot = -(powerPlantTransformation_ * ActivePowerPlantBounds().center());
-    auto* transform = objects_[0]->GetComponent<TransformComponent>();
-    transform->SetPivot(pivot * transform->GetScale());
-    ImGui::End();
-  }
-
 
   if(ImGui::Begin("Camera"))
   {
@@ -363,34 +418,21 @@ int Assignment1Scene::Render()
 
     ImGui::Separator();
 
-    int lightCount = lights_.size();
-    if(ImGui::DragInt("LightCount", &lightCount, 0.1f, 0, LightSystem::lightCount))
+    const auto& lightObjects = LightObjects();
+    int prevLightCount = activeLightCount_;
+    if(ImGui::DragInt("LightCount", &activeLightCount_, 0.1f, 0, LightSystem::lightCount))
     {
-      lightCount = glm::clamp(lightCount, 0, static_cast<int>(LightSystem::lightCount));
-      if(static_cast<size_t>(lightCount) < lights_.size()) // light count reduced
+      for (int i = std::min(activeLightCount_, prevLightCount);
+               i < std::max(activeLightCount_, prevLightCount); ++i)
       {
-        for(size_t i = lightCount; i < lights_.size(); ++i)
-        {
-          lights_[i]->Deactivate();
-        }
+        lightObjects[i]->SetActive(i < activeLightCount_);
       }
-      else // light count raised
-      {
-        float distance = lights_[0]->GetComponent<TransformComponent>()->GetPivot().x;
-        for (size_t i = lights_.size(); i < static_cast<size_t>(lightCount); ++i)
-        {
-          lights_[i]->Activate();
-          auto* lightTransform = lights_[i]->GetComponent<TransformComponent>();
-          lightTransform->SetPivot({ distance, 0, 0 });
-        }
-      }
-      lights_ = Range(objects_, 1, lightCount + 1);
     }
 
-    float distance = lights_[0]->GetComponent<TransformComponent>()->GetPivot().x;
+    float distance = lightObjects[0]->GetComponent<TransformComponent>()->GetPivot().x;
     if (ImGui::SliderFloat("Global Light Distance", &distance, 1.5, 10))
     {
-      for (GameObject* lightObject : lights_)
+      for (GameObject* lightObject : lightObjects)
       {
         auto* lightTransform = lightObject->GetComponent<TransformComponent>();
         lightTransform->SetPivot({ distance, 0, 0 });
@@ -413,67 +455,18 @@ int Assignment1Scene::Render()
   {
     if (ImGui::BeginMenu("Power Plant"))
     {
+      ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
       for(auto *obj : PowerPlantGroupObjects())
       {
         bool checked = obj->IsActive();
+        bool loaded = obj->HasComponent<ChildListComponent>();
+        const ImGuiStyle& style = ImGui::GetStyle();
+        if(!loaded) ImGui::PushStyleColor(ImGuiCol_Text, style.Colors[ImGuiCol_TextDisabled]);
         ImGui::MenuItem(obj->Name().c_str(), nullptr, &checked);
+        if (!loaded) ImGui::PopStyleColor();
         obj->SetActive(checked);
       }
-      ImGui::EndMenu();
-    }
-    if (ImGui::BeginMenu("Load Scenario"))
-    {
-      if (ImGui::MenuItem("Scenario 01"))
-      {
-        const float hue = glm::linearRand(0.f, 360.f);
-        auto lightType = static_cast<Light::LightType>(glm::linearRand(0, 2));
-        for(GameObject *light : lights_)
-        {
-          auto* lighting = light->GetComponent<LightComponent>();
-          auto* material = light->GetComponent<MaterialComponent>();
-          lighting->SetDiffuseColor(rgbColor(glm::vec3{ hue, 1.f, 1.f }));
-          lighting->SetSpecularColor(rgbColor(glm::vec3{ hue, 0.5f, 1.f }));
-          lighting->SetAmbientColor(rgbColor(glm::vec3{ hue, 0.2f, 0.2f }));
-          lighting->SetType(lightType);
-          lighting->SetActive(true);
-          material->SetEmissiveColor(rgbColor(glm::vec3{ hue, 0.5f, 1.f }));
-        }
-      }
-      if (ImGui::MenuItem("Scenario 02"))
-      {
-        auto lightType = static_cast<Light::LightType>(glm::linearRand(0, 2));
-        for (GameObject* light : lights_)
-        {
-          const float hue = glm::linearRand(0.f, 360.f);
-
-          auto* lighting = light->GetComponent<LightComponent>();
-          auto* material = light->GetComponent<MaterialComponent>();
-          lighting->SetDiffuseColor(rgbColor(glm::vec3{ hue, 1.f, 1.f }));
-          lighting->SetSpecularColor(rgbColor(glm::vec3{ hue, 0.5f, 1.f }));
-          lighting->SetAmbientColor(rgbColor(glm::vec3{ hue, 0.2f, 0.2f }));
-          lighting->SetType(lightType);
-          lighting->SetActive(true);
-          material->SetEmissiveColor(rgbColor(glm::vec3{ hue, 0.5f, 1.f }));
-        }
-      }
-      if (ImGui::MenuItem("Scenario 03"))
-      {
-
-        for (GameObject* light : lights_)
-        {
-          const float hue = glm::linearRand(0.f, 360.f);
-          auto lightType = static_cast<Light::LightType>(glm::linearRand(0, 2));
-
-          auto* lighting = light->GetComponent<LightComponent>();
-          auto* material = light->GetComponent<MaterialComponent>();
-          lighting->SetDiffuseColor(rgbColor(glm::vec3{ hue, 1.f, 1.f }));
-          lighting->SetSpecularColor(rgbColor(glm::vec3{ hue, 0.5f, 1.f }));
-          lighting->SetAmbientColor(rgbColor(glm::vec3{ hue, 0.2f, 0.2f }));
-          lighting->SetType(lightType);
-          lighting->SetActive(true);
-          material->SetEmissiveColor(rgbColor(glm::vec3{ hue, 0.5f, 1.f }));
-        }
-      }
+      ImGui::PopItemFlag();
       ImGui::EndMenu();
     }
     ImGui::EndMainMenuBar();
@@ -488,16 +481,12 @@ int Assignment1Scene::Render()
 
   MaterialSystem::Update();
 
-  /*{
-    auto* transform = objects_[0]->GetComponent<TransformComponent>();
-    transform->SetRotationAngle(angleOfRotation);
-  }*/
-
   int i = 0;
-  for(auto* light : lights_)
+  auto activeLights = ActiveLights();
+  for(auto* light : activeLights)
   {
     auto* transform = light->GetComponent<TransformComponent>();
-    transform->SetRotationAngle(-angleOfRotation + (360.f / lights_.size() * static_cast<float>(i)));
+    transform->SetRotationAngle(-angleOfRotation + (360.f / activeLights.size() * static_cast<float>(i)));
     ++i;
   }
 

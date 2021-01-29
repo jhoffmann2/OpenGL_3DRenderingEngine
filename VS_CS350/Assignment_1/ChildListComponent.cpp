@@ -1,4 +1,4 @@
-﻿#include "ParentComponent.h"
+﻿#include "ChildListComponent.h"
 #include "GameObject.h"
 #include <fstream>
 
@@ -11,9 +11,9 @@
 #include "TransformComponent.h"
 #include "VertexNormalRender.h"
 
-ParentComponent::ParentComponent() = default;
+ChildListComponent::ChildListComponent() = default;
 
-ParentComponent::ParentComponent(const std::vector<Mesh>& meshes, const std::vector<std::string>& names)
+ChildListComponent::ChildListComponent(const std::vector<Mesh>& meshes, const std::vector<std::string>& names)
 {
   for (size_t i = 0; i < meshes.size(); ++i)
   {
@@ -22,8 +22,8 @@ ParentComponent::ParentComponent(const std::vector<Mesh>& meshes, const std::vec
     std::cout << "generating child: " << name << std::endl;
 
     const int mesh_id = SolidRender::loadMesh(mesh, SolidRender::DEFFERED);
-    VertexNormalRender::loadMesh(mesh);
-    FaceNormalRender::loadMesh(mesh);
+    VertexNormalRender::loadMesh(mesh, 0.01f);
+    FaceNormalRender::loadMesh(mesh, 0.01f);
     children_.emplace_back(new GameObject(name));
     auto* rendering = new RenderingComponent(mesh_id);
     children_.back()->AddComponent(rendering);
@@ -31,38 +31,31 @@ ParentComponent::ParentComponent(const std::vector<Mesh>& meshes, const std::vec
   std::cout << "finished importing children meshes" << std::endl;
 }
 
-ParentComponent::ParentComponent(const std::vector<GameObject*> & children) :
+ChildListComponent::ChildListComponent(const std::vector<GameObject*> & children) :
   children_(children)
 {
 }
 
-void ParentComponent::AddChild(GameObject* object)
+void ChildListComponent::AddChild(GameObject* object)
 {
   children_.emplace_back(object);
 }
 
-const std::vector<GameObject*>& ParentComponent::Children() const
+const std::vector<GameObject*>& ChildListComponent::Children() const
 {
   return children_;
 }
 
-void ParentComponent::PreRender()
-{
-  for (GameObject *child : children_)
-  {
-    child->PreRender();
-  }
-}
-
-void ParentComponent::Render()
+void ChildListComponent::Render()
 {
   for (GameObject* child : children_)
   {
+    child->PreRender();
     child->Render();
   }
 }
 
-void ParentComponent::Init()
+void ChildListComponent::Init()
 {
   for (GameObject* child : children_)
   {
@@ -70,15 +63,16 @@ void ParentComponent::Init()
   }
 }
 
-void ParentComponent::DebugRender()
+void ChildListComponent::DebugRender()
 {
   for (GameObject* child : children_)
   {
+    child->PreRender();
     child->DebugRender();
   }
 }
 
-void ParentComponent::Kill()
+void ChildListComponent::Kill()
 {
   for (GameObject* child : children_)
   {
@@ -86,7 +80,7 @@ void ParentComponent::Kill()
   }
 }
 
-void ParentComponent::OnObjectDeactivated()
+void ChildListComponent::OnObjectDeactivated()
 {
   for (GameObject* child : children_)
   {
@@ -94,7 +88,7 @@ void ParentComponent::OnObjectDeactivated()
   }
 }
 
-void ParentComponent::OnObjectActivated()
+void ChildListComponent::OnObjectActivated()
 {
   for (GameObject* child : children_)
   {
@@ -102,7 +96,7 @@ void ParentComponent::OnObjectActivated()
   }
 }
 
-void ParentComponent::ImGuiEditor()
+void ChildListComponent::ImGuiEditor()
 {
   for (GameObject* child : children_)
   {
@@ -110,7 +104,7 @@ void ParentComponent::ImGuiEditor()
   }
 }
 
-std::string ParentComponent::Name()
+std::string ChildListComponent::Name()
 {
   return "Children";
 }
