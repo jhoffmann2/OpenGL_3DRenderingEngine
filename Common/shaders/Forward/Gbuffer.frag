@@ -36,6 +36,6 @@ void main(void)
 	DiffuseOut.a = texture(specularTexture, uv).r;
 
 	WorldPosOut.xyz = world_position.xyz;
-	WorldPosOut.w = float(curMaterial);
+	WorldPosOut.w = float(curMaterial) / 10;
 	NormalOut.xyz = normalize(world_normal.xyz);
 }

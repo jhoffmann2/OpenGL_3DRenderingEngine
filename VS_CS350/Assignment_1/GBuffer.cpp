@@ -78,6 +78,8 @@ void GBuffer::Bind()
 
   glBindFramebuffer(GL_FRAMEBUFFER, gBufferFBO);
 
+
+
 }
 
 void GBuffer::UnBind()
@@ -91,18 +93,28 @@ void GBuffer::UnBind()
 
   SolidRender::SetShader(unbindShader);
 
-  // copy gbuffer depth info over to default FBO
-  glBindFramebuffer(GL_READ_FRAMEBUFFER, gBufferFBO);
-  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-  glBlitFramebuffer(
-    0, 0, width, height,
-    0, 0, width, height,
-    GL_DEPTH_BUFFER_BIT,
-    GL_NEAREST
-  );
+  if(Instance().copyDepth_)
+  {
+    // copy gbuffer depth info over to default FBO
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, gBufferFBO);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBlitFramebuffer(
+      0, 0, width, height,
+      0, 0, width, height,
+      GL_DEPTH_BUFFER_BIT,
+      GL_NEAREST
+    );
+  }
 
   // bind default FBO to screen
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+  for (size_t i = 0; i < RenderTargetCount; ++i)
+  {
+    GLint swizzle[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
+    glTextureParameteriv(instance.textures[i], GL_TEXTURE_SWIZZLE_RGBA, swizzle);
+  }
 }
 
 void GBuffer::RenderFSQ()
@@ -135,6 +147,71 @@ void GBuffer::RenderFSQ()
 
   // turn depth buffer back on
   glDepthMask(GL_TRUE);
+}
+
+void GBuffer::ImguiEditor()
+{
+  if (ImGui::Begin("Deferred Shading"))
+  {
+    ImGui::Checkbox("copy depth buffer", &Instance().copyDepth_);
+
+    ImGui::Text("Normal Target");
+    ImGuiImage(TARGET_NORMAL);
+
+    ImGui::NewLine();
+    static int worldormat = 0;
+    ImGui::Text("WorldPosition and Material");
+    ImGui::Combo(
+      "##WorldPosition and Material",
+      reinterpret_cast<int*>(&worldormat),
+      "WORLD_POSITION (RGB channels)\0"
+      "MATERIAL (Alpha channel)\0"
+    );
+    ImGuiImage(TARGET_WORLD_POS, worldormat);
+
+    ImGui::NewLine();
+    static int difforspec = 0;
+    ImGui::Text("Diffuse and Specular Textures");
+    ImGui::Combo(
+      "##Diffuse and Specular Textures",
+      reinterpret_cast<int*>(&difforspec),
+      "DIFFUSE (RGB channels)\0"
+      "SPECULAR (Alpha channel)\0"
+    );
+    ImGuiImage(TARGET_DIFFUSE, difforspec);
+    ImGui::TextWrapped("^^ Note that im not using any textures right now so all white is correct output");
+  }
+  ImGui::End();
+}
+
+void GBuffer::ImGuiImage(RenderTarget target, int swizzle_id)
+{
+  auto& instance = Instance();
+  const float width = ImGui::GetWindowContentRegionWidth();
+  const float aratio = static_cast<float>(instance.height) / static_cast<float>(instance.width);
+  const GLuint texture = (target != DEPTH_TEXTURE)? instance.textures[target] : instance.depthTexture;
+
+  switch(swizzle_id)
+  {
+  case 0:
+    glTextureParameteri(texture, GL_TEXTURE_SWIZZLE_A, GL_ONE);
+    break;
+  case 1:
+    {
+    GLint swizzle[] = { GL_ALPHA, GL_ALPHA, GL_ALPHA, GL_ONE };
+    glTextureParameteriv(texture, GL_TEXTURE_SWIZZLE_RGBA, swizzle);
+    break;
+    }
+  default:
+    assert("Illegal swizzle ID");
+  }
+
+  ImGui::Image(
+    (void*)(intptr_t)texture,
+    { width, width * aratio },
+    {0,1},
+    {1,0}
+  );
 }
 
 GBuffer& GBuffer::Instance()

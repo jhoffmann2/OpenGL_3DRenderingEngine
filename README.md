@@ -38,14 +38,17 @@ Simply launch application and use the imgui.
   - see child objects and edit their components
   - note: if parent has a component that the child doesn't have, the child will inherit those properties
 ### camera window
-- rotate camera
-- change camera's distance from origin
+- rotate camera (note you can also modify these values with WASD)
+- change camera's distance from origin (note you can also modify this value with QE)
 ### world Lighting Window
 - modify world ambient
 - modify fog parameters
 - modify light attenuation
 - modify light count
 - modify light orbit distance
+### Deferred Shading window
+- toggle copying depth buffer
+- view render targets
 ### Menu bar:
 - Power Plant
   - Toggle sections of the powerplant (warning slow loading meshes first time you load a section)

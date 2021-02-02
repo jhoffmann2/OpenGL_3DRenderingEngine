@@ -7,23 +7,27 @@
 class GBuffer
 {
 public:
-  static void Init(size_t width, size_t height);
-  static void Bind();
-  static void UnBind();
-  static void RenderFSQ();
-
-  GBuffer(GBuffer &) = delete;
-  GBuffer& operator=(GBuffer&) = delete;
-
-private:
   enum RenderTarget
   {
     TARGET_DIFFUSE,
     TARGET_WORLD_POS,
     TARGET_NORMAL,
 
-    RenderTargetCount
+    RenderTargetCount,
+    DEPTH_TEXTURE
   };
+
+  static void Init(size_t width, size_t height);
+  static void Bind();
+  static void UnBind();
+  static void RenderFSQ();
+  static void ImguiEditor();
+
+  GBuffer(GBuffer &) = delete;
+  GBuffer& operator=(GBuffer&) = delete;
+
+private:
+  static void ImGuiImage(RenderTarget target, int swizzle_id = 0);
 
   static GBuffer &Instance();
 
@@ -41,6 +45,7 @@ private:
   std::array<GLenum, RenderTargetCount> drawBuffers;
 
   size_t width, height;
+  bool copyDepth_ = true;
 
 
   struct FSQ_DATA

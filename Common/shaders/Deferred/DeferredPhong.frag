@@ -34,7 +34,7 @@ void main(void)
 	
 	vec4 N = texture(normalTex, uv_frag);
 
-	uint material = uint(P.w);
+	uint material = uint(P.w * 10);
 	P.w = 1;
 
 	vec4 kd = texture(diffuseTex, uv_frag);

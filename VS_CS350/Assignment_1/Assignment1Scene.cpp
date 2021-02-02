@@ -258,8 +258,8 @@ int Assignment1Scene::Init()
   objects_.back()->AddComponent(
     new TransformComponent(
       { 0,0,0 },
-      { 7.911,6.078,0.856 },
-      { EY,-203 },
+      { 0,0,0 },
+      { EY,0 },
       40.f
     )
   );
@@ -309,7 +309,14 @@ int Assignment1Scene::Init()
     objects_.emplace_back(new GameObject("Lights"));
     auto* pc = new ChildListComponent();
     objects_.back()->AddComponent(pc);
-    
+
+      const float hue = glm::linearRand(24.f,40.f);
+    MaterialHandle light_material(1);
+    light_material.SetEmissiveColor(rgbColor(glm::vec3{ hue, 0.0f, 1.f }));
+    light_material.SetAmbientColor(glm::vec3{ 0 });
+    light_material.SetDiffuseColor(glm::vec3{ 0 });
+    light_material.SetSpecularColor(glm::vec3{ 0 });
+    light_material.SetSpecularExponent(20);
 
     for(size_t i = 0; i < LightSystem::lightCount; ++i)
     {
@@ -322,12 +329,11 @@ int Assignment1Scene::Init()
           {0,0,0},
           {2,0,0},
           {EY,0},
-          .02f
+          .06f
         )
       );
 
       auto* light = new LightComponent(i);
-      const float hue = glm::linearRand(24.f,40.f);
       light->SetDiffuseColor(rgbColor(glm::vec3{hue, .25f, 1.f}));
       light->SetSpecularColor(rgbColor(glm::vec3{ hue, .1f, 1.f }));
       light->SetAmbientColor(rgbColor(glm::vec3{ hue, .25f, 0.2f }));
@@ -338,13 +344,7 @@ int Assignment1Scene::Init()
       auto* rendering = new RenderingComponent(sphere_mesh, SolidRender::FLAT_EMISSION);
       lightObj->AddComponent(rendering);
 
-      auto* material = new MaterialComponent(i + 1);
-      material->SetEmissiveColor(rgbColor(glm::vec3{ hue, 0.0f, 1.f }));
-      material->SetAmbientColor(glm::vec3{ 0.f });
-      material->SetDiffuseColor(glm::vec3{ 0.f });
-      material->SetSpecularColor(glm::vec3{ 0.f });
-      material->SetSpecularExponent(20);
-      lightObj->AddComponent(material);
+      lightObj->AddComponent(new MaterialComponent(light_material));
 
       lightObj->SetActive(false);
 
@@ -506,6 +506,8 @@ int Assignment1Scene::Render()
     o->PreRender();
     o->DebugRender();
   }
+
+  GBuffer::ImguiEditor();
 
   return 0;
 }
