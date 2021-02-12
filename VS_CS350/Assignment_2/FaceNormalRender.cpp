@@ -20,6 +20,7 @@ End Header --------------------------------------------------------*/
 #include <stdexcept>
 
 #include "Camera.h"
+#include "GLHelper.h"
 #include "shader.hpp"
 
 FaceNormalRender::FaceNormalRender()
@@ -83,26 +84,17 @@ int FaceNormalRender::loadMesh(const Mesh& m, float line_length)
 	std::vector<unsigned> lines(m.faces.size() * 2);
 	std::iota(lines.begin(), lines.end(), 0);
 
-	glGenBuffers(1, &vertex_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(),
-		vertices.data(), GL_STATIC_DRAW);
-
-	glGenBuffers(1, &line_buffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, line_buffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-		sizeof(unsigned) * lines.size(),
-		lines.data(), GL_STATIC_DRAW);
+	vertex_buffer = GLHelper::GenBuffer(vertices);
+	line_buffer = GLHelper::GenBuffer(lines, GL_ELEMENT_ARRAY_BUFFER);
 
 	// create vertex array object
 	glGenVertexArrays(1, &vao);
 	//   start state recording
 	glBindVertexArray(vao);
+
 	// assign postion attribute to vertex_buffer
-	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-	const GLint aposition = glGetAttribLocation(Instance().program, "position");
-	glVertexAttribPointer(aposition, 4, GL_FLOAT, false, 0, nullptr);
-	glEnableVertexAttribArray(aposition);
+	GLHelper::BindVertexAttribute(vertex_buffer, 0, vertices);
+
 	// ready the line buffer for drawing
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, line_buffer);
 	//   stop state recording

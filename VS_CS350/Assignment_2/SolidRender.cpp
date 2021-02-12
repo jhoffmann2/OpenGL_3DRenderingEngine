@@ -14,6 +14,8 @@ End Header --------------------------------------------------------*/
 #include "SolidRender.h"
 #include <streambuf>
 
+
+#include "GLHelper.h"
 #include "shader.hpp"
 #include "LightSystem.h"
 
@@ -54,22 +56,6 @@ SolidRender& SolidRender::Instance()
 	return renderer;
 }
 
-template<typename T>
-int GenBuffer(const std::vector<T> &v, GLenum bufferType)
-{
-	GLuint buffer_id;
-	glGenBuffers(1, &buffer_id);
-	glBindBuffer(bufferType, buffer_id);
-
-	glBufferData(
-		bufferType,
-		sizeof(T) * v.size(),
-		v.data(),
-		GL_STATIC_DRAW
-	);
-	return buffer_id;
-}
-
 int SolidRender::loadMesh(const Mesh& m, SHADER program)
 {
 	MeshData data;
@@ -82,49 +68,19 @@ int SolidRender::loadMesh(const Mesh& m, SHADER program)
 	GLuint& vao = data.vertexArrayBuffer_;
 	int& face_count = data.faceCount_;
 
-	glGenBuffers(1, &vertex_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * m.vertices.size(),
-		m.vertices.data(), GL_STATIC_DRAW);
-
-	glGenBuffers(1, &normal_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, normal_buffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * m.vertex_normals.size(),
-		m.vertex_normals.data(), GL_STATIC_DRAW);
-
-	glGenBuffers(1, &uv_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, uv_buffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * m.vertex_uv.size(),
-		m.vertex_uv.data(), GL_STATIC_DRAW);
-
-	glGenBuffers(1, &face_buffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, face_buffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-		sizeof(glm::uvec3) * m.faces.size(),
-		m.faces.data(), GL_STATIC_DRAW);
+	vertex_buffer = GLHelper::GenBuffer(m.vertices);
+	normal_buffer = GLHelper::GenBuffer(m.vertex_normals);
+	uv_buffer = GLHelper::GenBuffer(m.vertex_uv);
+	face_buffer = GLHelper::GenBuffer(m.faces, GL_ELEMENT_ARRAY_BUFFER);
 
 	// create vertex array object
 	glGenVertexArrays(1, &vao);
 	//   start state recording
 	glBindVertexArray(vao);
 
-	// assign postion attribute to vertex_buffer
-	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-	const GLint aposition = 0;
-	glVertexAttribPointer(aposition, 3, GL_FLOAT, false, 0, nullptr);
-	glEnableVertexAttribArray(aposition);
-
-	// assign normal attribute to normal_buffer
-	glBindBuffer(GL_ARRAY_BUFFER, normal_buffer);
-	const GLint anormal = 1;
-	glVertexAttribPointer(anormal, 3, GL_FLOAT, false, 0, nullptr);
-	glEnableVertexAttribArray(anormal);
-
-	// assign uv attribute to uv_buffer
-	glBindBuffer(GL_ARRAY_BUFFER, uv_buffer);
-	const GLint auv = 2;
-	glVertexAttribPointer(auv, 2, GL_FLOAT, false, 0, nullptr);
-	glEnableVertexAttribArray(auv);
+	GLHelper::BindVertexAttribute(vertex_buffer, 0, m.vertices);
+	GLHelper::BindVertexAttribute(normal_buffer, 1, m.vertex_normals);
+	GLHelper::BindVertexAttribute(uv_buffer, 2, m.vertex_uv);
 
 	// ready the face buffer for drawing
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, face_buffer);
