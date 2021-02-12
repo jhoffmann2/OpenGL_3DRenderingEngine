@@ -57,7 +57,7 @@ GLuint LoadShaders(const std::string& VertexShaderCode, const std::string& Fragm
   if (InfoLogLength > 0) {
     std::vector<char> VertexShaderErrorMessage(InfoLogLength + 1);
     glGetShaderInfoLog(VertexShaderID, InfoLogLength, nullptr, &VertexShaderErrorMessage[0]);
-    printf("%s\n", &VertexShaderErrorMessage[0]);
+    //printf("%s\n", &VertexShaderErrorMessage[0]);
   }
 
   // Compile Fragment Shader
@@ -71,7 +71,7 @@ GLuint LoadShaders(const std::string& VertexShaderCode, const std::string& Fragm
   if (InfoLogLength > 0) {
     std::vector<char> FragmentShaderErrorMessage(InfoLogLength + 1);
     glGetShaderInfoLog(FragmentShaderID, InfoLogLength, nullptr, &FragmentShaderErrorMessage[0]);
-    printf("%s\n", &FragmentShaderErrorMessage[0]);
+    //printf("%s\n", &FragmentShaderErrorMessage[0]);
   }
 
   // Link the program

@@ -15,10 +15,10 @@ End Header --------------------------------------------------------*/
 #include ../Include/lightingUniforms.glsl
 #include ../Include/uv.glsl
 
-in vec4 world_position;
-in vec4 world_normal;
+in vec3 world_position;
+in vec3 world_normal;
 
-in vec4 model_pos;
+in vec3 model_pos;
 in vec2 uv_frag;
 
 uniform sampler2D diffuseTexture;
@@ -35,7 +35,7 @@ void main(void)
 	DiffuseOut.rgb = texture(diffuseTexture, uv).rgb;
 	DiffuseOut.a = texture(specularTexture, uv).r;
 
-	WorldPosOut.xyz = world_position.xyz;
+	WorldPosOut.xyz = world_position;
 	WorldPosOut.w = float(curMaterial) / 10;
-	NormalOut.xyz = normalize(world_normal.xyz);
+	NormalOut.xyz = normalize(world_normal);
 }

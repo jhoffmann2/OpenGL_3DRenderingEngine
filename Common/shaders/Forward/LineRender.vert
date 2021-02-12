@@ -12,7 +12,7 @@ Creation date: 9/28/2020
 End Header --------------------------------------------------------*/ 
 #version 460
 
-in vec4 position;
+in vec3 position;
 
 layout (std140, binding = 2) uniform VertexGlobals
 {
@@ -23,5 +23,5 @@ layout (std140, binding = 2) uniform VertexGlobals
 };
 
 void main() {
-	gl_Position = camToNDC * worldToCam * modelToWorld * position;
+	gl_Position = camToNDC * worldToCam * modelToWorld * vec4(position, 1);
 }

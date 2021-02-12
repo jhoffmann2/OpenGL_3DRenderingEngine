@@ -8,7 +8,7 @@ layout(location = 3) uniform sampler2D environment3;
 layout(location = 4) uniform sampler2D environment4;
 layout(location = 5) uniform sampler2D environment5;
 
-vec3 EnvironmentMap(vec4 direction)
+vec3 EnvironmentMap(vec3 direction)
 {
   uint cubeFace;
 	vec2 cubeUV = cubicTextureMap(direction, cubeFace);

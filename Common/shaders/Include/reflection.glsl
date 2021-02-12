@@ -2,11 +2,11 @@
 #include lightingUniforms.glsl
 #include environmentMap.glsl
 
-vec3 reflectedColor(vec4 P, vec4 N)
+vec3 reflectedColor(vec3 P, vec3 N)
 {
-	const vec4 V = normalize(eyePos - P);
+	const vec3 V = normalize(eyePos - P);
 	const float ndotv = dot(N, V);
-	const vec4 R = 2 * N * ndotv - V;
+	const vec3 R = 2 * N * ndotv - V;
 
 	return EnvironmentMap(R);
 }

@@ -40,7 +40,7 @@ void main(void)
 	vec4 kd = texture(diffuseTex, uv_frag);
 	vec3 ks = vec3(kd.w);
 
-	vec3 i_local = (S < 1)? phongLight(P, N, kd.rgb, ks, material) : vec3(0);
+	vec3 i_local = (S < 1)? phongLight(P.xyz, N.xyz, kd.rgb, ks, material) : vec3(0);
 		
 
 	frag_color = vec4(mix(fogColor, i_local, S), 1);

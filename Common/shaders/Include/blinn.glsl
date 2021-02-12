@@ -1,8 +1,8 @@
 #include lightingUniforms.glsl
 
-vec3 blinnLight(vec4 P, vec4 N, vec3 kd_tex, vec3 ks_tex, uint materialIndex)
+vec3 blinnLight(vec3 P, vec3 N, vec3 kd_tex, vec3 ks_tex, uint materialIndex)
 {
-	const vec4 V = normalize(eyePos - P);
+	const vec3 V = normalize(eyePos - P);
 	
 	const Material material = materials[materialIndex];
 	const vec3 EmissiveColor = material.EmissiveColor;
@@ -20,12 +20,12 @@ vec3 blinnLight(vec4 P, vec4 N, vec3 kd_tex, vec3 ks_tex, uint materialIndex)
 		if(!lights[i].isActive)
 			continue;
 
-		const vec4 L = (lights[i].type == 1) ? 
+		const vec3 L = (lights[i].type == 1) ? 
 			normalize(lights[i].direction) : 
 			normalize(lights[i].position - P);
 
 		const float ndotl = dot(N, L);
-		const vec4 H = normalize(L + V);
+		const vec3 H = normalize(L + V);
 		const float ndoth = dot(N, H);
 		const float Llen = length(lights[i].position - P);
 		const float Attenuation = min(

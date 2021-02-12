@@ -1,17 +1,17 @@
 
 
-vec2 planarTextureMap(vec4 pos)
+vec2 planarTextureMap(vec3 pos)
 {
 	return pos.xy;
 }
 
-vec2 cylindricalTextureMap(vec4 pos)
+vec2 cylindricalTextureMap(vec3 pos)
 {
 	float theta = degrees(atan(pos.z, pos.x));
 	return vec2(theta / 360, pos.y);
 }
 
-vec2 sphericalTextureMap(vec4 pos)
+vec2 sphericalTextureMap(vec3 pos)
 {
 	float theta = degrees(atan(pos.z, pos.x));
 	float r = length(pos);//sqrt(pos.x * pos.x + pos.y * pos.y + pos.z * pos.z);
@@ -20,7 +20,7 @@ vec2 sphericalTextureMap(vec4 pos)
 	return vec2(theta / 360, phi / 180);
 }
 
-vec2 cubicTextureMap(vec4 r, out uint cubeFace)
+vec2 cubicTextureMap(vec3 r, out uint cubeFace)
 {
 	r = normalize(r);
 	if(abs(r.x) > abs(r.y) && abs(r.x) > abs(r.z))
@@ -49,7 +49,7 @@ vec2 cubicTextureMap(vec4 r, out uint cubeFace)
 	}
 }
 
-vec2 calculateUV(vec4 pos, vec2 uv_frag, int textureMode_)
+vec2 calculateUV(vec3 pos, vec2 uv_frag, int textureMode_)
 {
 	switch(textureMode_)
 	{

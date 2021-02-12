@@ -13,18 +13,18 @@ End Header --------------------------------------------------------*/
 #version 460
 #include ../Include/MeshProperties.glsl
 
-out vec4 world_position;
-out vec4 world_normal;
-
-out vec4 model_pos;
+out vec3 model_pos;
 out vec2 uv_frag;
+
+out vec3 world_position;
+out vec3 world_normal;
 
 
 void main() {
 	uv_frag = uv_vert;
 	model_pos = position;
 
-	world_normal = modelNToWorldN * normal;
-	world_position = modelToWorld * position;
-	gl_Position = camToNDC * worldToCam * world_position;
+	world_normal = (modelNToWorldN * vec4(normal, 0)).xyz;
+	world_position = (modelToWorld * vec4(position, 1)).xyz;
+	gl_Position = camToNDC * worldToCam * vec4(world_position, 1);
 }

@@ -1,8 +1,8 @@
 
 struct Light
 {
-	vec4 position;
-	vec4 direction;
+	vec3 position;
+	vec3 direction;
 
 	vec3 diffuseColor;
 	vec3 specularColor;
@@ -22,7 +22,7 @@ layout (std140, binding = 0) buffer Lighting
 	float fogNear;
 	float fogFar;
 	vec3 globalAmbientColor;
-	vec4 eyePos;
+	vec3 eyePos;
 	Light lights[];
 }; 
 
