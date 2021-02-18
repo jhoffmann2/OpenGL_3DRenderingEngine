@@ -15,6 +15,7 @@ End Header --------------------------------------------------------*/
 #include <vector>
 #include "Utilities.h"
 #include <assimp/scene.h>
+#include "ntg/bounds.h"
 
 struct Mesh
 {
@@ -37,13 +38,13 @@ Mesh generateSphereMesh(size_t division_count, UV_MAPPING uvMapping = UV_NONE);
 Mesh aiSceneToMesh(const aiScene* scene);
 Mesh aiImportMesh(const std::string& path);
 
-glm::bounds3 meshBounds(const Mesh& mesh);
-glm::bounds3 meshBounds(const std::vector<Mesh>& meshes);
+ntg::bounds3 meshBounds(const Mesh& mesh);
+ntg::bounds3 meshBounds(const std::vector<Mesh>& meshes);
 
 void meshBoundsExpand(const std::vector<Mesh>& meshes, glm::vec3 &min, glm::vec3 &max);
 glm::mat4 CenterMeshTransform(const std::vector<Mesh> &meshes);
 glm::mat4 CenterMeshTransform(const glm::vec3& min, const glm::vec3& max);
-glm::mat4 CenterMeshTransform(const glm::bounds3& bounds);
+glm::mat4 CenterMeshTransform(const ntg::bounds3& bounds);
 void MeshTransform(std::vector<Mesh> &meshes, const glm::mat4 &transform);
 
 void ImportMeshList(

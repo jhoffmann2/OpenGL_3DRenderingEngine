@@ -17,12 +17,9 @@ End Header --------------------------------------------------------*/
 #include <sstream>
 #include <filesystem>
 #include <fstream>
+#include <numeric>
 #include <glm/gtx/color_space.hpp>
 #include <glm/gtx/easing.hpp>
-
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 
 #include "imgui.h"
 #include "LightComponent.h"
@@ -38,9 +35,13 @@ End Header --------------------------------------------------------*/
 #include "FaceNormalRender.h"
 #include "GBuffer.h"
 #include "MaterialComponent.h"
-#include "ChildListComponent.h"
+#include "ParentChildComponent.h"
 #include "imgui_internal.h"
 #include "VertexNormalRender.h"
+#include "VolumeComponent.h"
+#include "ntg/bounds.inl"
+#include "ntg/hyperplane.inl"
+#include "ntg/simplex.inl"
 
 #define DEFERRED true
 #define LOG_ACTIVE true
@@ -96,14 +97,16 @@ void MainScene::initMembers()
   objects_.clear();
 }
 
-glm::bounds3 MainScene::ActivePowerPlantBounds()
+ntg::bounds3 MainScene::ActivePowerPlantBounds() const
 {
-  glm::bounds3 out;
-  for(size_t i = 0; i < powerPlantGroupCount; ++i)
+  ntg::bounds3 out;
+  for (const auto* pc : PowerPlantGroup())
   {
-    if(PowerPlantGroupObjects()[i]->IsActive())
+    GameObject *obj = pc->GetGameObject();
+    if(obj->IsActive())
     {
-      out = out.grow(powerPlantBounds_[i]);
+      auto *volumeComponent = obj->GetComponent<BoxVolumeComponent>();
+      out = out.grow(volumeComponent->volume_);
     }
   }
   return out;
@@ -111,19 +114,20 @@ glm::bounds3 MainScene::ActivePowerPlantBounds()
 
 void MainScene::UpdateActivePowerPlants()
 {
-  constexpr size_t lerp_time = 60; // lerp over 120 frames
+  constexpr size_t lerp_time = 60; // lerp over 60 frames
   static size_t cur_lerp = lerp_time + 1;
 
-  for (auto* obj : PowerPlantGroupObjects())
+  for (ParentChildComponent* pc : PowerPlantGroup())
   {
-    if(obj->IsActive() && !obj->HasComponent<ChildListComponent>())
+    GameObject *gameObject = pc->GetGameObject();
+    if(gameObject->IsActive() && pc->Children().empty())
     {
       std::vector<Mesh> meshes;
       std::vector<std::string> names;
 
       ImportMeshList(
         "../../Common/models/Powerplant/",
-        obj->Name() + ".txt",
+        gameObject->Name() + ".txt",
         meshes,
         names
       );
@@ -131,16 +135,14 @@ void MainScene::UpdateActivePowerPlants()
       std::cout << "centering and normalizing meshes" << std::endl;
       MeshTransform(meshes, powerPlantTransformation_);
 
-      obj->AddComponent(
-        new ChildListComponent(meshes, names)
-      );
+      pc->AddChildrenFromMeshes(meshes, names);
       cur_lerp = lerp_time + 1;
-      break;
+      break;// only load one per frame
     }
   }
   
-  static glm::bounds3 prev_bounds;
-  glm::bounds3 cur_bounds = ActivePowerPlantBounds();
+  static ntg::bounds3 prev_bounds;
+  ntg::bounds3 cur_bounds = ActivePowerPlantBounds();
   if(cur_bounds != prev_bounds)
   {
     cur_lerp = lerp_time + 1;
@@ -155,12 +157,12 @@ void MainScene::UpdateActivePowerPlants()
   {
     cur_lerp = 1;
 
-    glm::bounds3 bounds = ActivePowerPlantBounds();
-    glm::vec3 center = ActivePowerPlantBounds().center();
-    center.y = bounds.min.y + 0.25f * bounds.size().y; // favor looking toward the ground
+    ntg::bounds3 bounds = cur_bounds;
+    glm::vec3 center = bounds.center();
+    if(bounds.valid())
+      center.y = bounds.min.y + 0.25f * bounds.size().y; // favor looking toward the ground
 
-    glm::vec3 pivot = -(powerPlantTransformation_ * glm::vec4(center, 1));
-    destination_pivot = pivot * transform->GetScale();
+    destination_pivot = -center * transform->GetScale();
     start_pivot = transform->GetPivot();
   }
 
@@ -169,20 +171,9 @@ void MainScene::UpdateActivePowerPlants()
   ++cur_lerp;
 }
 
-const std::vector<GameObject*>& MainScene::PowerPlantGroupObjects() const
+const std::unordered_set<ParentChildComponent*>& MainScene::PowerPlantGroup() const
 {
-  return objects_[POWER_PLANT]->GetComponent<ChildListComponent>()->Children();
-}
-
-const std::vector<GameObject*>& MainScene::LightObjects() const
-{
-  return objects_[LIGHTS]->GetComponent<ChildListComponent>()->Children();
-}
-
-ElementRange<const std::vector<GameObject*>> MainScene::ActiveLights() const
-{
-  const auto& allLights = LightObjects();
-  return { allLights.begin(), allLights.begin() + activeLightCount_ };
+  return objects_[POWER_PLANT]->GetComponent<ParentChildComponent>()->Children();
 }
 
 //////////////////////////////////////////////////////
@@ -205,27 +196,27 @@ int MainScene::Init()
 
   const auto sphere_meshData(generateSphereMesh(30));
 
-  const int sphere_mesh = SolidRender::loadMesh(sphere_meshData, SolidRender::PHONG_SHADING);
+  const int sphere_mesh = SolidRender::loadMesh(sphere_meshData);
   VertexNormalRender::loadMesh(sphere_meshData);
   FaceNormalRender::loadMesh(sphere_meshData);
 
-
+  std::vector<ntg::bounds3> powerPlantBounds;
   if(std::filesystem::exists("../../Common/models/Powerplant/bounds.txt"))
   {
     std::ifstream boundsFile("../../Common/models/Powerplant/bounds.txt");
     while(!boundsFile.eof())
     {
-      powerPlantBounds_.emplace_back();
-      boundsFile >> powerPlantBounds_.back();
+      powerPlantBounds.emplace_back();
+      boundsFile >> powerPlantBounds.back();
     }
-    powerPlantBounds_.pop_back();
+    powerPlantBounds.pop_back();
   }
   else
   {
     std::cout << "calculating power plant size" << std::endl;
     for (size_t i = 1; i <= powerPlantGroupCount; ++i)
     {
-      powerPlantBounds_.emplace_back();
+      powerPlantBounds.emplace_back();
       const std::string name = "Section" + std::to_string(i);
 
       std::vector<Mesh> meshes;
@@ -239,17 +230,17 @@ int MainScene::Init()
       );
 
       const auto categoryBounds = meshBounds(meshes);
-      powerPlantBounds_.back() = powerPlantBounds_.back().grow(categoryBounds);
+      powerPlantBounds.back() = powerPlantBounds.back().grow(categoryBounds);
     }
 
     std::ofstream boundsFile("../../Common/models/Powerplant/bounds.txt");
-    glm::bounds3 fullPlantBounds;
-    for(const auto& b : powerPlantBounds_)
+    ntg::bounds3 fullPlantBounds;
+    for(const auto& b : powerPlantBounds)
     {
       fullPlantBounds = fullPlantBounds.grow(b);
       boundsFile << b << std::endl;
     }
-    powerPlantBounds_.emplace_back(fullPlantBounds);
+    powerPlantBounds.emplace_back(fullPlantBounds);
     boundsFile << fullPlantBounds << std::endl;
   }
 
@@ -270,43 +261,24 @@ int MainScene::Init()
   material.SetSpecularColor(glm::vec3{ 0.3176f });
   material.SetSpecularExponent(20);
   objects_.back()->AddComponent(new MaterialComponent(material));
-  auto* pc = new ChildListComponent();
+  auto* pc = new ParentChildComponent();
 
-  powerPlantTransformation_ = CenterMeshTransform(powerPlantBounds_.back());
-  for (size_t i = 1; i <= powerPlantGroupCount; ++i)
+  powerPlantTransformation_ = CenterMeshTransform(powerPlantBounds.back());
+  for (size_t i = 0; i < powerPlantGroupCount; ++i)
   {
-    const std::string name = "Section" + std::to_string(i);
+    const std::string name = "Section" + std::to_string(i + 1);
     auto* section = new GameObject(name);
-    section->SetActive(false);
-    pc->AddChild(section);
+    section->SetActive(i == 9); // start w/ only section 10 loaded
+    auto* section_pc = new ParentChildComponent(pc);
+    section->AddComponent(section_pc);
+    section->AddComponent(new BoxVolumeComponent(powerPlantTransformation_ * powerPlantBounds[i]));
+    pc->AddChild(section_pc);
   }
   objects_.back()->AddComponent(pc);
 
-  // preload section 10
-  {
-    auto* obj = PowerPlantGroupObjects()[9];
-    obj->SetActive(true);
-    std::vector<Mesh> meshes;
-    std::vector<std::string> names;
-
-    ImportMeshList(
-      "../../Common/models/Powerplant/",
-      obj->Name() + ".txt",
-      meshes,
-      names
-    );
-
-    std::cout << "centering and normalizing meshes" << std::endl;
-    MeshTransform(meshes, powerPlantTransformation_);
-
-    obj->AddComponent(
-      new ChildListComponent(meshes, names)
-    );
-  }
-
   {
     objects_.emplace_back(new GameObject("Lights"));
-    auto* pc = new ChildListComponent();
+    auto* pc = new ParentChildComponent();
     objects_.back()->AddComponent(pc);
 
       const float hue = glm::linearRand(24.f,40.f);
@@ -345,16 +317,17 @@ int MainScene::Init()
 
       lightObj->AddComponent(new MaterialComponent(light_material));
 
+      auto* light_pc = new ParentChildComponent(pc);
+      lightObj->AddComponent(light_pc);
+
       lightObj->SetActive(false);
 
-      pc->AddChild(lightObj);
+      pc->AddChild(light_pc);
+      lights_.emplace_back(lightObj);
     }
   }
-
-  for(auto *light : ActiveLights())
-  {
-    light->SetActive(true);
-  }
+  for(int i = 0; i < activeLightCount_; ++i)
+    lights_[i]->Activate();
 
   VertexNormalRender::setCamera(cam);
   FaceNormalRender::setCamera(cam);
@@ -417,21 +390,20 @@ int MainScene::Render()
 
     ImGui::Separator();
 
-    const auto& lightObjects = LightObjects();
     int prevLightCount = activeLightCount_;
     if(ImGui::DragInt("LightCount", &activeLightCount_, 0.1f, 0, LightSystem::lightCount))
     {
       for (int i = std::min(activeLightCount_, prevLightCount);
                i < std::max(activeLightCount_, prevLightCount); ++i)
       {
-        lightObjects[i]->SetActive(i < activeLightCount_);
+        lights_[i]->SetActive(i < activeLightCount_);
       }
     }
 
-    float distance = lightObjects[0]->GetComponent<TransformComponent>()->GetPivot().x;
+    float distance = lights_[0]->GetComponent<TransformComponent>()->GetPivot().x;
     if (ImGui::SliderFloat("Global Light Distance", &distance, 1.5, 10))
     {
-      for (GameObject* lightObject : lightObjects)
+      for (GameObject* lightObject : lights_)
       {
         auto* lightTransform = lightObject->GetComponent<TransformComponent>();
         lightTransform->SetPivot({ distance, 0, 0 });
@@ -455,10 +427,11 @@ int MainScene::Render()
     if (ImGui::BeginMenu("Power Plant"))
     {
       ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
-      for(auto *obj : PowerPlantGroupObjects())
+      for(auto *pc : PowerPlantGroup())
       {
+        GameObject *obj = pc->GetGameObject();
         bool checked = obj->IsActive();
-        bool loaded = obj->HasComponent<ChildListComponent>();
+        bool loaded = !obj->GetComponent<ParentChildComponent>()->Children().empty();
         const ImGuiStyle& style = ImGui::GetStyle();
         if(!loaded) ImGui::PushStyleColor(ImGuiCol_Text, style.Colors[ImGuiCol_TextDisabled]);
         ImGui::MenuItem(obj->Name().c_str(), nullptr, &checked);
@@ -480,13 +453,12 @@ int MainScene::Render()
 
   MaterialSystem::Update();
 
-  int i = 0;
-  auto activeLights = ActiveLights();
-  for(auto* light : activeLights)
+  
+  for(int i = 0; i < activeLightCount_; ++i)
   {
-    auto* transform = light->GetComponent<TransformComponent>();
-    transform->SetRotationAngle(-angleOfRotation + (360.f / activeLights.size() * static_cast<float>(i)));
-    ++i;
+    auto* transform = lights_[i]->GetComponent<TransformComponent>();
+    transform->SetRotationAngle(-angleOfRotation + (360.f / activeLightCount_ * static_cast<float>(i)));
+    
   }
 
   SolidRender::clear(glm::vec4(LightSystem::GetFogColor(), 1));

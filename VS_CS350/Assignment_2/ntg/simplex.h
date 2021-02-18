@@ -25,11 +25,15 @@ namespace ntg
 
     [[nodiscard]] bool operator==(const simplex& other) const;
     [[nodiscard]] bool operator!=(const simplex& other) const;
-    [[nodiscard]] simplex operator*(const mat<vcl, vcl, vct>& transform) const;
-    [[nodiscard]] simplex operator*(const mat<vcl + 1, vcl + 1, vct>& transform) const;
 
     vec<vcl, vct> points[point_count]{vec<vcl, vct>{0}};
   };
+
+  template<length_t vcl = 3, length_t pc = vcl, typename vct = float>
+  [[nodiscard]] simplex<vcl, pc, vct> operator*(const mat<vcl, vcl, vct>& transform, simplex<vcl, pc, vct> s);
+
+  template<length_t vcl = 3, length_t pc = vcl, typename vct = float>
+  [[nodiscard]] simplex<vcl, pc, vct> operator*(const mat<vcl + 1, vcl + 1, vct>& transform, simplex<vcl, pc, vct> s);
 
   using lineseg1 = simplex<1, 2, float>;
   using lineseg2 = simplex<2, 2, float>;

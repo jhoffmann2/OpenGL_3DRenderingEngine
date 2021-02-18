@@ -79,20 +79,21 @@ namespace ntg
     return !(*this == other);
   }
 
-  template <length_t vcl, typename vct>
-  bounds<vcl, vct> bounds<vcl, vct>::operator*(const mat<vcl, vcl, vct>& transform) const
+  template<length_t vcl, typename vct>
+  bounds<vcl, vct> operator*(const mat<vcl, vcl, vct>& transform, const bounds<vcl, vct>& bounds)
   {
-    return { min * transform, max * transform };
+    return { bounds.min * transform, bounds.max * transform };
   }
 
-  template <length_t vcl, typename vct>
-  bounds<vcl, vct> bounds<vcl, vct>::operator*(const mat<vcl + 1, vcl + 1, vct>& transform) const
+  template<length_t vcl, typename vct>
+  bounds<vcl, vct> operator*(const mat<vcl + 1, vcl + 1, vct>& transform, const bounds<vcl, vct>& bounds)
   {
     return {
-      glm::vec<vcl + 1, vct>(min, 1) * transform,
-      glm::vec<vcl + 1, vct>(max, 1) * transform
+      transform * glm::vec<vcl + 1, vct>(bounds.min, 1),
+      transform * glm::vec<vcl + 1, vct>(bounds.max, 1)
     };
   }
+
 
   template <length_t vcl, typename vct>
   std::ostream& operator<<(std::ostream& os, const bounds<vcl, vct>& b)

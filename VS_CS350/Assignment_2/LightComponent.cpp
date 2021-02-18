@@ -18,7 +18,7 @@ LightComponent::LightComponent(size_t index) : LightHandle(index)
 
 void LightComponent::PreRender()
 {
-  glm::vec3 pos = Parent().GetComponent<TransformComponent>()->GetPosition();
+  glm::vec3 pos = GetGameObject()->GetComponent<TransformComponent>()->GetPosition();
   SetPosition(pos);
   if(pointToTarget_)
   {

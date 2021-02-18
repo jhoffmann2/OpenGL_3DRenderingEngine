@@ -27,12 +27,16 @@ namespace ntg
 
     [[nodiscard]] bool operator==(const bounds& other) const;
     [[nodiscard]] bool operator!=(const bounds& other) const;
-    [[nodiscard]] bounds operator*(const mat<vcl,vcl,vct>& transform) const;
-    [[nodiscard]] bounds operator*(const mat<vcl+1,vcl+1,vct>& transform) const;
 
     vec<vcl, vct> min = vec<vcl, vct>(std::numeric_limits<vct>::max());
     vec<vcl, vct> max = vec<vcl, vct>(std::numeric_limits<vct>::min());
   };
+
+  template<length_t vcl = 3, typename vct = float>
+  [[nodiscard]] bounds<vcl, vct> operator*(const mat<vcl, vcl, vct>& transform, const bounds<vcl, vct>& bounds);
+
+  template<length_t vcl = 3, typename vct = float>
+  [[nodiscard]] bounds<vcl, vct> operator*(const mat<vcl + 1, vcl + 1, vct>& transform, const bounds<vcl, vct>& bounds);
 
   using bounds2 = bounds<2, float>;
   using bounds3 = bounds<3, float>;

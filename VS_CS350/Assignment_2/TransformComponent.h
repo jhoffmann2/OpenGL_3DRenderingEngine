@@ -32,7 +32,6 @@ public:
   [[nodiscard]]glm::vec3 GetPosition() const;
   [[nodiscard]]glm::mat4 GetModel() const;
 private:
-
   glm::vec3 translation_;
   glm::vec3 pivot_;
   struct Rotation
@@ -41,7 +40,6 @@ private:
     float angle_;
   } rotation_;
   glm::vec3 scale_;
-
 
   // used by imgui
   bool lockTranslation_ = false;

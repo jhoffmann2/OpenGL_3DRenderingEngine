@@ -26,8 +26,6 @@ namespace ntg
 
     [[nodiscard]] bool operator==(const radial& other);
     [[nodiscard]] bool operator!=(const radial& other);
-    [[nodiscard]] radial operator*(const mat<vcl, vcl, vct>& transform) const;
-    [[nodiscard]] radial operator*(const mat<vcl + 1, vcl + 1, vct>& transform) const;
 
     vec<vcl, vct> center = vec<vcl, vct>(0);
     vct radius = std::numeric_limits<vct>::min();
@@ -35,6 +33,12 @@ namespace ntg
     template<length_t vml>
     static vct extractScale(const mat<vml, vml,vct>& t);
   };
+
+  template<length_t vcl = 3, typename vct = float>
+  [[nodiscard]] radial<vcl, vct> operator*(const mat<vcl, vcl, vct>& transform, const radial<vcl, vct>& r);
+
+  template<length_t vcl = 3, typename vct = float>
+  [[nodiscard]] radial<vcl, vct> operator*(const mat<vcl + 1, vcl + 1, vct>& transform, const radial<vcl, vct>& r);
 
   using radial2 = radial<2, float>;
   using radial3 = radial<3, float>;

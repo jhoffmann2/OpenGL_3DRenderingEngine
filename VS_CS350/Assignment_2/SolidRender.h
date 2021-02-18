@@ -41,7 +41,7 @@ public:
   };
   static SolidRender& Instance();
   static void clear(const glm::vec4 &color);
-  static int loadMesh(const Mesh &m, SHADER program);
+  static int loadMesh(const Mesh &m);
   static void unloadMesh(int mi);
   static void draw(int mi, Texture &diffuseTex, Texture &specularTex);
   static SHADER GetShader();

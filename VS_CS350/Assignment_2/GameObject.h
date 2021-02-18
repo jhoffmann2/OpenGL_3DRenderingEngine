@@ -51,7 +51,7 @@ public:
   void AddComponent(const ComponentType *component)
   {
     ComponentType* nonconst = const_cast<ComponentType*>(component);
-    nonconst->SetObject(this);
+    nonconst->SetGameObject(this);
     components_[ComponentKey<ComponentType>()] = nonconst;
   }
 

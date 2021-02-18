@@ -99,26 +99,6 @@ namespace ntg
   }
 
   template <length_t vcl, typename vct>
-  radial<vcl, vct> radial<vcl, vct>::operator*(
-    const mat<vcl, vcl, vct>& transform) const
-  {
-    return {
-      center * transform,
-      radius * extractScale(transform)
-    };
-  }
-
-  template <length_t vcl, typename vct>
-  radial<vcl, vct> radial<vcl, vct>::operator*(
-    const mat<vcl + 1, vcl + 1, vct>& transform) const
-  {
-    return {
-      glm::vec<vcl + 1, vct>(center) * transform,
-      radius * extractScale(transform)
-    };
-  }
-
-  template <length_t vcl, typename vct>
   template <length_t vml>
   vct radial<vcl, vct>::extractScale(const mat<vml, vml, vct>& t)
   {
@@ -129,6 +109,23 @@ namespace ntg
     return glm::sqrt(glm::compMax(s));
   }
 
+  template<length_t vcl = 3, typename vct = float>
+  radial<vcl, vct> operator*(const mat<vcl, vcl, vct>& transform, const radial<vcl, vct>& r)
+  {
+    return {
+      transform * r.center,
+      extractScale(transform) * r.radius
+    };
+  }
+
+  template<length_t vcl = 3, typename vct = float>
+  radial<vcl, vct> operator*(const mat<vcl + 1, vcl + 1, vct>& transform, const radial<vcl, vct>& r)
+  {
+    return {
+      transform * glm::vec<vcl + 1, vct>(r.center),
+      extractScale(transform) * r.radius
+    };
+  }
 
   template <length_t vcl, typename vct>
   std::ostream& operator<<(std::ostream& os, const radial<vcl, vct>& b)

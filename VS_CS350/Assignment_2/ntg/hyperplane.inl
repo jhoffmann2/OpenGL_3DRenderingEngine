@@ -125,18 +125,18 @@ namespace ntg
     return normal != other.normal || origin != other.origin;
   }
 
-  template <length_t vcl, typename vct>
-  hyperplane<vcl, vct> hyperplane<vcl, vct>::operator*(const mat<vcl, vcl, vct>& transform) const
+  template<length_t vcl, typename vct>
+  hyperplane<vcl, vct> operator*(const mat<vcl, vcl, vct>& transform, const hyperplane<vcl, vct>& h)
   {
-    return { normal * transform, origin * transform };
+    return {transform * h.normal, transform * h.origin};
   }
 
-  template <length_t vcl, typename vct>
-  hyperplane<vcl, vct> hyperplane<vcl, vct>::operator*(const mat<vcl + 1, vcl + 1, vct>& transform) const
+  template<length_t vcl, typename vct>
+  hyperplane<vcl, vct> operator*(const mat<vcl + 1, vcl + 1, vct>& transform, const hyperplane<vcl, vct>& h)
   {
     return {
-      glm::vec<vcl + 1, vct>(normal, 0) * transform,
-      glm::vec<vcl + 1, vct>(origin, 1) * transform
+      transform * glm::vec<vcl + 1, vct>(h.normal, 0),
+      transform * glm::vec<vcl + 1, vct>(h.origin, 1)
     };
   }
 

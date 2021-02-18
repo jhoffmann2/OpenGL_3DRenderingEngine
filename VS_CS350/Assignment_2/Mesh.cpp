@@ -22,6 +22,7 @@ End Header --------------------------------------------------------*/
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <glm/gtx/vector_angle.hpp>
+#include "ntg/bounds.inl"
 
 
 #include "Utilities.h"
@@ -349,19 +350,19 @@ Mesh aiImportMesh(const std::string& path)
 }
 
 
-glm::bounds3 meshBounds(const Mesh& mesh)
+ntg::bounds3 meshBounds(const Mesh& mesh)
 {
   return std::accumulate(
     mesh.vertices.begin(), 
     mesh.vertices.end(), 
-    glm::bounds3(),
-    glm::bounds3::grow_static
+    ntg::bounds3(),
+    ntg::bounds3::grow_static
   );
 }
 
-glm::bounds3 meshBounds(const std::vector<Mesh>& meshes)
+ntg::bounds3 meshBounds(const std::vector<Mesh>& meshes)
 {
-  glm::bounds3 b;
+  ntg::bounds3 b;
   for (const Mesh& mesh : meshes)
   {
     b = b.grow(meshBounds(mesh));
@@ -412,7 +413,7 @@ glm::mat4 CenterMeshTransform(const glm::vec3& minCorner, const glm::vec3& maxCo
   return glm::scale(1.f / max_distance) * translate(-(maxCorner + minCorner) / 2.f);
 }
 
-glm::mat4 CenterMeshTransform(const glm::bounds3& bounds)
+glm::mat4 CenterMeshTransform(const ntg::bounds3& bounds)
 {
   const float max_distance = *std::max_element(
     glm::data(bounds.size()),

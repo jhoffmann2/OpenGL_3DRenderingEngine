@@ -19,12 +19,16 @@ namespace ntg
 
     [[nodiscard]] bool operator==(const hyperplane& other) const;
     [[nodiscard]] bool operator!=(const hyperplane& other) const;
-    [[nodiscard]] hyperplane operator*(const mat<vcl, vcl, vct> & transform) const;
-    [[nodiscard]] hyperplane operator*(const mat<vcl + 1, vcl + 1, vct> & transform) const;
 
     vec<vcl, vct> origin{0};
     vec<vcl, vct> normal;
   };
+
+  template<length_t vcl = 3, typename vct = float>
+  [[nodiscard]] hyperplane<vcl, vct> operator*(const mat<vcl, vcl, vct>& transform, const hyperplane<vcl, vct>& h);
+
+  template<length_t vcl = 3, typename vct = float>
+  [[nodiscard]] hyperplane<vcl, vct> operator*(const mat<vcl + 1, vcl + 1, vct>& transform, const hyperplane<vcl, vct>& h);
 
   using hyperplane2 = hyperplane<2, float>;
   using hyperplane3 = hyperplane<3, float>;

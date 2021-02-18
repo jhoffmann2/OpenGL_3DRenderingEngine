@@ -19,10 +19,13 @@ End Header --------------------------------------------------------*/
 #define GLM_ENABLE_EXPERIMENTAL
 #include <bitset>
 #include <vector>
+
+#include "ntg/bounds.h"
 #include "SolidRender.h"
 #include "Camera.h"
 #include "GameObject.h"
 #include "Light.h"
+#include "ParentChildComponent.h"
 
 
 class MainScene : public Scene
@@ -48,11 +51,12 @@ private:
   // member functions
   void initMembers();
 
-  glm::bounds3 ActivePowerPlantBounds();
+  ntg::bounds3 ActivePowerPlantBounds() const;
   void UpdateActivePowerPlants();
-  [[nodiscard]] const std::vector<GameObject*>& PowerPlantGroupObjects() const;
-  [[nodiscard]] const std::vector<GameObject*>& LightObjects() const;
-  [[nodiscard]] ElementRange<const std::vector<GameObject*>> ActiveLights() const;
+  [[nodiscard]] const std::unordered_set<ParentChildComponent*>& PowerPlantGroup() const;
+
+  std::vector<GameObject*> lights_;
+  int activeLightCount_ = 3;
 
   
   GLfloat angleOfRotation;
@@ -72,10 +76,8 @@ private:
     BaseObjectsCount
   };
 
-  int activeLightCount_ = 3;
-
   static constexpr size_t powerPlantGroupCount = 21;
-  std::vector<glm::bounds3> powerPlantBounds_;
+  //std::vector<ntg::bounds3> powerPlantBounds_;
   glm::mat4 powerPlantTransformation_;
 
   std::vector<GameObject*> objects_;

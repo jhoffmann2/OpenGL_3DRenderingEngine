@@ -19,8 +19,8 @@ public:
   virtual void OnObjectDeactivated();
   virtual void OnObjectActivated();
 
-  void SetObject(GameObject* obj);
-  [[nodiscard]] GameObject& Parent() const;
+  void SetGameObject(GameObject* obj);
+  [[nodiscard]] GameObject *GetGameObject() const;
 private:
   GameObject* object_ = nullptr;
 };

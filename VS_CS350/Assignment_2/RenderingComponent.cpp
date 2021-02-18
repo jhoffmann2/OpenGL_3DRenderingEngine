@@ -107,7 +107,7 @@ void RenderingComponent::ImGuiEditor()
   if (ImGui::SmallButton("Load"))
   {
     const auto obj_meshData(ObjToMesh(objFilePaths[currentModel].string(), mapping));
-    meshIndex_ = SolidRender::loadMesh(obj_meshData, shader_);
+    meshIndex_ = SolidRender::loadMesh(obj_meshData);
     VertexNormalRender::loadMesh(obj_meshData);
     FaceNormalRender::loadMesh(obj_meshData);
   }

@@ -144,23 +144,19 @@ namespace ntg
     return false;
   }
 
-  template <length_t vcl, length_t point_count, typename vct>
-  simplex<vcl, point_count, vct> simplex<vcl, point_count, vct>::operator*(
-    const mat<vcl, vcl, vct>& transform) const
+  template <length_t vcl, length_t pc, typename vct>
+  simplex<vcl, pc, vct> operator*(const mat<vcl, vcl, vct>& transform, simplex<vcl, pc, vct> s)
   {
-    simplex out(*this);
-    for (vec<vcl, vct>& point : out.points)
+    for (vec<vcl, vct>& point : s.points)
       point = transform * point;
-    return out;
+    return s;
   }
 
-  template <length_t vcl, length_t point_count, typename vct>
-  simplex<vcl, point_count, vct> simplex<vcl, point_count, vct>::operator*(
-    const mat<vcl + 1, vcl + 1, vct>& transform) const
+  template <length_t vcl, length_t pc, typename vct>
+  simplex<vcl, pc, vct> operator*(const mat<vcl + 1, vcl + 1, vct>& transform, simplex<vcl, pc, vct> s)
   {
-    simplex out(*this);
-    for (vec<vcl, vct>& point : out.points)
+    for (vec<vcl, vct>& point : s.points)
       point = transform * vec<vcl + 1, vct>(point, 1);
-    return out;
+    return s;
   }
 }

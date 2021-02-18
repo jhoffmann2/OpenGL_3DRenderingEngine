@@ -56,7 +56,7 @@ SolidRender& SolidRender::Instance()
 	return renderer;
 }
 
-int SolidRender::loadMesh(const Mesh& m, SHADER program)
+int SolidRender::loadMesh(const Mesh& m)
 {
 	MeshData data;
 

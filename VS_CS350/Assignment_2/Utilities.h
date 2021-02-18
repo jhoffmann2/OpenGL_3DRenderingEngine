@@ -15,7 +15,6 @@ End Header --------------------------------------------------------*/
 #include <istream>
 #include <glm/glm.hpp>
 #include <iostream>
-#include "bounds.h"
 #include <glm/gtc/matrix_transform.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 
@@ -39,7 +38,7 @@ namespace glm
   }
 
   template<length_t VecL, typename VecT>
-  std::ostream& operator<<(std::ostream& os, vec<VecL, VecT>& v)
+  std::ostream& operator<<(std::ostream& os, const vec<VecL, VecT>& v)
   {
     os << '[';
     for (length_t i = 0; i < VecL; ++i)
@@ -76,6 +75,82 @@ namespace glm
   inline mat4 translate(const vec3& t)
   {
     return translate(mat4(1), t);
+  }
+}
+
+
+namespace std
+{
+  template<glm::length_t vcl = 3, typename vct = float>
+  constexpr vct *begin(glm::vec<vcl,vct> &v)
+  {
+    return glm::data(v);
+  }
+
+  template<glm::length_t vcl = 3, typename vct = float>
+  constexpr vct* end(glm::vec<vcl, vct>& v)
+  {
+    return glm::data(v) + vcl;
+  }
+
+  template<glm::length_t vcl = 3, typename vct = float>
+  constexpr const vct* begin(const glm::vec<vcl, vct>& v)
+  {
+    return glm::data(v);
+  }
+
+  template<glm::length_t vcl = 3, typename vct = float>
+  constexpr const vct* end(const glm::vec<vcl, vct>& v)
+  {
+    return glm::data(v) + vcl;
+  }
+
+  template<glm::length_t vcl = 3, typename vct = float>
+  constexpr const vct* cbegin(const glm::vec<vcl, vct>& v)
+  {
+    return glm::data(v);
+  }
+
+  template<glm::length_t vcl = 3, typename vct = float>
+  constexpr const vct* cend(const glm::vec<vcl, vct>& v)
+  {
+    return glm::data(v) + vcl;
+  }
+
+  template<glm::length_t C, glm::length_t R, typename vct = float>
+  constexpr glm::vec<C, vct> *begin(glm::mat<C,R,vct> &m)
+  {
+    return &m[0];
+  }
+
+  template<glm::length_t R, glm::length_t C, typename vct = float>
+  constexpr glm::vec<C, vct> *end(glm::mat<R,C,vct> &m)
+  {
+    return &m[0] + R;
+  }
+
+  template<glm::length_t C, glm::length_t R, typename vct = float>
+  constexpr const glm::vec<C, vct> *begin(const glm::mat<C,R,vct> &m)
+  {
+    return &m[0];
+  }
+
+  template<glm::length_t R, glm::length_t C, typename vct = float>
+  constexpr const glm::vec<C, vct> *end(const glm::mat<R,C,vct> &m)
+  {
+    return &m[0] + R;
+  }
+
+  template<glm::length_t C, glm::length_t R, typename vct = float>
+  constexpr const glm::vec<C, vct> *cbegin(const glm::mat<C,R,vct> &m)
+  {
+    return &m[0];
+  }
+
+  template<glm::length_t R, glm::length_t C, typename vct = float>
+  constexpr const glm::vec<C, vct> *cend(const glm::mat<R,C,vct> &m)
+  {
+    return &m[0] + R;
   }
 }
 

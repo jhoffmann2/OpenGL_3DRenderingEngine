@@ -35,12 +35,12 @@ void ObjectComponent::OnObjectActivated()
 {
 }
 
-void ObjectComponent::SetObject(GameObject* obj)
+void ObjectComponent::SetGameObject(GameObject* obj)
 {
   object_ = obj;
 }
 
-GameObject& ObjectComponent::Parent() const
+GameObject *ObjectComponent::GetGameObject() const
 {
-  return *object_;
+  return object_;
 }

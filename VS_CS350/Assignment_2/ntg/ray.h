@@ -20,6 +20,12 @@ namespace ntg
     vec<vcl, vct> direction;
   };
 
+  template<length_t vcl = 3, typename vct = float>
+  [[nodiscard]] ray<vcl, vct> operator*(const mat<vcl, vcl, vct>& transform, const ray<vcl, vct>& r);
+
+  template<length_t vcl = 3, typename vct = float>
+  [[nodiscard]] ray<vcl, vct> operator*(const mat<vcl + 1, vcl + 1, vct>& transform, const ray<vcl, vct>& r);
+
   using ray2 = ray<2, float>;
   using ray3 = ray<3, float>;
   using ray4 = ray<4, float>;
