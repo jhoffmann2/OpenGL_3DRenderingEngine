@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="02. Assignment 2 SP2021.pdf" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Affine.cpp" />
+    <ClCompile Include="Assignment1Scene.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CameraTransform.cpp" />
+    <ClCompile Include="ChildListComponent.cpp" />
+    <ClCompile Include="FaceNormalRender.cpp" />
+    <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="GBuffer.cpp" />
+    <ClCompile Include="GLApplication.cpp" />
+    <ClCompile Include="Light.cpp" />
+    <ClCompile Include="LightComponent.cpp" />
+    <ClCompile Include="LightHandle.cpp" />
+    <ClCompile Include="LightSystem.cpp" />
+    <ClCompile Include="material.cpp" />
+    <ClCompile Include="MaterialComponent.cpp" />
+    <ClCompile Include="MaterialSystem.cpp" />
+    <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="ObjectComponent.cpp" />
+    <ClCompile Include="RenderingComponent.cpp" />
+    <ClCompile Include="SolidRender.cpp" />
+    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="TransformComponent.cpp" />
+    <ClCompile Include="VertexGlobalSystem.cpp" />
+    <ClCompile Include="VertexNormalRender.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Affine.h" />
+    <ClInclude Include="Assignment1Scene.h" />
+    <ClInclude Include="bounds.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="ChildListComponent.h" />
+    <ClInclude Include="FaceNormalRender.h" />
+    <ClInclude Include="GameObject.h" />
+    <ClInclude Include="GBuffer.h" />
+    <ClInclude Include="Light.h" />
+    <ClInclude Include="LightComponent.h" />
+    <ClInclude Include="LightHandle.h" />
+    <ClInclude Include="LightSystem.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="MaterialComponent.h" />
+    <ClInclude Include="MaterialHandle.h" />
+    <ClInclude Include="MaterialSystem.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="ObjectComponent.h" />
+    <ClInclude Include="RenderingComponent.h" />
+    <ClInclude Include="SolidRender.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="TransformComponent.h" />
+    <ClInclude Include="Utilities.h" />
+    <ClInclude Include="VertexGlobalSystem.h" />
+    <ClInclude Include="VertexNormalRender.h" />
+  </ItemGroup>
+</Project>
