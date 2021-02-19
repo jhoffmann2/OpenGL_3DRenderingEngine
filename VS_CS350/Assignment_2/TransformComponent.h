@@ -30,7 +30,7 @@ public:
   [[nodiscard]]const glm::vec3 &GetScale() const;
 
   [[nodiscard]]glm::vec3 GetPosition() const;
-  [[nodiscard]]glm::mat4 GetModel() const;
+  [[nodiscard]]glm::mat4 GetModelToWorld() const;
 private:
   glm::vec3 translation_;
   glm::vec3 pivot_;

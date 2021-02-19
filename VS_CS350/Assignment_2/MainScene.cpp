@@ -141,6 +141,7 @@ void MainScene::UpdateActivePowerPlants()
     }
   }
   
+  auto* transform = objects_[POWER_PLANT]->GetComponent<TransformComponent>();
   static ntg::bounds3 prev_bounds;
   ntg::bounds3 cur_bounds = ActivePowerPlantBounds();
   if(cur_bounds != prev_bounds)
@@ -152,18 +153,17 @@ void MainScene::UpdateActivePowerPlants()
   // update the pivot so powerplant is centered;
   static glm::vec3 destination_pivot;
   static glm::vec3 start_pivot;
-  auto* transform = objects_[0]->GetComponent<TransformComponent>();
   if(cur_lerp > lerp_time)
   {
     cur_lerp = 1;
 
-    ntg::bounds3 bounds = cur_bounds;
+    ntg::bounds3 bounds = transform->GetModelToWorld() * cur_bounds;
     glm::vec3 center = bounds.center();
     if(bounds.valid())
       center.y = bounds.min.y + 0.25f * bounds.size().y; // favor looking toward the ground
 
-    destination_pivot = -center * transform->GetScale();
     start_pivot = transform->GetPivot();
+    destination_pivot = start_pivot - center;
   }
 
   float t = glm::sineEaseInOut(static_cast<float>(cur_lerp) / lerp_time);

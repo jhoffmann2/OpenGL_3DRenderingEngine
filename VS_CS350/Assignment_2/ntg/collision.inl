@@ -263,7 +263,7 @@ namespace ntg
   bool collide(const ray<vcl, vct>& r, const simplex<vcl, vcl + 1, vct>& s, vct& tmin_out, vct& tmax_out)
   {
     tmin_out = std::numeric_limits<vct>::max();
-    tmax_out = std::numeric_limits<vct>::min();
+    tmax_out = std::numeric_limits<vct>::lowest();
     bool collsion = false;
     // construct n lower dimension simplexes out of each face and raycast onto those instead
     for (size_t i = 0; i < vcl; ++i)

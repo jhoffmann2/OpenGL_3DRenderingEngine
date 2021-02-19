@@ -47,7 +47,7 @@ namespace ntg
   radial<vcl, vct> radial<vcl, vct>::grow(const bounds<vcl, vct>& aabb) const
   {
     const vec<vcl, vct>d_max;
-    const vct l2_max = std::numeric_limits<vct>::min();
+    const vct l2_max = std::numeric_limits<vct>::lowest();
     for (const vec<vcl, vct>& vertex : aabb)
     {
       const vec<vcl, vct>d = vertex - center;
@@ -109,7 +109,7 @@ namespace ntg
     return glm::sqrt(glm::compMax(s));
   }
 
-  template<length_t vcl = 3, typename vct = float>
+  template<length_t vcl, typename vct>
   radial<vcl, vct> operator*(const mat<vcl, vcl, vct>& transform, const radial<vcl, vct>& r)
   {
     return {
@@ -118,7 +118,7 @@ namespace ntg
     };
   }
 
-  template<length_t vcl = 3, typename vct = float>
+  template<length_t vcl, typename vct>
   radial<vcl, vct> operator*(const mat<vcl + 1, vcl + 1, vct>& transform, const radial<vcl, vct>& r)
   {
     return {

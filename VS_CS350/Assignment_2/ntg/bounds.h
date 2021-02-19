@@ -29,7 +29,7 @@ namespace ntg
     [[nodiscard]] bool operator!=(const bounds& other) const;
 
     vec<vcl, vct> min = vec<vcl, vct>(std::numeric_limits<vct>::max());
-    vec<vcl, vct> max = vec<vcl, vct>(std::numeric_limits<vct>::min());
+    vec<vcl, vct> max = vec<vcl, vct>(std::numeric_limits<vct>::lowest());
   };
 
   template<length_t vcl = 3, typename vct = float>

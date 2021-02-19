@@ -11,7 +11,7 @@
 
 void TransformComponent::PreRender()
 {
-  VertexGlobalSystem::SetModelToWorld(GetModel());
+  VertexGlobalSystem::SetModelToWorld(GetModelToWorld());
 }
 
 bool LockedDragFloat3(const char* label, glm::vec3 &v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f", ImGuiSliderFlags flags = 0)
@@ -140,7 +140,7 @@ glm::vec3 TransformComponent::GetPosition() const
   return translation_ + rotate(pivot_, glm::radians(rotation_.angle_), rotation_.normal_);
 }
 
-glm::mat4 TransformComponent::GetModel() const
+glm::mat4 TransformComponent::GetModelToWorld() const
 {
   //TODO: USE DIRTY VAR TO MAKE THIS FASTER
   glm::mat4 out{1};

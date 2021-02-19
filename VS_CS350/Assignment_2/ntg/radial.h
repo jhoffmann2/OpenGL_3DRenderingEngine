@@ -28,7 +28,7 @@ namespace ntg
     [[nodiscard]] bool operator!=(const radial& other);
 
     vec<vcl, vct> center = vec<vcl, vct>(0);
-    vct radius = std::numeric_limits<vct>::min();
+    vct radius = std::numeric_limits<vct>::lowest();
   private:
     template<length_t vml>
     static vct extractScale(const mat<vml, vml,vct>& t);
