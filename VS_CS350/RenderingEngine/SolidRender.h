@@ -53,9 +53,9 @@ private:
   SolidRender(void);
   ~SolidRender(void);
   struct MeshData {
-    enum { VERT=0, NORM=1, FACE=2, UV=3 };
+    enum { VERT, NORM, UV, V_MAT, FACE, VERTEX_ATTRIB_COUNT };
     GLuint vertexArrayBuffer_,
-           bufferObjects_[4];
+           bufferObjects_[VERTEX_ATTRIB_COUNT];
     int faceCount_;
   };
 

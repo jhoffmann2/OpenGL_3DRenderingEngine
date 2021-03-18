@@ -24,6 +24,7 @@ struct Mesh
   std::vector<glm::vec3> vertex_normals;
   std::vector<glm::vec2> vertex_uv;
   std::vector<glm::vec3> face_normals;
+  std::vector<int> vertex_material;
 };
 enum UV_MAPPING
 {

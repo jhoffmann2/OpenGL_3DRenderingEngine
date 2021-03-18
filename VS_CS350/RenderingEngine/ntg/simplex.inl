@@ -27,6 +27,12 @@ namespace ntg
   }
 
   template <length_t vcl, length_t point_count, typename vct>
+  simplex<vcl, point_count, vct>::simplex(const vec<vcl, vct>(&pointArr)[point_count])
+  {
+    std::copy(std::begin(pointArr), std::end(pointArr), points);
+  }
+
+  template <length_t vcl, length_t point_count, typename vct>
   vec<point_count, vct> simplex<vcl, point_count, vct>::toBarycentric(const vec<vcl, vct>& world) const
   {
     // use cramer's rule to solve the system of equations

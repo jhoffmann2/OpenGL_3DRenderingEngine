@@ -18,6 +18,7 @@ out vec3 world_normal;
 
 out vec3 model_pos;
 out vec2 uv_frag;
+out float local_mat;
 
 
 void main() {
@@ -27,4 +28,5 @@ void main() {
 	world_normal = (modelNToWorldN * vec4(normal, 0)).xyz;
 	world_position = (modelToWorld * vec4(position, 1)).xyz;
 	gl_Position = camToNDC * worldToCam * vec4(world_position, 1);
+	local_mat = v_mat;
 }

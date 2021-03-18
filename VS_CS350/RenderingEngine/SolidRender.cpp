@@ -63,14 +63,16 @@ int SolidRender::loadMesh(const Mesh& m)
 	// references to inside of data to avoid rewriting code
 	GLuint& vertex_buffer = data.bufferObjects_[MeshData::VERT];
 	GLuint& normal_buffer = data.bufferObjects_[MeshData::NORM];
-	GLuint& face_buffer = data.bufferObjects_[MeshData::FACE];
 	GLuint& uv_buffer = data.bufferObjects_[MeshData::UV];
+	GLuint& vMat_buffer = data.bufferObjects_[MeshData::V_MAT];
+	GLuint& face_buffer = data.bufferObjects_[MeshData::FACE];
 	GLuint& vao = data.vertexArrayBuffer_;
 	int& face_count = data.faceCount_;
 
 	vertex_buffer = GLHelper::GenBuffer(m.vertices);
 	normal_buffer = GLHelper::GenBuffer(m.vertex_normals);
 	uv_buffer = GLHelper::GenBuffer(m.vertex_uv);
+	vMat_buffer = GLHelper::GenBuffer(m.vertex_material);
 	face_buffer = GLHelper::GenBuffer(m.faces, GL_ELEMENT_ARRAY_BUFFER);
 
 	// create vertex array object
@@ -78,9 +80,10 @@ int SolidRender::loadMesh(const Mesh& m)
 	//   start state recording
 	glBindVertexArray(vao);
 
-	GLHelper::BindVertexAttribute(vertex_buffer, 0, m.vertices);
-	GLHelper::BindVertexAttribute(normal_buffer, 1, m.vertex_normals);
-	GLHelper::BindVertexAttribute(uv_buffer, 2, m.vertex_uv);
+	GLHelper::BindVertexAttribute(vertex_buffer, MeshData::VERT, m.vertices);
+	GLHelper::BindVertexAttribute(normal_buffer, MeshData::NORM, m.vertex_normals);
+	GLHelper::BindVertexAttribute(uv_buffer, MeshData::UV, m.vertex_uv);
+	GLHelper::BindVertexAttribute(vMat_buffer, MeshData::V_MAT, GL_INT);
 
 	// ready the face buffer for drawing
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, face_buffer);
@@ -98,15 +101,11 @@ void SolidRender::unloadMesh(int mi)
 
 	// references to inside of data to avoid rewriting code
 	MeshData &data = Instance().meshData_[mi];
-	GLuint &vertex_buffer = data.bufferObjects_[MeshData::VERT];
-	GLuint &normal_buffer = data.bufferObjects_[MeshData::NORM];
-	GLuint &face_buffer = data.bufferObjects_[MeshData::FACE];
 	GLuint &vao = data.vertexArrayBuffer_;
 
 	glDeleteVertexArrays(1, &vao);
-	glDeleteBuffers(1, &normal_buffer);
-	glDeleteBuffers(1, &face_buffer);
-	glDeleteBuffers(1, &vertex_buffer);
+	for(size_t i = 0; i < MeshData::VERTEX_ATTRIB_COUNT; ++i)
+		glDeleteBuffers(1, &data.bufferObjects_[i]);
 }
 
 void SolidRender::draw(int mi, Texture& diffuseTex, Texture& specularTex)
@@ -131,7 +130,9 @@ void SolidRender::draw(int mi, Texture& diffuseTex, Texture& specularTex)
 	// recall state
 	glBindVertexArray(vao);
 	glLineWidth(3.0f);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glDrawElements(GL_TRIANGLES, 3 * face_count, GL_UNSIGNED_INT, nullptr);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glBindVertexArray(0);
 }
 

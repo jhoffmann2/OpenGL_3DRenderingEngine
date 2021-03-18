@@ -12,8 +12,9 @@ namespace ntg
 
     simplex() = default;
     simplex(const std::initializer_list<vec<vcl, vct>>& l);
-    simplex(const mat<point_count,vcl,vct>& pointlist);
-    simplex(const std::array<vec<vcl,vct>,point_count>& pointlist);
+    explicit simplex(const mat<point_count,vcl,vct>& pointlist);
+    explicit simplex(const std::array<vec<vcl,vct>,point_count>& pointlist);
+    explicit simplex(const vec<vcl, vct> (&pointArr)[point_count]);
 
     // converts input coordinate into local barycentric coordinates
     // note: if the input point doesn't exist within this space, it will be projected

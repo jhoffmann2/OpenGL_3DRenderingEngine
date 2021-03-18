@@ -20,6 +20,7 @@ in vec3 world_normal;
 
 in vec3 model_pos;
 in vec2 uv_frag;
+in float local_mat;
 
 uniform sampler2D diffuseTexture;
 uniform sampler2D specularTexture;
@@ -36,6 +37,12 @@ void main(void)
 	DiffuseOut.a = texture(specularTexture, uv).r;
 
 	WorldPosOut.xyz = world_position;
-	WorldPosOut.w = float(curMaterial) / 10;
+	
+	WorldPosOut.w = 0.1f * (
+		abs(local_mat + 1.f) < 0.05f ? // local_mat ~== -1.f
+			float(curMaterial) : 
+			local_mat
+	);
+
 	NormalOut.xyz = normalize(world_normal);
 }

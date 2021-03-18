@@ -208,6 +208,9 @@ read_new_face:
   {
     vertex_uv.emplace_back(calculateUV(pos, uvMapping));
   }
+
+  mesh.vertex_material.resize(vertices.size(), -1);
+
   return mesh;
 }
 
@@ -277,6 +280,8 @@ Mesh generateSphereMesh(size_t division_count, UV_MAPPING uvMapping)
     vertex_uv.emplace_back(calculateUV(pos, uvMapping));
   }
 
+  mesh.vertex_material.resize(vertices.size(), -1);
+
   return mesh;
 }
 
@@ -335,6 +340,8 @@ Mesh aiSceneToMesh(const aiScene* scene)
   outMesh.face_normals.resize(inMesh.mNumFaces);
   // TODO: Generate Face Normals
 
+  outMesh.vertex_material.resize(inMesh.mNumVertices, -1);
+
   //CenterMesh(outMesh.vertices);
   return outMesh;
 }
@@ -343,7 +350,9 @@ Mesh aiImportMesh(const std::string& path)
 {
   static Assimp::Importer importer;
 
-  const aiScene* scene = importer.ReadFile(path, aiProcess_GenSmoothNormals);
+  const aiScene* scene = importer.ReadFile(path, 
+    aiProcess_GenSmoothNormals | aiProcess_Triangulate
+  );
   if(!scene)
     std::cout << importer.GetErrorString() << std::endl;
   return aiSceneToMesh(scene);

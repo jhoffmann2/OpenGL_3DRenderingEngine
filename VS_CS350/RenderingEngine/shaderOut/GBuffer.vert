@@ -14,6 +14,7 @@ End Header --------------------------------------------------------*/
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normal;
 layout(location = 2) in vec2 uv_vert;
+layout(location = 3) in float v_mat;
 layout (std140, binding = 2) uniform VertexGlobals
 {
 	mat4 camToNDC;
@@ -25,10 +26,12 @@ out vec3 world_position;
 out vec3 world_normal;
 out vec3 model_pos;
 out vec2 uv_frag;
+out float local_mat;
 void main() {
 	uv_frag = uv_vert;
 	model_pos = position;
 	world_normal = (modelNToWorldN * vec4(normal, 0)).xyz;
 	world_position = (modelToWorld * vec4(position, 1)).xyz;
 	gl_Position = camToNDC * worldToCam * vec4(world_position, 1);
+	local_mat = v_mat;
 }
