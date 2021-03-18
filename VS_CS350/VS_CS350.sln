@@ -41,9 +41,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Include", "Include", "{7141
 		..\Common\shaders\Include\uv.glsl = ..\Common\shaders\Include\uv.glsl
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Assignment_2", "Assignment_2\Assignment_2.vcxproj", "{7B11B54B-4173-48BE-BD33-D48669A3E202}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RenderingEngine", "RenderingEngine\RenderingEngine.vcxproj", "{7B11B54B-4173-48BE-BD33-D48669A3E202}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ntg", "Assignment_2\ntg\ntg.vcxproj", "{213062DA-61AC-40AB-9656-B3C61EE9B80F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ntg", "RenderingEngine\ntg\ntg.vcxproj", "{213062DA-61AC-40AB-9656-B3C61EE9B80F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
