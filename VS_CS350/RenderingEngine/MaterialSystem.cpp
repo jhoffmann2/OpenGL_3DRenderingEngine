@@ -53,7 +53,7 @@ void MaterialSystem::SetCurrentMaterialIndex(size_t index)
 {
   MaterialSystem& instance = Instance();
   auto& cur = instance.shaderData_.curMaterial_;
-  if(cur != index)
+  if(cur != static_cast<GLuint>(index))
   {
     cur = index;
 

@@ -9,3 +9,15 @@ bin-int
 *.user
 #------------------------------------
 Common/imgui/
+
+VS_CS350/Release/
+
+VS_CS350/RenderingEngine/Release/
+
+VS_CS350/RenderingEngine/x64/
+
+VS_CS350/x64/
+
+VS_CS350/RenderingEngine/ntg/Release/
+
+VS_CS350/RenderingEngine/ntg/x64/

@@ -112,6 +112,8 @@ ntg::bounds3 MainScene::ActivePowerPlantBounds() const
   return out;
 }
 
+std::vector<std::vector<Mesh>> allMeshes;
+
 void MainScene::UpdateActivePowerPlants()
 {
   constexpr size_t lerp_time = 60; // lerp over 60 frames
@@ -135,8 +137,10 @@ void MainScene::UpdateActivePowerPlants()
       std::cout << "centering and normalizing meshes" << std::endl;
       MeshTransform(meshes, powerPlantTransformation_);
 
+
       pc->AddChildrenFromMeshes(meshes, names);
       cur_lerp = lerp_time + 1;
+      allMeshes.emplace_back(std::move(meshes));
       break;// only load one per frame
     }
   }

@@ -348,7 +348,7 @@ Mesh aiSceneToMesh(const aiScene* scene)
 
 Mesh aiImportMesh(const std::string& path)
 {
-  static Assimp::Importer importer;
+  Assimp::Importer importer;
 
   const aiScene* scene = importer.ReadFile(path, 
     aiProcess_GenSmoothNormals | aiProcess_Triangulate
@@ -424,10 +424,11 @@ glm::mat4 CenterMeshTransform(const glm::vec3& minCorner, const glm::vec3& maxCo
 
 glm::mat4 CenterMeshTransform(const ntg::bounds3& bounds)
 {
-  const float max_distance = *std::max_element(
-    glm::data(bounds.size()),
-    glm::data(bounds.size()) + 3
-  );
+  glm::vec3 size = bounds.size();
+
+  float max_distance = 0;
+  for (float v : size)
+    max_distance = glm::max(max_distance, abs(v));
   return glm::scale(1.f / max_distance) * translate(-bounds.center());
 }
 
