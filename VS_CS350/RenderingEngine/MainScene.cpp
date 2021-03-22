@@ -122,16 +122,6 @@ void MainScene::UpdateActivePowerPlants()
 
   auto* transform = objects_[POWER_PLANT]->GetComponent<TransformComponent>();
   SpacialTree* SPT = SpacialTreeHierarchy::GetTree(transform);
-  if(SPT == nullptr)
-  {
-    SPT = SpacialTreeHierarchy::SetTree(
-      transform, 
-      new Octree(ntg::bounds3(
-        { -0.5f,-0.5f,-0.5f }, 
-        { 0.5f,0.5f,0.5f }
-      ))
-    );
-  }
 
   for (ParentChildComponent* pc : PowerPlantGroup())
   {
@@ -262,14 +252,15 @@ int MainScene::Init()
   }
 
   objects_.emplace_back(new GameObject("Power Plant"));
-  objects_.back()->AddComponent(
-    new TransformComponent(
-      { 0,0,0 },
-      { 0,0,0 },
-      { EY,0 },
-      40.f
-    )
+
+  TransformComponent * transform = new TransformComponent(
+    { 0,0,0 },
+    { 0,0,0 },
+    { EY,0 },
+    40.f
   );
+  objects_.back()->AddComponent(transform);
+
   
   MaterialHandle material(0);
   material.SetEmissiveColor(glm::vec3{ 0 });
@@ -281,6 +272,11 @@ int MainScene::Init()
   auto* pc = new ParentChildComponent();
 
   powerPlantTransformation_ = CenterMeshTransform(powerPlantBounds.back());
+  SpacialTreeHierarchy::SetTree(
+    transform,
+    new Octree(powerPlantTransformation_ * powerPlantBounds.back())
+  );
+
   for (size_t i = 0; i < powerPlantGroupCount; ++i)
   {
     const std::string name = "Section" + std::to_string(i + 1);

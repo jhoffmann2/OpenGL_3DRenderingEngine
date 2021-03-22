@@ -24,7 +24,7 @@ Node::Node(bool isLeaf, const ntg::bounds3& bounds, Branch* parent) :
 {
 }
 
-Node::Node(bool isLeaf, Branch* parent, size_t octant) :
+Node::Node(bool isLeaf, Branch* parent, unsigned char octant) :
   isLeaf_(isLeaf), parent_(parent), tree_(parent->tree_)
 {
   static const glm::vec3 directions[8] = {
@@ -84,7 +84,7 @@ Leaf::Leaf(const ntg::bounds3& bounds, Branch* parent) :
 {
 }
 
-Leaf::Leaf(Branch* parent, size_t octant) :
+Leaf::Leaf(Branch* parent, unsigned char octant) :
   Node(true, parent, octant)
 {
 }
@@ -131,7 +131,7 @@ Node* Branch::MatchChild(const glm::vec3& point) const
 
 Leaf* Branch::MatchLeaf(const glm::vec3& point)
 {
-  const size_t oct = octant(point);
+  const signed oct = octant(point);
   Node *&child = children_[oct];
 
   if(!child)
@@ -141,7 +141,7 @@ Leaf* Branch::MatchLeaf(const glm::vec3& point)
   return child->ToBranch()->MatchLeaf(point);
 }
 
-size_t Branch::octant(const glm::vec3& point) const
+unsigned char Branch::octant(const glm::vec3& point) const
 {
   const glm::vec3 v = point - bounds_.center();
   return ((v[0] >= -1e-6)) |
@@ -149,25 +149,29 @@ size_t Branch::octant(const glm::vec3& point) const
     ((v[2] >= -1e-6) << 2);
 }
 
-size_t firstSetBit(size_t v)
+unsigned char firstSetBit(unsigned char v)
 {
-  auto&vl = reinterpret_cast<long long&>(v);
-  long long out = vl & -vl;
-  return reinterpret_cast<size_t &>(out);
+  auto&vl = reinterpret_cast<char&>(v);
+  char out = vl & -vl;
+  return reinterpret_cast<unsigned char&>(out);
 }
 
-glm::vec3 getSplitPlaneNormal(size_t octant1, size_t octant2)
+bool getSplitPlaneNormal(unsigned char o1, unsigned char o2, unsigned char o3, size_t direction, glm::vec3 &out_normal)
 {
-  switch (firstSetBit(octant1 ^ octant2))
+  const unsigned char v = ~((o1 & o2 & o3) | ~(o1 | o2 | o3)) & (1 << direction);
+  switch (v)
   {
   case 1: // yz plane
-    return { 1, 0, 0 };
+    out_normal = { 1, 0, 0 };
+    return true;
   case 2: // xz plane
-    return { 0, 1, 0 };
+    out_normal = { 0, 1, 0 };
+    return true;
   case 4: // xy plane
-    return { 0, 0, 1 };
+    out_normal = { 0, 0, 1 };
+    return true;
   }
-  throw std::out_of_range("Octants must not match");
+  return false;
 }
 
 void Branch::Add(const ntg::triangle3& tri)
@@ -177,54 +181,54 @@ void Branch::Add(const ntg::triangle3& tri)
   std::vector<ntg::triangle3> backSplit;
   frontSplit.reserve(2);
 
-  size_t oct0 = octant(tri.points[0]);
-  const size_t oct1 = octant(tri.points[1]);
-  const size_t oct2 = octant(tri.points[2]);
+  unsigned char oct0 = octant(tri.points[0]);
+  const unsigned char oct1 = octant(tri.points[1]);
+  const unsigned char oct2 = octant(tri.points[2]);
 
-  if(oct0 != oct1)
-  {
-    const ntg::hyperplane3 p(bounds_.center(), getSplitPlaneNormal(oct0, oct1));
-    if(split(tri, p, frontSplit, backSplit))
-    {
-      for (const ntg::triangle3 &new_tri : frontSplit)
-        Add(new_tri);
-      for (const ntg::triangle3 &new_tri : backSplit)
-        Add(new_tri);
-      return;
-    }
-    if(oct1 == oct2)
-      oct0 = oct1;
-  }
-  else if (oct0 != oct2)
-  {
-    const ntg::hyperplane3 p(bounds_.center(), getSplitPlaneNormal(oct0, oct2));
-    if (split(tri, p, frontSplit, backSplit))
-    {
-      for (const ntg::triangle3& new_tri : frontSplit)
-        Add(new_tri);
-      for (const ntg::triangle3& new_tri : backSplit)
-        Add(new_tri);
-      return;
-    }
-    if (oct1 == oct2)
-      oct0 = oct1;
-  }
-  
+  std::vector<ntg::triangle3> triangles;
+  triangles.push_back(tri);
 
-  // if you've made it this far, all three points are in the same octant yay!
-  if(children_[oct0] == nullptr)
+  for(size_t direction = 0; direction < 3; ++direction)
   {
-    Leaf *l = new Leaf(this, oct0);
-    children_[oct0] = l;
+    std::vector<ntg::triangle3> split_triangles;
+    glm::vec3 n;
+    if(getSplitPlaneNormal(oct0, oct1, oct2, direction, n))
+    {
+      for (const ntg::triangle3 &triangle : triangles)
+      {
+        if (split(triangle, { bounds_.center(),n }, frontSplit, backSplit))
+        {
+          for (const ntg::triangle3& new_tri : frontSplit)
+              split_triangles.push_back(new_tri);
+          for (const ntg::triangle3& new_tri : backSplit)
+              split_triangles.push_back(new_tri);
+        }
+        else
+          split_triangles.push_back(triangle);
+      }
+      triangles = std::move(split_triangles);
+    }
+  }
+  for (const ntg::triangle3& triangle : triangles)
+      ForceAdd(triangle);
+}
+
+void Branch::ForceAdd(const ntg::triangle3& tri)
+{
+  const unsigned char oct = octant(tri.toWorld({1.f/3.f, 1.f / 3.f, 1.f / 3.f}));
+  if (children_[oct] == nullptr)
+  {
+    Leaf* l = new Leaf(this, oct);
+    children_[oct] = l;
     l->Add(tri);
     return;
   }
-  if(children_[oct0]->isLeaf_)
+  if (children_[oct]->isLeaf_)
   {
-    children_[oct0]->ToLeaf()->Add(tri);
+    children_[oct]->ToLeaf()->Add(tri);
     return;
   }
-  children_[oct0]->ToBranch()->Add(tri);
+  children_[oct]->ToBranch()->Add(tri);
 }
 
 Branch::Branch(const ntg::bounds3& bounds, Octree* tree) :
@@ -239,7 +243,7 @@ Branch::Branch(const ntg::bounds3& bounds, Branch* parent):
   children_.fill(nullptr);
 }
 
-Branch::Branch(Branch* parent, size_t octant) :
+Branch::Branch(Branch* parent, unsigned char octant) :
   Node(false, parent, octant)
 {
   children_.fill(nullptr);
@@ -305,11 +309,12 @@ void Octree::ImguiDraw(TransformComponent* transform)
 
 void Branch::ImguiDraw(const glm::mat4& transform)
 {
-  const float hue = glm::linearRand(0.f, 360.f);
-  DebugDraw::SetColor(rgbColor(glm::vec3{ hue, 1.f, 1.f }));
+  DebugDraw::DrawAABB(bounds_, GL_LINE);
 
   ImGui::Indent(10);
   const ntg::bounds3 worldbounds = transform * bounds_;
+
+  ImGui::PushStyleColor(ImGuiCol_Text, {1.f, 1.f, 1.f, 1.f});
   ImGui::Text("Bounds: [%.2f, %.2f, %.2f], [%.2f, %.2f, %.2f]",
     worldbounds.min.x,
     worldbounds.min.y,
@@ -318,26 +323,56 @@ void Branch::ImguiDraw(const glm::mat4& transform)
     worldbounds.max.y,
     worldbounds.max.z
   );
+  ImGui::PopStyleColor();
+
   for(size_t i = 0; i < children_.size(); ++i)
   {
     if(children_[i])
     {
       ImGui::PushID(static_cast<int>(i));
       
+      const glm::vec3 color = rgbColor(
+          linearRand(
+            glm::vec3{ 0.f, 0.5f, 0.5f }, 
+            glm::vec3{ 360.f, 1.f, 1.f }
+          )
+        );
+      ImGui::PushStyleColor(ImGuiCol_Header, ImVec4{color.r, color.g, color.b, 1.f});
+      DebugDraw::SetColor(glm::vec4{ color, 1.f });
+
       if(children_[i]->isLeaf_)
       {
         if (ImGui::CollapsingHeader("Leaf"))
           children_[i]->ToLeaf()->ImguiDraw(transform);
         else
-          children_[i]->ToLeaf()->Render();
+        {
+          if(ImGui::IsItemHovered())
+          {
+            const ImGuiStyle& style = ImGui::GetStyle();
+            auto c = style.Colors[ImGuiCol_HeaderHovered];
+            DebugDraw::SetColor(glm::vec4{ 1.f, 1.f, 1.f, 1.f });
+          }
+          DebugDraw::DrawAABB(children_[i]->bounds_, GL_LINE);
+          children_[i]->ToLeaf()->Render(); 
+        }
       }
       else
       {
         if (ImGui::CollapsingHeader("Branch"))
           children_[i]->ToBranch()->ImguiDraw(transform);
         else
+        {
+          if (ImGui::IsItemHovered())
+          {
+            const ImGuiStyle& style = ImGui::GetStyle();
+            auto c = style.Colors[ImGuiCol_HeaderHovered];
+            DebugDraw::SetColor(glm::vec4{ 1.f, 1.f, 1.f, 1.f });
+          }
+          DebugDraw::DrawAABB(children_[i]->bounds_, GL_LINE);
           children_[i]->ToBranch()->Render();
+        }
       }
+      ImGui::PopStyleColor();
 
       ImGui::PopID();
     }
@@ -347,12 +382,13 @@ void Branch::ImguiDraw(const glm::mat4& transform)
 
 void Leaf::ImguiDraw(const glm::mat4& transform)
 {
-  const float hue = glm::linearRand(0.f, 360.f);
-  DebugDraw::SetColor(rgbColor(glm::vec3{ hue, 1.f, 1.f }));
+  DebugDraw::DrawAABB(bounds_, GL_LINE);
 
   ImGui::Indent(10);
   const ntg::bounds3 worldbounds = transform * bounds_;
   Render();
+
+  ImGui::PushStyleColor(ImGuiCol_Text, { 1.f, 1.f, 1.f, 1.f });
   ImGui::Text("Bounds: [%.2f, %.2f, %.2f], [%.2f, %.2f, %.2f]",
     worldbounds.min.x,
     worldbounds.min.y,
@@ -361,6 +397,7 @@ void Leaf::ImguiDraw(const glm::mat4& transform)
     worldbounds.max.y,
     worldbounds.max.z
   );
+
   if(ImGui::Button("Split"))
   {
     Split();
@@ -368,6 +405,7 @@ void Leaf::ImguiDraw(const glm::mat4& transform)
   }
   char buffer[32]{0};
   sprintf_s(buffer, 32, "Triangles [%llu]", triangles_.size());
+
   if (ImGui::CollapsingHeader(buffer))
   {
     for(const ntg::triangle3 &tri : triangles_)
@@ -389,11 +427,12 @@ void Leaf::ImguiDraw(const glm::mat4& transform)
     }
   }
   ImGui::Unindent(10);
+  ImGui::PopStyleColor();
 }
 
 void Leaf::Render() const
 {
-  DebugDraw::DrawWireframe(triangles_);
+  DebugDraw::DrawTriangleList(triangles_, GL_LINE);
 }
 
 void Branch::Render() const

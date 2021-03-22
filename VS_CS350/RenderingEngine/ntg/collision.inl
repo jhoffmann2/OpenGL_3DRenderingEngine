@@ -367,7 +367,7 @@ namespace ntg
   int ternary_collide(const vec<vcl, vct>& p, const hyperplane<vcl, vct>& h)
   {
     const float d = glm::dot(p - h.origin, h.normal);
-    return (glm::abs(d) < 0.001f)? 0 : static_cast<int>(sign(d));
+    return (glm::abs(d) < 1e-6)? 0 : static_cast<int>(sign(d));
   }
 
   template <length_t vcl, typename vct>
@@ -456,6 +456,11 @@ namespace ntg
         throw std::out_of_range("invalid jump table value");
       }
     }
+    for(size_t i = 0; i < frontSize; ++i)
+      assert(ternary_collide(frontlist[i], p) >= 0);
+    for(size_t i = 0; i < backSize; ++i)
+      assert(ternary_collide(backlist[i], p) <= 0);
+
     if(frontSize >= 3)
       front_out.emplace_back(triangle3{frontlist[0], frontlist[1], frontlist[2]});
     if (frontSize == 4)

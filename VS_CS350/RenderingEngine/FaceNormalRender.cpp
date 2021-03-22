@@ -100,7 +100,7 @@ int FaceNormalRender::loadMesh(const Mesh& m, float line_length)
 	//   stop state recording
 	glBindVertexArray(0);
 
-	line_count = lines.size();
+	line_count = static_cast<int>(lines.size());
 
 	Instance().mesh_data.push_back(data);
 	return static_cast<int>(Instance().mesh_data.size() - 1);

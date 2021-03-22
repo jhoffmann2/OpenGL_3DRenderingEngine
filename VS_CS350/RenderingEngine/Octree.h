@@ -17,7 +17,7 @@ struct Node
 {
   Node(bool isLeaf, const ntg::bounds3& bounds, Octree* tree);
   Node(bool isLeaf, const ntg::bounds3& bounds, Branch* parent);
-  Node(bool isLeaf, Branch* parent, size_t octant);
+  Node(bool isLeaf, Branch* parent, unsigned char octant);
   [[nodiscard]] Leaf *ToLeaf();
   [[nodiscard]] Branch *ToBranch();
   [[nodiscard]] const Leaf *ToLeaf() const;
@@ -32,7 +32,7 @@ struct Leaf : Node
 {
   Leaf(const ntg::bounds3& bounds, Octree* tree);
   Leaf(const ntg::bounds3& bounds, Branch* parent);
-  Leaf(Branch* parent, size_t octant);
+  Leaf(Branch* parent, unsigned char octant);
   void Add(const ntg::triangle3& tri);
   Branch *Split();
   void ImguiDraw(const glm::mat4& transform);
@@ -44,12 +44,13 @@ struct Branch : Node
 {
   Branch(const ntg::bounds3& bounds, Octree* tree);
   Branch(const ntg::bounds3& bounds, Branch *parent);
-  Branch(Branch *parent, size_t octant);
+  Branch(Branch *parent, unsigned char octant);
   [[nodiscard]] Node*& MatchChild(const glm::vec3& point);
   [[nodiscard]] Node* MatchChild(const glm::vec3& point) const;
   [[nodiscard]] Leaf* MatchLeaf(const glm::vec3& point);
-  [[nodiscard]] size_t octant(const glm::vec3& point) const;
+  [[nodiscard]] unsigned char octant(const glm::vec3& point) const;
   void Add(const ntg::triangle3& tri);
+  void ForceAdd(const ntg::triangle3& tri);
   void ImguiDraw(const glm::mat4& transform);
   void Render() const;
 

@@ -23,7 +23,7 @@ class SpacialTreeHierarchy
 public:
   [[nodiscard]] static bool Collide(const glm::vec3& point, ntg::triangle3& hit);
   [[nodiscard]] static SpacialTree *GetTree(TransformComponent* key);
-  [[nodiscard]] static SpacialTree *SetTree(TransformComponent* key, SpacialTree* val);
+  static SpacialTree *SetTree(TransformComponent* key, SpacialTree* val);
   static void DeleteTree(TransformComponent* key);
   static void ImguiDraw();
   SpacialTreeHierarchy(SpacialTreeHierarchy&) = delete;
