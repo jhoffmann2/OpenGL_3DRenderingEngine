@@ -68,6 +68,11 @@ public:
     return name_;
   }
 
+  [[nodiscard]] int ID() const
+  {
+    return id_;
+  }
+
 private:
   template<typename ComponentType>
   [[nodiscard]] static std::type_index ComponentKey()

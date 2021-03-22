@@ -81,8 +81,12 @@ namespace ntg
   bool collide(const vec<vcl, vct>& p, const bounds<vcl, vct>& b)
   {
     for (size_t i = 0; i < vcl; ++i)
-      if (b.max[i] < p[i] || p[i] < b.min[i])
+    {
+      if (b.max[i] - p[i] < 1e-6)
         return false;
+      if (p[i] - b.min[i] < 1e-6)
+        return false;
+    }
     return true;
   }
 
@@ -136,7 +140,7 @@ namespace ntg
   bool collide(const ray<vcl, vct>& r, const hyperplane<vcl, vct>& h, vct& t_out)
   {
     const vct denom = glm::dot(r.direction, h.normal);
-    if (denom > -1e-6) // check for parallel
+    if (glm::abs(denom) < 1e-6) // check for parallel
       return false;
     const vec<vcl, vct> diff = h.origin - r.origin;
     t_out = glm::dot(diff, h.normal) / denom;
@@ -344,5 +348,122 @@ namespace ntg
   bool collide(const radial<vcl, vct>& r, const hyperplane<vcl, vct>& h)
   {
     return collide(h, r);
+  }
+
+  template <length_t vcl, typename vct>
+  bool in_front(const vec<vcl, vct>& p, const hyperplane<vcl, vct>& h)
+  {
+    return glm::dot(p - h.origin, h.normal) > 0;
+  }
+
+  template <length_t vcl, typename vct>
+  bool in_front(const hyperplane<vcl, vct>& h, const vec<vcl, vct>& p)
+  {
+    return in_front(p,h);
+  }
+
+
+  template <length_t vcl, typename vct>
+  int ternary_collide(const vec<vcl, vct>& p, const hyperplane<vcl, vct>& h)
+  {
+    const float d = glm::dot(p - h.origin, h.normal);
+    return (glm::abs(d) < 0.001f)? 0 : static_cast<int>(sign(d));
+  }
+
+  template <length_t vcl, typename vct>
+  int ternary_collide(const hyperplane<vcl, vct>& h, const vec<vcl, vct>& p)
+  {
+    return ternary_collide(p,h);
+  }
+
+  inline bool collide(const lineseg3& l, const hyperplane3& p, vec3& hit_out)
+  {
+    float t;
+    const ray3 r{ l.points[0], l.points[1] - l.points[0] };
+    if(collide(r, p, t))
+    {
+      if(t > 1) return false;
+      if(t < 0) return false;
+      hit_out = r.origin + r.direction * t;
+      return true;
+    }
+    return false;
+  }
+
+  inline bool split(const triangle3& t, const hyperplane3& p, std::vector<triangle3>& front_out,
+                    std::vector<triangle3>& back_out)
+  {
+    const lineseg3 edges[3] = {
+      {t.points[0], t.points[1]},
+      {t.points[1], t.points[2]},
+      {t.points[2], t.points[0]},
+    };
+
+    vec3 frontlist[4];
+    vec3 backlist[4];
+    size_t frontSize = 0;
+    size_t backSize = 0;
+
+    for (const lineseg3 &edge : edges)
+    {
+      const int tc0 = ternary_collide(edge.points[0], p) + 1;
+      const int tc1 = ternary_collide(edge.points[1], p) + 1;
+      const int state = (tc0 | tc1 << 2);
+      switch(state)
+      {
+      case 1:  // C, B
+        backlist[backSize] = edge.points[0];
+        ++backSize;
+      case 0:  // B, B
+        backlist[backSize] = edge.points[1];
+        ++backSize;
+        break;
+      case 4:  // B, C
+        backlist[backSize] = edge.points[1];
+        ++backSize;
+      case 6:  // F, C
+      case 5:  // C, C
+      case 10: // F, F
+      case 9:  // C, F
+        frontlist[frontSize] = edge.points[1];
+        ++frontSize;
+        break;
+      case 2:  // F, B
+        {
+          vec3 hit;
+          collide(edge, p, hit);
+          frontlist[frontSize] = hit;
+          ++frontSize;
+          backlist[backSize] = hit;
+          ++backSize;
+          backlist[backSize] = edge.points[1];
+          ++backSize;
+        }
+        break;
+      case 8:  // B, F
+        {
+          vec3 hit;
+          collide(edge, p, hit);
+          frontlist[frontSize] = hit;
+          ++frontSize;
+          frontlist[frontSize] = edge.points[1];
+          ++frontSize;
+          backlist[backSize] = hit;
+          ++backSize;
+        }
+        break;
+      default:
+        throw std::out_of_range("invalid jump table value");
+      }
+    }
+    if(frontSize >= 3)
+      front_out.emplace_back(triangle3{frontlist[0], frontlist[1], frontlist[2]});
+    if (frontSize == 4)
+      front_out.emplace_back(triangle3{frontlist[0], frontlist[2], frontlist[3]});
+    if(backSize >= 3)
+      back_out.emplace_back(triangle3{backlist[0], backlist[1], backlist[2]});
+    if (backSize == 4)
+      back_out.emplace_back(triangle3{backlist[0], backlist[2], backlist[3]});
+    return frontSize >= 3 && backSize >= 3;
   }
 }

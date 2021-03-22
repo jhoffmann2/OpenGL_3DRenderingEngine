@@ -11,6 +11,15 @@ namespace ntg
   {}
 
   template <length_t vcl, typename vct>
+  bounds<vcl, vct> bounds<vcl, vct>::FromTwoCorners(const vec<vcl, vct>& a, const vec<vcl, vct>& b)
+  {
+    return {
+      {glm::min(a.x, b.x), glm::min(a.y, b.y), glm::min(a.z, b.z)},
+      {glm::max(a.x, b.x), glm::max(a.y, b.y), glm::max(a.z, b.z)},
+    };
+  }
+
+  template <length_t vcl, typename vct>
   bounds<vcl, vct> bounds<vcl, vct>::grow(const vec<vcl, vct>& p) const
   {
     return { glm::min(min, p), glm::max(max, p) };
@@ -49,7 +58,7 @@ namespace ntg
   template <length_t vcl, typename vct>
   bool bounds<vcl, vct>::valid() const
   {
-    for (size_t i = 0; i < vcl; ++i)
+    for (length_t i = 0; i < vcl; ++i)
       if (max[i] < min[i])
         return false;
     return true;
@@ -98,11 +107,11 @@ namespace ntg
   template <length_t vcl, typename vct>
   std::ostream& operator<<(std::ostream& os, const bounds<vcl, vct>& b)
   {
-    for (size_t i = 0; i < vcl; ++i)
+    for (length_t i = 0; i < vcl; ++i)
     {
       os << b.min[i] << " ";
     }
-    for (size_t i = 0; i < vcl; ++i)
+    for (length_t i = 0; i < vcl; ++i)
     {
       os << b.max[i] << " ";
     }

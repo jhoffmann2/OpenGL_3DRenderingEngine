@@ -130,9 +130,7 @@ void SolidRender::draw(int mi, Texture& diffuseTex, Texture& specularTex)
 	// recall state
 	glBindVertexArray(vao);
 	glLineWidth(3.0f);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glDrawElements(GL_TRIANGLES, 3 * face_count, GL_UNSIGNED_INT, nullptr);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glBindVertexArray(0);
 }
 

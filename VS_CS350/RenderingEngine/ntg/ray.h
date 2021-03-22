@@ -13,8 +13,6 @@ namespace ntg
 
     [[nodiscard]] bool operator==(const ray& other) const;
     [[nodiscard]] bool operator!=(const ray& other) const;
-    [[nodiscard]] ray operator*(const mat<vcl, vcl, vct> & transform) const;
-    [[nodiscard]] ray operator*(const mat<vcl + 1, vcl + 1, vct> & transform) const;
 
     vec<vcl, vct> origin;
     vec<vcl, vct> direction;

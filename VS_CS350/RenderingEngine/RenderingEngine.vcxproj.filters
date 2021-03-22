@@ -43,6 +43,12 @@
     <Filter Include="Utilities\ntg-math">
       <UniqueIdentifier>{ff860034-ffd5-4230-b806-bd1ef7e97e10}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SpacialPartitioning">
+      <UniqueIdentifier>{b5d7f80e-dd51-411a-ad62-66b5d3c50b5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SpacialPartitioning\Octrees">
+      <UniqueIdentifier>{e0b25db5-8bc8-4f4d-87e5-25b9629073a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp">
@@ -143,6 +149,15 @@
     </ClCompile>
     <ClCompile Include="ParentChildComponent.cpp">
       <Filter>GameObject\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Octree.cpp">
+      <Filter>SpacialPartitioning\Octrees</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugDraw.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="SpacialTree.cpp">
+      <Filter>SpacialPartitioning</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -271,6 +286,18 @@
     <ClInclude Include="ParentChildComponent.h">
       <Filter>GameObject\Components</Filter>
     </ClInclude>
+    <ClInclude Include="Octree.h">
+      <Filter>SpacialPartitioning\Octrees</Filter>
+    </ClInclude>
+    <ClInclude Include="SpacialTree.h">
+      <Filter>SpacialPartitioning</Filter>
+    </ClInclude>
+    <ClInclude Include="hit.h">
+      <Filter>Utilities\ntg-math</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugDraw.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ntg\bounds.inl">
@@ -297,5 +324,10 @@
     <None Include="ntg\type_mat1x1.inl">
       <Filter>Utilities\ntg-math</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="octree.natvis">
+      <Filter>SpacialPartitioning\Octrees</Filter>
+    </Natvis>
   </ItemGroup>
 </Project>

@@ -21,21 +21,6 @@ namespace ntg
   }
 
   template <length_t vcl, typename vct>
-  ray<vcl, vct> ray<vcl, vct>::operator*(const mat<vcl, vcl, vct>& transform) const
-  {
-    return { direction * transform, origin * transform };
-  }
-
-  template <length_t vcl, typename vct>
-  ray<vcl, vct> ray<vcl, vct>::operator*(const mat<vcl + 1, vcl + 1, vct>& transform) const
-  {
-    return {
-      glm::vec<vcl + 1, vct>(direction, 0) * transform,
-      glm::vec<vcl + 1, vct>(origin, 1) * transform
-    };
-  }
-
-  template <length_t vcl, typename vct>
   ray<vcl, vct> operator*(const mat<vcl, vcl, vct>& transform, const ray<vcl, vct>& r)
   {
     return {transform * r.direction, transform * r.origin };

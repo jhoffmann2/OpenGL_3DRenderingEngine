@@ -1,6 +1,7 @@
 #pragma once
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/norm.hpp>
+#include <vector>
 
 #include "bounds.h"
 #include "radial.h"
@@ -107,4 +108,20 @@ namespace ntg
 
   template <length_t vcl, typename vct>
   bool collide(const radial<vcl, vct>& r, const hyperplane<vcl, vct>& h);
+
+  template <length_t vcl, typename vct>
+  bool in_front(const vec<vcl, vct>& p, const hyperplane<vcl, vct>& h);
+
+  template <length_t vcl, typename vct>
+  bool in_front(const hyperplane<vcl, vct>& h, const vec<vcl, vct>& p);
+
+  template <length_t vcl, typename vct>
+  int ternary_collide(const vec<vcl, vct>& p, const hyperplane<vcl, vct>& h);
+
+  template <length_t vcl, typename vct>
+  int ternary_collide(const hyperplane<vcl, vct>& h, const vec<vcl, vct>& p);
+
+  bool collide(const lineseg3 &l, const hyperplane3& p, vec3 &hit_out);
+
+  bool split(const triangle3 &t, const hyperplane3 &p, std::vector<triangle3> &front_out, std::vector<triangle3> &back_out);
 }

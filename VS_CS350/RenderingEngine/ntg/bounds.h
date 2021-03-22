@@ -13,6 +13,9 @@ namespace ntg
   public:
     bounds() = default;
     bounds(const vec<vcl, vct>& min, const vec<vcl, vct>& max);
+
+    [[nodiscard]] static bounds FromTwoCorners(const vec<vcl, vct>& a, const vec<vcl, vct>& b);
+
     [[nodiscard]] bounds grow(const vec<vcl, vct>& p) const;
     [[nodiscard]] bounds grow(const bounds& b) const;
     [[nodiscard]] static bounds grow_static(const bounds& b, const vec<vcl, vct>& p);

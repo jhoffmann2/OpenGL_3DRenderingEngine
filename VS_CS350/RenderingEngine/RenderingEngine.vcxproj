@@ -107,9 +107,11 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="DebugDraw.cpp" />
     <ClCompile Include="MainScene.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CameraTransform.cpp" />
+    <ClCompile Include="Octree.cpp" />
     <ClCompile Include="ParentChildComponent.cpp" />
     <ClCompile Include="FaceNormalRender.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -125,6 +127,7 @@
     <ClCompile Include="ObjectComponent.cpp" />
     <ClCompile Include="RenderingComponent.cpp" />
     <ClCompile Include="SolidRender.cpp" />
+    <ClCompile Include="SpacialTree.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TransformComponent.cpp" />
     <ClCompile Include="VertexGlobalSystem.cpp" />
@@ -142,9 +145,12 @@
     <ClInclude Include="..\..\Common\imgui\imstb_truetype.h" />
     <ClInclude Include="..\..\Common\Scene.h" />
     <ClInclude Include="..\..\Common\shader.hpp" />
+    <ClInclude Include="DebugDraw.h" />
     <ClInclude Include="GLHelper.h" />
+    <ClInclude Include="hit.h" />
     <ClInclude Include="MainScene.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Octree.h" />
     <ClInclude Include="ParentChildComponent.h" />
     <ClInclude Include="FaceNormalRender.h" />
     <ClInclude Include="GameObject.h" />
@@ -169,6 +175,7 @@
     <ClInclude Include="ObjectComponent.h" />
     <ClInclude Include="RenderingComponent.h" />
     <ClInclude Include="SolidRender.h" />
+    <ClInclude Include="SpacialTree.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TransformComponent.h" />
     <ClInclude Include="Utilities.h" />
@@ -185,6 +192,9 @@
     <None Include="ntg\ray.inl" />
     <None Include="ntg\simplex.inl" />
     <None Include="ntg\type_mat1x1.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="octree.natvis" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -246,12 +256,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

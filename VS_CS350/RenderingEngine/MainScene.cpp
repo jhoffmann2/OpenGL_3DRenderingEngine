@@ -37,11 +37,13 @@ End Header --------------------------------------------------------*/
 #include "MaterialComponent.h"
 #include "ParentChildComponent.h"
 #include "imgui_internal.h"
+#include "Octree.h"
 #include "VertexNormalRender.h"
 #include "VolumeComponent.h"
 #include "ntg/bounds.inl"
 #include "ntg/hyperplane.inl"
 #include "ntg/simplex.inl"
+#include "SpacialTree.h"
 
 #define DEFERRED true
 #define LOG_ACTIVE true
@@ -112,12 +114,24 @@ ntg::bounds3 MainScene::ActivePowerPlantBounds() const
   return out;
 }
 
-std::vector<std::vector<Mesh>> allMeshes;
-
 void MainScene::UpdateActivePowerPlants()
 {
   constexpr size_t lerp_time = 60; // lerp over 60 frames
   static size_t cur_lerp = lerp_time + 1;
+
+
+  auto* transform = objects_[POWER_PLANT]->GetComponent<TransformComponent>();
+  SpacialTree* SPT = SpacialTreeHierarchy::GetTree(transform);
+  if(SPT == nullptr)
+  {
+    SPT = SpacialTreeHierarchy::SetTree(
+      transform, 
+      new Octree(ntg::bounds3(
+        { -0.5f,-0.5f,-0.5f }, 
+        { 0.5f,0.5f,0.5f }
+      ))
+    );
+  }
 
   for (ParentChildComponent* pc : PowerPlantGroup())
   {
@@ -137,15 +151,14 @@ void MainScene::UpdateActivePowerPlants()
       std::cout << "centering and normalizing meshes" << std::endl;
       MeshTransform(meshes, powerPlantTransformation_);
 
-
       pc->AddChildrenFromMeshes(meshes, names);
       cur_lerp = lerp_time + 1;
-      allMeshes.emplace_back(std::move(meshes));
+      for (Mesh m : meshes)
+        SPT->Add(m);
       break;// only load one per frame
     }
   }
   
-  auto* transform = objects_[POWER_PLANT]->GetComponent<TransformComponent>();
   static ntg::bounds3 prev_bounds;
   ntg::bounds3 cur_bounds = ActivePowerPlantBounds();
   if(cur_bounds != prev_bounds)
@@ -484,6 +497,7 @@ int MainScene::Render()
     o->PreRender();
     o->DebugRender();
   }
+  SpacialTreeHierarchy::ImguiDraw();
 
   GBuffer::ImguiEditor();
 
