@@ -45,6 +45,7 @@ public:
   int Render() override;
   int postRender() override;
   void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+  void MouseCallback(GLFWwindow* window, double xpos, double ypos);
 
 private:
 
@@ -60,8 +61,8 @@ private:
 
   
   GLfloat angleOfRotation;
-  size_t windowWidth_;
-  size_t windowHeight_;
+  size_t viewportWidth_;
+  size_t viewportHeight_;
   Camera cam;
 
   // camera controls:
@@ -81,8 +82,8 @@ private:
   glm::mat4 powerPlantTransformation_;
 
   std::vector<GameObject*> objects_;
+  glm::vec4 mouse_ndc;
 };
-
 
 
 #endif //SIMPLE_SCENE_SIMPLESCENE_Obj_H

@@ -39,7 +39,7 @@ void LightComponent::OnObjectDeactivated()
 
 void LightComponent::ImGuiEditor()
 {
-  int lightIndex = GetIndex();
+  size_t lightIndex = GetIndex();
   size_t itemCount = 0;
   static char buffer[16][16]{{0}};
   static char* items[16]{ nullptr };
@@ -58,7 +58,7 @@ void LightComponent::ImGuiEditor()
   itemsitr = buffer;
   std::vector<LightHandle> unusedLights;
 
-  sprintf_s(*itemsitr, 16, "LIGHT: %i", lightIndex);
+  sprintf_s(*itemsitr, 16, "LIGHT: %llu", lightIndex);
   unusedLights.push_back(*this);
   ++itemsitr;
   ++itemCount;

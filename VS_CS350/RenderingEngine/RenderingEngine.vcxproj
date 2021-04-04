@@ -107,6 +107,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="BspTree.cpp" />
     <ClCompile Include="DebugDraw.cpp" />
     <ClCompile Include="MainScene.cpp" />
     <ClCompile Include="Camera.cpp" />
@@ -145,11 +146,12 @@
     <ClInclude Include="..\..\Common\imgui\imstb_truetype.h" />
     <ClInclude Include="..\..\Common\Scene.h" />
     <ClInclude Include="..\..\Common\shader.hpp" />
+    <ClInclude Include="BspTree.h" />
     <ClInclude Include="DebugDraw.h" />
     <ClInclude Include="GLHelper.h" />
-    <ClInclude Include="hit.h" />
     <ClInclude Include="MainScene.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="ntg\hit.h" />
     <ClInclude Include="Octree.h" />
     <ClInclude Include="ParentChildComponent.h" />
     <ClInclude Include="FaceNormalRender.h" />
@@ -187,6 +189,7 @@
     <None Include="ntg\bounds.inl" />
     <None Include="ntg\bounds_vertex_iterator.inl" />
     <None Include="ntg\collision.inl" />
+    <None Include="ntg\hit.inl" />
     <None Include="ntg\hyperplane.inl" />
     <None Include="ntg\radial.inl" />
     <None Include="ntg\ray.inl" />

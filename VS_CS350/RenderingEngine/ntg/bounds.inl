@@ -56,6 +56,16 @@ namespace ntg
   }
 
   template <length_t vcl, typename vct>
+  vct bounds<vcl, vct>::volume()
+  {
+    vec<vcl, vct> s = size();
+    vct v = 1.f;
+    for (length_t i = 0; i < vcl; ++i)
+      v *= s[i];
+    return v;
+  }
+
+  template <length_t vcl, typename vct>
   bool bounds<vcl, vct>::valid() const
   {
     for (length_t i = 0; i < vcl; ++i)

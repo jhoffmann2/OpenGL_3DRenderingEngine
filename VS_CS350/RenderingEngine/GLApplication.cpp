@@ -43,6 +43,7 @@ End Header --------------------------------------------------------*/
 // Function declarations
 bool savePPMImageFile(std::string &filepath, std::vector<GLfloat> &pixels, int width, int height);
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+void MouseCallback(GLFWwindow* window, double xpos, double ypos);
 
 //////////////////////////////////////////////////////////////////////
 
@@ -125,6 +126,7 @@ int main()
     scene->Init();
 
     glfwSetKeyCallback(window, KeyCallback);
+    glfwSetCursorPosCallback(window, MouseCallback);
 
     do
     {
@@ -194,4 +196,9 @@ bool savePPMImageFile(std::string &filepath, std::vector<GLfloat> &pixels, int w
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
   dynamic_cast<MainScene*>(scene)->KeyCallback(window, key, scancode, action, mods);
+}
+
+void MouseCallback(GLFWwindow* window, double xpos, double ypos)
+{
+  dynamic_cast<MainScene*>(scene)->MouseCallback(window, xpos, ypos);
 }

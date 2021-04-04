@@ -21,6 +21,10 @@ End Header --------------------------------------------------------*/
 #include <glm/gtx/color_space.hpp>
 #include <glm/gtx/easing.hpp>
 
+
+
+#include "BspTree.h"
+#include "DebugDraw.h"
 #include "imgui.h"
 #include "LightComponent.h"
 #include "Mesh.h"
@@ -43,6 +47,7 @@ End Header --------------------------------------------------------*/
 #include "ntg/bounds.inl"
 #include "ntg/hyperplane.inl"
 #include "ntg/simplex.inl"
+#include "ntg/hit.inl"
 #include "SpacialTree.h"
 
 #define DEFERRED true
@@ -75,8 +80,8 @@ static const glm::vec3 cam_pos{ 0.f,.75f,3.75f};
 MainScene::MainScene(int windowWidth, int windowHeight) :
   Scene(windowWidth, windowHeight),
   angleOfRotation(0.0f),
-  windowWidth_(windowWidth),
-  windowHeight_(windowHeight),
+  viewportWidth_(windowWidth),
+  viewportHeight_(windowHeight),
   cam(
     cam_pos, 
     -cam_pos, 
@@ -121,7 +126,7 @@ void MainScene::UpdateActivePowerPlants()
 
 
   auto* transform = objects_[POWER_PLANT]->GetComponent<TransformComponent>();
-  SpacialTree* SPT = SpacialTreeHierarchy::GetTree(transform);
+  auto* octree = SpacialTreeHierarchy::GetTree<Octree>(objects_[POWER_PLANT]);
 
   for (ParentChildComponent* pc : PowerPlantGroup())
   {
@@ -143,8 +148,16 @@ void MainScene::UpdateActivePowerPlants()
 
       pc->AddChildrenFromMeshes(meshes, names);
       cur_lerp = lerp_time + 1;
-      for (Mesh m : meshes)
-        SPT->Add(m);
+      for(size_t i = 0; i < meshes.size(); ++i)
+      {
+        std::cout << "adding [" << names[i] << "] to octree" << std::endl;
+        octree->Add(meshes[i]);
+      }
+
+      SpacialTreeHierarchy::SetTree(
+        gameObject,
+        new BspTree(meshes)
+      );
       break;// only load one per frame
     }
   }
@@ -197,7 +210,7 @@ void MainScene::CleanUp()
 //////////////////////////////////////////////////////
 int MainScene::Init()
 {
-  GBuffer::Init(windowWidth_, windowHeight_);
+  GBuffer::Init(viewportWidth_, viewportHeight_);
 
   VertexGlobalSystem::Init();
 
@@ -273,7 +286,7 @@ int MainScene::Init()
 
   powerPlantTransformation_ = CenterMeshTransform(powerPlantBounds.back());
   SpacialTreeHierarchy::SetTree(
-    transform,
+    objects_.back(),
     new Octree(powerPlantTransformation_ * powerPlantBounds.back())
   );
 
@@ -359,7 +372,6 @@ int MainScene::Init()
 //////////////////////////////////////////////////////
 int MainScene::Render()
 {
-
   UpdateActivePowerPlants();
 
   if(ImGui::Begin("Camera"))
@@ -374,7 +386,7 @@ int MainScene::Render()
     direction = glm::rotate(direction, glm::radians(y_polar), glm::cross(glm::vec3{ direction }, glm::vec3{ 0,1,0 }));
 
     direction *= radius;
-    cam = Camera{ direction, -direction, EY, 60.f, static_cast<float>(windowWidth_) / windowHeight_, 0.1f, 100 };
+    cam = Camera{ direction, -direction, EY, 60.f, static_cast<float>(viewportWidth_) / viewportHeight_, 0.1f, 100 };
 
     ImGui::PopItemWidth();
   }
@@ -493,7 +505,22 @@ int MainScene::Render()
     o->PreRender();
     o->DebugRender();
   }
-  SpacialTreeHierarchy::ImguiDraw();
+
+
+  glm::mat4 NDCToWorld = inverse(VertexGlobalSystem::GetCamToNDC() * transpose(inverse(VertexGlobalSystem::GetWorldToCam())));
+  ntg::ray3 r = {cam.eye(), NDCToWorld * mouse_ndc };
+
+  ntg::hit3 hit;
+  if(SpacialTreeHierarchy::Raycast(objects_[POWER_PLANT], r, hit))
+  {
+    DebugDraw::SetColor({1.f, 1.f, 1.f, 1.f});
+    VertexGlobalSystem::SetModelToWorld(glm::mat4{1.f});
+    DebugDraw::DrawTriangleList({hit.triangle}, GL_FILL);
+    DebugDraw::SetColor({ 0.f, 1.f, 0.f, 1.f });
+    DebugDraw::DrawLineList({{hit.point, hit.point + hit.normal() * .5f}});
+  }
+  
+  SpacialTreeHierarchy::ImguiDraw(r);
 
   GBuffer::ImguiEditor();
 
@@ -542,4 +569,17 @@ void MainScene::KeyCallback(GLFWwindow* window, int key, int scancode, int actio
       break;
     }
   }
+}
+
+void MainScene::MouseCallback(GLFWwindow* window, double xpos, double ypos)
+{
+  int winWidth, winHeight;
+  glfwGetWindowSize(window, &winWidth, &winHeight);
+  ypos -= winHeight - viewportHeight_;
+  mouse_ndc = {
+    2.f * (xpos / viewportWidth_) - 1.f,
+    -(2.f * (ypos / viewportHeight_) - 1.f),
+    1.f,
+    1.f
+  };
 }

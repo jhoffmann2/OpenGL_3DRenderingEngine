@@ -23,6 +23,7 @@ namespace ntg
     [[nodiscard]] vec<vcl, vct> center() const;
     [[nodiscard]] vec<vcl, vct> half_size() const;
     [[nodiscard]] vec<vcl, vct> size() const;
+    [[nodiscard]] vct volume();
     [[nodiscard]] bool valid() const;
 
     [[nodiscard]] bounds_vertex_iterator<vcl,vct> begin() const;

@@ -8,7 +8,7 @@ static const float isq2 = 1.f / glm::sqrt(2.f);
 template <glm::length_t vcl, typename vct>
 void radial_radial_single_axis_move_test()
 {
-  for (size_t axis = 0; axis < vcl; ++axis)
+  for (glm::length_t axis = 0; axis < vcl; ++axis)
   {
     ntg::radial<vcl,vct> r1 { glm::vec<vcl,vct>{0},6.125 };
     ntg::radial<vcl, vct>r2 { glm::vec<vcl,vct>{0},3.875 };
@@ -49,9 +49,9 @@ TEST(RadialRadial_SingleAxis_Move, Collision_4D) {
 template <glm::length_t vcl, typename vct>
 void radial_radial_two_axis_move_test()
 {
-  for (size_t axis1 = 0; axis1 < vcl; ++axis1)
+  for (glm::length_t axis1 = 0; axis1 < vcl; ++axis1)
   {
-    for (size_t axis2 = axis1 + 1; axis2 < vcl; ++axis2)
+    for (glm::length_t axis2 = axis1 + 1; axis2 < vcl; ++axis2)
     {
       ntg::radial<vcl, vct> r1{ glm::vec<vcl,vct>{0},6.125 };
       ntg::radial<vcl, vct>r2{ glm::vec<vcl,vct>{0},3.875 };
@@ -89,7 +89,7 @@ TEST(RadialRadial_TwoAxis_Move, Collision_4D) {
 template <glm::length_t vcl, typename vct>
 void radial_radial_single_axis_expand_test()
 {
-  for (size_t axis = 0; axis < vcl; ++axis)
+  for (glm::length_t axis = 0; axis < vcl; ++axis)
   {
     glm::vec<vcl, vct> c0{ 0 };
     glm::vec<vcl, vct> c1{ 0 };
@@ -134,9 +134,9 @@ TEST(RadialRadial_SingleAxis_Expand, Collision_4D) {
 template <glm::length_t vcl, typename vct>
 void radial_radial_two_axis_expand_test()
 {
-  for (size_t axis1 = 0; axis1 < vcl; ++axis1)
+  for (glm::length_t axis1 = 0; axis1 < vcl; ++axis1)
   {
-    for (size_t axis2 = axis1 + 1; axis2 < vcl; ++axis2)
+    for (glm::length_t axis2 = axis1 + 1; axis2 < vcl; ++axis2)
     {
       glm::vec<vcl, vct> c0{ 0 };
       glm::vec<vcl, vct> c1{ 0 };
@@ -178,7 +178,7 @@ TEST(RadialRadial_TwoAxis_Expand, Collision_4D) {
 template <glm::length_t vcl, typename vct>
 void bounds_bounds_single_axis_move_test()
 {
-  for (size_t axis = 0; axis < vcl; ++axis)
+  for (glm::length_t axis = 0; axis < vcl; ++axis)
   {
     glm::vec<vcl, vct> v1{5.f};
     v1[axis] = 6.125f;
@@ -225,9 +225,9 @@ TEST(BoundsBounds_SingleAxis_Move, Collision_4D) {
 template <glm::length_t vcl, typename vct>
 void bounds_bounds_two_axis_move_test()
 {
-  for (size_t axis1 = 0; axis1 < vcl; ++axis1)
+  for (glm::length_t axis1 = 0; axis1 < vcl; ++axis1)
   {
-    for (size_t axis2 = axis1 + 1; axis2 < vcl; ++axis2)
+    for (glm::length_t axis2 = axis1 + 1; axis2 < vcl; ++axis2)
     {
       glm::vec<vcl, vct> v1{ 5.f };
       v1[axis1] = 6.125f;
@@ -275,7 +275,7 @@ TEST(BoundsBounds_TwoAxis_Move, Collision_4D) {
 template <glm::length_t vcl, typename vct>
 void bounds_radial_single_axis_move_test()
 {
-  for (size_t axis = 0; axis < vcl; ++axis)
+  for (glm::length_t axis = 0; axis < vcl; ++axis)
   {
     glm::vec<vcl, vct> v1{ 5.f };
     v1[axis] = 6.125f;
@@ -319,9 +319,9 @@ TEST(BoundsRadial_SingleAxis_Move, Collision_4D) {
 template <glm::length_t vcl, typename vct>
 void bounds_radial_two_axis_move_test()
 {
-  for (size_t axis1 = 0; axis1 < vcl; ++axis1)
+  for (glm::length_t axis1 = 0; axis1 < vcl; ++axis1)
   {
-    for (size_t axis2 = axis1 + 1; axis2 < vcl; ++axis2)
+    for (glm::length_t axis2 = axis1 + 1; axis2 < vcl; ++axis2)
     {
       glm::vec<vcl, vct> v1{ 5.f };
       v1[axis1] = 6.125f;
@@ -364,7 +364,7 @@ TEST(BoundsRadial_TwoAxis_Move, Collision_4D) {
 template <glm::length_t vcl, typename vct>
 void radial_point_single_axis_move_test()
 {
-  for (size_t axis = 0; axis < vcl; ++axis)
+  for (glm::length_t axis = 0; axis < vcl; ++axis)
   {
     ntg::radial<vcl, vct> r{ glm::vec<vcl,vct>{0},10.f };
     glm::vec<vcl, vct> p{ 0 };
@@ -405,9 +405,9 @@ TEST(RadialPoint_SingleAxis_Move, Collision_4D) {
 template <glm::length_t vcl, typename vct>
 void radial_point_two_axis_move_test()
 {
-  for (size_t axis1 = 0; axis1 < vcl; ++axis1)
+  for (glm::length_t axis1 = 0; axis1 < vcl; ++axis1)
   {
-    for (size_t axis2 = axis1 + 1; axis2 < vcl; ++axis2)
+    for (glm::length_t axis2 = axis1 + 1; axis2 < vcl; ++axis2)
     {
       ntg::radial<vcl, vct> r{ glm::vec<vcl,vct>{0},10.f };
       glm::vec<vcl, vct> p{ 0 };
@@ -445,7 +445,7 @@ TEST(RadialPoint_TwoAxis_Move, Collision_4D) {
 template <glm::length_t vcl, typename vct>
 void bounds_point_single_axis_move_test()
 {
-  for (size_t axis = 0; axis < vcl; ++axis)
+  for (glm::length_t axis = 0; axis < vcl; ++axis)
   {
     ntg::bounds<vcl, vct> b{ glm::vec<vcl,vct>{-10.f},glm::vec<vcl,vct>{10.f} };
     glm::vec<vcl, vct> p{ 0 };
@@ -487,9 +487,9 @@ TEST(BoundsPoint_SingleAxis_Move, Collision_4D) {
 template <glm::length_t vcl, typename vct>
 void bounds_point_two_axis_move_test()
 {
-  for (size_t axis1 = 0; axis1 < vcl; ++axis1)
+  for (glm::length_t axis1 = 0; axis1 < vcl; ++axis1)
   {
-    for (size_t axis2 = axis1 + 1; axis2 < vcl; ++axis2)
+    for (glm::length_t axis2 = axis1 + 1; axis2 < vcl; ++axis2)
     {
       ntg::bounds<vcl, vct> b{ glm::vec<vcl,vct>{-10.f},glm::vec<vcl,vct>{10.f} };
       glm::vec<vcl, vct> p{ 0 };
@@ -529,10 +529,10 @@ TEST(BoundsPoint_TwoAxis_Move, Collision_4D) {
 template <glm::length_t vcl, typename vct>
 void highdim_simplex_point_single_axis_move_test()
 {
-  for (size_t axis = 0; axis < vcl; ++axis)
+  for (glm::length_t axis = 0; axis < vcl; ++axis)
   {
     ntg::simplex<vcl, vcl+1, vct> s;
-    for(size_t i = 0; i < vcl; ++i)
+    for(glm::length_t i = 0; i < vcl; ++i)
       s.points[i][i] = 10.f;
     glm::vec<vcl, vct> p{ 0 };
 
@@ -573,14 +573,14 @@ template <glm::length_t vcl, typename vct>
 void highdim_simplex_point_all_axis_move_test()
 {
   ntg::simplex<vcl, vcl+1, vct> s;
-  for(size_t i = 0; i < vcl; ++i)
+  for(glm::length_t i = 0; i < vcl; ++i)
     s.points[i][i] = 10.0;
   glm::vec<vcl, vct> p{ 0 };
 
   while (p[0] <= 10.0 / vcl)
   {
     EXPECT_TRUE(ntg::collide(s, p));
-    for (size_t axis = 0; axis < vcl; ++axis)
+    for (glm::length_t axis = 0; axis < vcl; ++axis)
     {
       p[axis] += lambda;
     }
@@ -616,22 +616,22 @@ template <glm::length_t vcl, typename vct>
 void lowdim_simplex_point_all_axis_move_test()
 {
   ntg::simplex<vcl, vcl, vct> s;
-  for(size_t i = 0; i < vcl; ++i)
+  for(glm::length_t i = 0; i < vcl; ++i)
     s.points[i][i] = 10.0;
   glm::vec<vcl, vct> p{ 0 };
 
   while (p[0] < 10.0 / vcl)
   {
     EXPECT_FALSE(ntg::collide(s, p));
-    for (size_t axis = 0; axis < vcl; ++axis)
+    for (glm::length_t axis = 0; axis < vcl; ++axis)
     {
       p[axis] += lambda;
     }
   }
-  for (size_t axis = 0; axis < vcl; ++axis)
+  for (glm::length_t axis = 0; axis < vcl; ++axis)
     p[axis] = 10.f / vcl;
   EXPECT_TRUE(ntg::collide(s, p));
-  for (size_t axis = 0; axis < vcl; ++axis)
+  for (glm::length_t axis = 0; axis < vcl; ++axis)
   {
     p[axis] += lambda;
   }
@@ -660,14 +660,14 @@ template <glm::length_t vcl, typename vct>
 void lowdim_simplex_point_planewalk_test()
 {
   ntg::simplex<vcl, vcl, vct> s;
-  for(size_t i = 0; i < vcl; ++i)
+  for(glm::length_t i = 0; i < vcl; ++i)
     s.points[i][i] = 10.0;
   glm::vec<vcl-1, vct> barycentric{ 0 };
 
   while (barycentric[0] <= 1.0 / (vcl-1))
   {
     EXPECT_TRUE(ntg::collide(s, s.toWorld(barycentric)));
-    for (size_t axis = 0; axis < vcl-1; ++axis)
+    for (glm::length_t axis = 0; axis < vcl-1; ++axis)
     {
       barycentric[axis] += lambda;
     }
@@ -702,15 +702,15 @@ void hyperplane_point_all_axis_move_test()
   while (p[0] < 10.0 / vcl)
   {
     EXPECT_FALSE(ntg::collide(h, p));
-    for (size_t axis = 0; axis < vcl; ++axis)
+    for (glm::length_t axis = 0; axis < vcl; ++axis)
     {
       p[axis] += lambda;
     }
   }
-  for (size_t axis = 0; axis < vcl; ++axis)
+  for (glm::length_t axis = 0; axis < vcl; ++axis)
     p[axis] = 10.f / vcl;
   EXPECT_TRUE(ntg::collide(h, p));
-  for (size_t axis = 0; axis < vcl; ++axis)
+  for (glm::length_t axis = 0; axis < vcl; ++axis)
   {
     p[axis] += lambda;
   }
@@ -739,7 +739,7 @@ template <glm::length_t vcl, typename vct>
 void hyperplane_point_planewalk_test()
 {
   ntg::simplex<vcl,vcl, vct> s;
-  for (size_t i = 0; i < vcl; ++i)
+  for (glm::length_t i = 0; i < vcl; ++i)
     s.points[i][i] = 10.0;
   ntg::hyperplane<vcl, vct> h(s);
   glm::vec<vcl - 1, vct> barycentric{ 0 };
@@ -747,7 +747,7 @@ void hyperplane_point_planewalk_test()
   while (barycentric[0] <= 3.0)
   {
     EXPECT_TRUE(ntg::collide(h, s.toWorld(barycentric)));
-    for (size_t axis = 0; axis < vcl - 1; ++axis)
+    for (glm::length_t axis = 0; axis < vcl - 1; ++axis)
     {
       barycentric[axis] += lambda;
     }
@@ -795,7 +795,7 @@ glm::vec<3,double> rot(const glm::vec<3, double>& v, double r, glm::vec<3, doubl
 template <glm::length_t vcl, typename vct>
 void hyperplane_ray_single_axis_rotate_test()
 {
-  for(size_t axis = 0; axis < vcl; ++axis)
+  for(glm::length_t axis = 0; axis < vcl; ++axis)
   {
     ntg::hyperplane<vcl, vct> h{ glm::vec<vcl,vct>{10.f / vcl}, glm::vec<vcl,vct>{1.f / vcl} };
     glm::vec<vcl, vct> axis_vec{ 0.f };

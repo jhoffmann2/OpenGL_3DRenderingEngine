@@ -14,7 +14,7 @@ namespace ntg
   constexpr std::array<vec<vcl, vct>, vcl> linearly_independent()
   {
     std::array<vec<vcl, vct>, vcl> trials{vec<vcl, vct>(0)};
-    for(size_t i = 0; i < vcl; ++i)
+    for(length_t i = 0; i < vcl; ++i)
     {
       trials[i][i] = static_cast<vct>(8475947); // arbitrarily rare number
     }
@@ -128,15 +128,20 @@ namespace ntg
   template<length_t vcl, typename vct>
   hyperplane<vcl, vct> operator*(const mat<vcl, vcl, vct>& transform, const hyperplane<vcl, vct>& h)
   {
-    return {transform * h.normal, transform * h.origin};
+    const glm::vec3 n = transpose(inverse(transform)) * h.normal;
+    return {
+      transform * h.origin,
+      normalize(n)
+    };
   }
 
   template<length_t vcl, typename vct>
   hyperplane<vcl, vct> operator*(const mat<vcl + 1, vcl + 1, vct>& transform, const hyperplane<vcl, vct>& h)
   {
+    const glm::vec3 n = transpose(inverse(transform)) * glm::vec<vcl + 1, vct>(h.normal, 0);
     return {
-      transform * glm::vec<vcl + 1, vct>(h.normal, 0),
-      transform * glm::vec<vcl + 1, vct>(h.origin, 1)
+      transform * glm::vec<vcl + 1, vct>(h.origin, 1),
+      normalize(n)
     };
   }
 

@@ -36,6 +36,9 @@ namespace ntg
   template<length_t vcl = 3, length_t pc = vcl, typename vct = float>
   [[nodiscard]] simplex<vcl, pc, vct> operator*(const mat<vcl + 1, vcl + 1, vct>& transform, simplex<vcl, pc, vct> s);
 
+  template<typename vct = float>
+  vct area(const simplex<3,3,vct> &tri);
+
   using lineseg1 = simplex<1, 2, float>;
   using lineseg2 = simplex<2, 2, float>;
   using lineseg3 = simplex<3, 2, float>;

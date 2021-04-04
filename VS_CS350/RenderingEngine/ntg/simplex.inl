@@ -38,20 +38,20 @@ namespace ntg
     // use cramer's rule to solve the system of equations
     std::array<vec<vcl, vct>, point_count> vectors;
     vectors[0] = world - points[0];
-    for (size_t i = 1; i < point_count; ++i)
+    for (length_t i = 1; i < point_count; ++i)
       vectors[i] = points[i] - points[0];
 
     std::array<vec<point_count - 1, vct>, point_count> row;
-    for (size_t i = 0; i < point_count; ++i)
+    for (length_t i = 0; i < point_count; ++i)
     {
-      for (size_t j = 0; j < point_count - 1; ++j)
+      for (length_t j = 0; j < point_count - 1; ++j)
       {
         row[i][j] = glm::dot(vectors[i], vectors[j + 1]);
       }
     }
 
     mat<point_count - 1, point_count - 1, vct> dm;
-    for (size_t j = 0; j < point_count - 1; ++j)
+    for (length_t j = 0; j < point_count - 1; ++j)
     {
       dm[j] = row[j + 1];
     }
@@ -59,7 +59,7 @@ namespace ntg
 
     vec<point_count, vct> output;
     output[0] = 1;
-    for (size_t i = 0; i < point_count - 1; ++i)
+    for (length_t i = 0; i < point_count - 1; ++i)
     {
       mat<point_count - 1, point_count - 1, vct> dmi = dm;
       dmi[i] = row[0];
@@ -76,20 +76,20 @@ namespace ntg
     // use cramer's rule to solve the system of equations
     std::array<vec<vcl, vct>, point_count> vectors;
     vectors[0] = world - points[0];
-    for (size_t i = 1; i < point_count; ++i)
+    for (length_t i = 1; i < point_count; ++i)
       vectors[i] = points[i] - points[0];
 
     std::array<vec<point_count - 1, vct>, point_count> row;
-    for (size_t i = 0; i < point_count; ++i)
+    for (length_t i = 0; i < point_count; ++i)
     {
-      for (size_t j = 0; j < point_count - 1; ++j)
+      for (length_t j = 0; j < point_count - 1; ++j)
       {
         row[i][j] = glm::dot(vectors[i], vectors[j + 1]);
       }
     }
 
     mat<point_count - 1, point_count - 1, vct> dm;
-    for (size_t j = 0; j < point_count - 1; ++j)
+    for (length_t j = 0; j < point_count - 1; ++j)
     {
       dm[j] = row[j + 1];
     }
@@ -97,7 +97,7 @@ namespace ntg
 
     vec<point_count-1, vct> output;
     output[0] = 1;
-    for (size_t i = 0; i < point_count - 1; ++i)
+    for (length_t i = 0; i < point_count - 1; ++i)
     {
       mat<point_count - 1, point_count - 1, vct> dmi = dm;
       dmi[i] = row[0];
@@ -113,7 +113,7 @@ namespace ntg
   vec<vcl, vct> simplex<vcl, point_count, vct>::toWorld(const vec<point_count, vct>& barycentric) const
   {
     vec<vcl, vct> out(0);
-    for (size_t i = 0; i < point_count; ++i)
+    for (length_t i = 0; i < point_count; ++i)
       out += barycentric[i] * points[i];
     return out;
   }
@@ -123,7 +123,7 @@ namespace ntg
   {
     vec<vcl, vct> out(0);
     vct barycentric_last = 1;
-    for (size_t i = 0; i < point_count-1; ++i)
+    for (length_t i = 0; i < point_count-1; ++i)
     {
       out += barycentric[i] * points[i];
       barycentric_last -= barycentric[i];
@@ -135,7 +135,7 @@ namespace ntg
   template <length_t vcl, length_t point_count, typename vct>
   bool simplex<vcl, point_count, vct>::operator==(const simplex& other) const
   {
-    for (size_t i = 0; i < point_count; ++i)
+    for (length_t i = 0; i < point_count; ++i)
       if (points[i] != other.points[i])
         return false;
     return true;
@@ -144,7 +144,7 @@ namespace ntg
   template <length_t vcl, length_t point_count, typename vct>
   bool simplex<vcl, point_count, vct>::operator!=(const simplex& other) const
   {
-    for (size_t i = 0; i < point_count; ++i)
+    for (length_t i = 0; i < point_count; ++i)
       if (points[i] != other.points[i])
         return true;
     return false;
@@ -164,5 +164,11 @@ namespace ntg
     for (vec<vcl, vct>& point : s.points)
       point = transform * vec<vcl + 1, vct>(point, 1);
     return s;
+  }
+
+  template <typename vct>
+  vct area(const simplex<3, 3, vct>& tri)
+  {
+    return 0.5f * glm::length(glm::cross(tri.points[1] - tri.points[0], tri.points[2] - tri.points[0]));
   }
 }

@@ -5,6 +5,7 @@
 #include <utility>
 
 #include "ObjectComponent.h"
+#include "ParentChildComponent.h"
 
 class GameObject
 {
@@ -35,9 +36,20 @@ public:
   {
     auto itr = components_.find(ComponentKey<ComponentType>());
     if(itr != components_.end())
-    {
       return reinterpret_cast<ComponentType *>(itr->second);
-    }
+    return nullptr;
+  }
+
+  template<typename ComponentType>
+  [[nodiscard]] ComponentType *GetParentedComponent() const
+  {
+    auto itr = components_.find(ComponentKey<ComponentType>());
+    if(itr != components_.end())
+      return reinterpret_cast<ComponentType *>(itr->second);
+
+    auto* const pcgParent = GetComponent<ParentChildComponent>()->GetParent();
+    if(pcgParent)
+      return pcgParent->GetGameObject()->GetParentedComponent<ComponentType>();
     return nullptr;
   }
 

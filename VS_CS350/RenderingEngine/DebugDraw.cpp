@@ -55,7 +55,7 @@ void DebugDraw::DrawLineList(const std::vector<ntg::lineseg3>& lines)
   glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(lines.size()) * 2);
 }
 
-// yes im aware this function is discusting but since it's for debug
+// yes im aware this function is disgusting but since it's for debug
 // i can't be bothered to make it more efficient
 void DebugDraw::DrawAABB(const ntg::bounds3& bounds, GLenum mode)
 {

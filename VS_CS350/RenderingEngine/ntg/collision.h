@@ -56,10 +56,22 @@ namespace ntg
   bool collide(const hyperplane<vcl, vct>& h, const ray<vcl, vct>& r, vct& t_out);
 
   template <length_t vcl, typename vct>
-  bool collide(const ray<vcl, vct>& r, const bounds<vcl, vct>& b, vct &tmin_out, vct &tmax_out);
+  bool collide(const ray<vcl, vct>& r, const hyperplane<vcl, vct>& h);
+
+  template <length_t vcl, typename vct>
+  bool collide(const hyperplane<vcl, vct>& h, const ray<vcl, vct>& r);
+
+  template <length_t vcl, typename vct>
+  bool collide(const ray<vcl, vct>& r, const bounds<vcl, vct>& b, vct& tmin_out, vct& tmax_out);
 
   template <length_t vcl, typename vct>
   bool collide(const bounds<vcl, vct>& b, const ray<vcl, vct>& r, vct& tmin_out, vct& tmax_out);
+
+  template <length_t vcl, typename vct>
+  bool collide(const ray<vcl, vct>& r, const bounds<vcl, vct>& b);
+
+  template <length_t vcl, typename vct>
+  bool collide(const bounds<vcl, vct>& b, const ray<vcl, vct>& r);
 
   template <length_t vcl, typename vct>
   bool collide(const ray<vcl, vct>& r, const bounds<vcl, vct>& b, simplex<vcl,2,vct> &s_out);
@@ -124,4 +136,11 @@ namespace ntg
   bool collide(const lineseg3 &l, const hyperplane3& p, vec3 &hit_out);
 
   bool split(const triangle3 &t, const hyperplane3 &p, std::vector<triangle3> &front_out, std::vector<triangle3> &back_out);
+  void split(const std::vector<triangle3> &triangles, const hyperplane3 &p, std::vector<triangle3> &front_out, std::vector<triangle3> &back_out);
+
+  size_t splitCount(const triangle3 &t, const hyperplane3 &p);
+
+  void splitCount(const triangle3 &t, const hyperplane3 &p, size_t &front_out, size_t &back_out);
+
+  void splitCount(const std::vector<triangle3>& triangles, const hyperplane3 &p, size_t &front_out, size_t &back_out);
 }
