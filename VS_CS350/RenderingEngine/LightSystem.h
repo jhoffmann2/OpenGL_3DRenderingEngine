@@ -28,7 +28,7 @@ public:
 private:
   static LightSystem& Instance();
   LightSystem() = default;
-  static Light& GetRawLightData(int index);
+  static Light& GetRawLightData(size_t index);
   static size_t LightIndex(const Light& light);
 
   // force 16 byte alignment between arrays

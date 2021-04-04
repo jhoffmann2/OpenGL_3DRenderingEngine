@@ -91,7 +91,7 @@ void RenderingComponent::ImGuiEditor()
     }
   static int currentModel;
   ImGui::PushItemWidth(300);
-  ImGui::Combo("Model", &currentModel, objFiles.data(), objFiles.size());
+  ImGui::Combo("Model", &currentModel, objFiles.data(), static_cast<int>(objFiles.size()));
   ImGui::SameLine();
   static UV_MAPPING mapping = UV_NONE;
   ImGui::Combo(

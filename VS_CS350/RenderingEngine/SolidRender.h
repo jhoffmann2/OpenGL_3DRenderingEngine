@@ -56,7 +56,7 @@ private:
     enum { VERT, NORM, UV, V_MAT, FACE, VERTEX_ATTRIB_COUNT };
     GLuint vertexArrayBuffer_,
            bufferObjects_[VERTEX_ATTRIB_COUNT];
-    int faceCount_;
+    size_t faceCount_;
   };
 
   GLint udiffuseTex, uSpecularTex;

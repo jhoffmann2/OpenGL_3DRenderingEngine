@@ -16,7 +16,7 @@ MaterialComponent::MaterialComponent(const MaterialHandle &handle) : MaterialHan
 
 void MaterialComponent::ImGuiEditor()
 {
-  int index = GetIndex();
+  int index = (int)GetIndex();
   ImGui::InputInt("Material ID:", &index);
   index = glm::clamp(index, 0, static_cast<int>(MaterialSystem::materialCount));
   SetIndex(index);

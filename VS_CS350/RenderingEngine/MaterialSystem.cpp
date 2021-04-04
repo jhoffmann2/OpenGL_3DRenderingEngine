@@ -55,7 +55,7 @@ void MaterialSystem::SetCurrentMaterialIndex(size_t index)
   auto& cur = instance.shaderData_.curMaterial_;
   if(cur != static_cast<GLuint>(index))
   {
-    cur = index;
+    cur = static_cast<GLuint>(index);
 
     // upload material index to gpu
     const GLbyte* data = reinterpret_cast<GLbyte*>(&cur);

@@ -48,12 +48,12 @@ void GBuffer::Init(size_t width, size_t height)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, textures[i], 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + (GLenum)i, GL_TEXTURE_2D, textures[i], 0);
   }
 
   glGenRenderbuffers(1, &rboDepth);
   glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, (GLsizei)width, (GLsizei)height);
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
 
   std::iota(drawBuffers.begin(), drawBuffers.end(), GL_COLOR_ATTACHMENT0);
@@ -99,8 +99,8 @@ void GBuffer::UnBind()
     glBindFramebuffer(GL_READ_FRAMEBUFFER, gBufferFBO);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glBlitFramebuffer(
-      0, 0, width, height,
-      0, 0, width, height,
+      0, 0, (GLint)width, (GLint)height,
+      0, 0, (GLint)width, (GLint)height,
       GL_DEPTH_BUFFER_BIT,
       GL_NEAREST
     );
@@ -289,7 +289,7 @@ void GBuffer::SetupFSQ()
   //   stop state recording
   glBindVertexArray(0);
 
-  face_count = faces.size();
+  face_count = static_cast<int>(faces.size());
 
   FSQ.uTex[TARGET_DIFFUSE] = glGetUniformLocation(FSQ.shader_program, "diffuseTex");
   FSQ.uTex[TARGET_NORMAL] = glGetUniformLocation(FSQ.shader_program, "normalTex");

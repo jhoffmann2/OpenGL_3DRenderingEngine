@@ -67,7 +67,7 @@ int SolidRender::loadMesh(const Mesh& m)
 	GLuint& vMat_buffer = data.bufferObjects_[MeshData::V_MAT];
 	GLuint& face_buffer = data.bufferObjects_[MeshData::FACE];
 	GLuint& vao = data.vertexArrayBuffer_;
-	int& face_count = data.faceCount_;
+	size_t& face_count = data.faceCount_;
 
 	vertex_buffer = GLHelper::GenBuffer(m.vertices);
 	normal_buffer = GLHelper::GenBuffer(m.vertex_normals);
@@ -125,12 +125,12 @@ void SolidRender::draw(int mi, Texture& diffuseTex, Texture& specularTex)
 	// references to inside of data to avoid rewriting code
 	MeshData& data = Instance().meshData_[mi];
 	GLuint& vao = data.vertexArrayBuffer_;
-	int& face_count = data.faceCount_;
+	size_t& face_count = data.faceCount_;
 
 	// recall state
 	glBindVertexArray(vao);
 	glLineWidth(3.0f);
-	glDrawElements(GL_TRIANGLES, 3 * face_count, GL_UNSIGNED_INT, nullptr);
+	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(3 * face_count), GL_UNSIGNED_INT, nullptr);
 	glBindVertexArray(0);
 }
 

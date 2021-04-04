@@ -121,7 +121,7 @@ const glm::vec3& LightSystem::GetEyePos()
   return Instance().shaderData_.globalProperties_.eyePos_;
 }
 
-Light& LightSystem::GetRawLightData(int index)
+Light& LightSystem::GetRawLightData(size_t index)
 {
   return Instance().shaderData_.lights_[index];
 }

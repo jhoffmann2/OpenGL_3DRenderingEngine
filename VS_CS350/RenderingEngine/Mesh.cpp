@@ -190,7 +190,7 @@ read_new_face:
   {
     const glm::uvec3& face = faces[i];
     const glm::vec3& face_normal = face_normals[i];
-    for (size_t j = 0; j < 3; ++j)
+    for (glm::length_t j = 0; j < 3; ++j)
     {
       const glm::vec3 &current = vertices[face[j]];
       const glm::vec3 &next = vertices[face[(j + 1) % 3]];
@@ -229,7 +229,7 @@ Mesh generateSphereMesh(size_t division_count, UV_MAPPING uvMapping)
   for (size_t i = 1; i < N; ++i) {
     float theta = PI * i / N;
     for (size_t j = 0; j < M; ++j) {
-      int index = M * (i - 1) + j;
+      size_t index = M * (i - 1) + j;
       float phi = 2 * PI * j / M;
       normals[index].x = sin(theta) * cos(phi);
       normals[index].y = sin(theta) * sin(phi);
@@ -246,14 +246,14 @@ Mesh generateSphereMesh(size_t division_count, UV_MAPPING uvMapping)
   for (size_t i = 2; i < N; ++i) {
     for (size_t j = 0; j < M; ++j) {
       glm::uvec3 face;
-      int jp1 = (j + 1) % M;
-      face[0] = M * (i - 2) + j;
-      face[1] = M * (i - 1) + jp1;
-      face[2] = M * (i - 2) + jp1;
+      size_t jp1 = (j + 1) % M;
+      face[0] = static_cast<unsigned>((M * (i - 2) + j));
+      face[1] = static_cast<unsigned>(M * (i - 1) + jp1);
+      face[2] = static_cast<unsigned>(M * (i - 2) + jp1);
       faces.push_back(face);
       fnormals.push_back(FaceNormal(face, vertices));
-      face[1] = M * (i - 1) + j;
-      face[2] = M * (i - 1) + jp1;
+      face[1] = static_cast<unsigned>(M * (i - 1) + j);
+      face[2] = static_cast<unsigned>(M * (i - 1) + jp1);
       faces.push_back(face);
       fnormals.push_back(FaceNormal(face, vertices));
     }
@@ -261,15 +261,15 @@ Mesh generateSphereMesh(size_t division_count, UV_MAPPING uvMapping)
 
   for (size_t j = 0; j < M; ++j) {
     glm::uvec3 face;
-    int jp1 = (j + 1) % M;
-    face[0] = j;
-    face[1] = jp1;
-    face[2] = NORTH;
+    size_t jp1 = (j + 1) % M;
+    face[0] = static_cast<unsigned>(j);
+    face[1] = static_cast<unsigned>(jp1);
+    face[2] = static_cast<unsigned>(NORTH);
     faces.push_back(face);
     fnormals.push_back(FaceNormal(face, vertices));
-    face[0] = M * (N - 2) + j;
-    face[1] = SOUTH;
-    face[2] = M * (N - 2) + jp1;
+    face[0] = static_cast<unsigned>(M * (N - 2) + j);
+    face[1] = static_cast<unsigned>(SOUTH);
+    face[2] = static_cast<unsigned>(M * (N - 2) + jp1);
     faces.push_back(face);
     fnormals.push_back(FaceNormal(face, vertices));
   }

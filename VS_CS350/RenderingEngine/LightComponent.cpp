@@ -78,7 +78,7 @@ void LightComponent::ImGuiEditor()
   }
 
   int item_current = 0;
-  if(ImGui::Combo("Light ID", &item_current, items, itemCount))
+  if(ImGui::Combo("Light ID", &item_current, items, (int)itemCount))
   {
     bool temp = IsActive();
     Deactivate();

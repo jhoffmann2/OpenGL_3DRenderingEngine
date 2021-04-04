@@ -43,7 +43,7 @@ private:
     enum { VERT, LINE };
     GLuint vertex_array_buffer;
     GLuint buffer_objects[2];
-    int line_count;
+    size_t line_count;
   };
   std::vector<MeshData> mesh_data;
 };

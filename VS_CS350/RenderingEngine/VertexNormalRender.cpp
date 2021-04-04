@@ -64,7 +64,7 @@ int VertexNormalRender::loadMesh(const Mesh& m, float line_length)
 	GLuint &vertex_buffer = data.buffer_objects[MeshData::VERT];
 	GLuint &line_buffer = data.buffer_objects[MeshData::LINE];
 	GLuint &vao = data.vertex_array_buffer;
-	int &line_count = data.line_count;
+	size_t &line_count = data.line_count;
 
 	std::vector<glm::vec3> vertices(m.vertices.size() * 2);
 	for(size_t i = 0; i < m.vertices.size() * 2; i += 2)
@@ -137,12 +137,12 @@ void VertexNormalRender::draw(int mi)
 	// references to inside of data to avoid rewriting code
 	MeshData &data = Instance().mesh_data[mi];
 	GLuint &vao = data.vertex_array_buffer;
-	int &line_count = data.line_count;
+	size_t &line_count = data.line_count;
 	
 	// recall state
 	glBindVertexArray(vao);
 	glLineWidth(3.0f);
-	glDrawElements(GL_LINES, 2 * line_count, GL_UNSIGNED_INT, nullptr);
+	glDrawElements(GL_LINES, static_cast<GLsizei>(2 * line_count), GL_UNSIGNED_INT, nullptr);
 	glBindVertexArray(0);
 }
 

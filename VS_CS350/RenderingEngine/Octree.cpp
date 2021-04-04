@@ -512,26 +512,6 @@ bool Octree::Raycast(const ntg::ray3& ray, ntg::hit3& hit) const
   return head_->ToBranch()->Raycast(ray, hit);
 }
 
-void Octree::ImguiDraw(GameObject* gameobject, const ntg::ray3& mouseRay)
-{
-  srand(0);
-  ImGui::PushID(gameobject->ID());
-  ImGui::Indent(10);
-  const std::string name = gameobject->Name() + " Octree";
-  if (ImGui::CollapsingHeader(name.c_str()))
-  {
-    const glm::mat4x4 t = gameobject->GetParentedComponent<TransformComponent>()->GetModelToWorld();
-    VertexGlobalSystem::SetModelToWorld(t);
-   
-    if (head_->isLeaf_)
-      head_->ToLeaf()->ImguiDraw(t, inverse(t) * mouseRay);
-    else
-      head_->ToBranch()->ImguiDraw(t, inverse(t) * mouseRay);
-  }
-  ImGui::Unindent(10);
-  ImGui::PopID();
-}
-
 static bool ImguiHoverWhite()
 {
   if (ImGui::IsItemHovered())
@@ -542,6 +522,32 @@ static bool ImguiHoverWhite()
   return false;
 }
 static std::vector<bool> headerHovered;
+
+void Octree::ImguiDraw(GameObject* gameobject, const ntg::ray3& mouseRay)
+{
+  srand(0);
+  ImGui::PushID(gameobject->ID());
+  ImGui::Indent(10);
+  const std::string name = gameobject->Name() + " Octree";
+  const glm::mat4x4 t = gameobject->GetParentedComponent<TransformComponent>()->GetModelToWorld();
+  VertexGlobalSystem::SetModelToWorld(t);
+  if (ImGui::CollapsingHeader(name.c_str()))
+  {
+    if (head_->isLeaf_)
+      head_->ToLeaf()->ImguiDraw(t, inverse(t) * mouseRay);
+    else
+      head_->ToBranch()->ImguiDraw(t, inverse(t) * mouseRay);
+  }
+  else if(ImguiHoverWhite())
+  {
+    if (head_->isLeaf_)
+      head_->ToLeaf()->Render();
+    else
+      head_->ToBranch()->Render();
+  }
+  ImGui::Unindent(10);
+  ImGui::PopID();
+}
 
 void OctreeBranch::ImguiDraw(const glm::mat4& transform, const ntg::ray3& mouseRay)
 {

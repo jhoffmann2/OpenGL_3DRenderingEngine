@@ -121,15 +121,22 @@ void BspTree::ImguiDraw(GameObject* gameobject, const ntg::ray3& mouseRay)
   ImGui::PushID(gameobject->ID());
   ImGui::Indent(10);
   const std::string name = gameobject->Name() + " BspTree";
+  const glm::mat4x4 t = gameobject->GetParentedComponent<TransformComponent>()->GetModelToWorld();
+  VertexGlobalSystem::SetModelToWorld(t);
   if (ImGui::CollapsingHeader(name.c_str()))
   {
-    const glm::mat4x4 t = gameobject->GetParentedComponent<TransformComponent>()->GetModelToWorld();
-    VertexGlobalSystem::SetModelToWorld(t);
 
     if (head_->isLeaf_)
       head_->ToLeaf()->ImguiDraw(t, inverse(t) * mouseRay);
     else
       head_->ToBranch()->ImguiDraw(t, inverse(t) * mouseRay);
+  }
+  else if(ImguiHoverWhite())
+  {
+    if (head_->isLeaf_)
+      head_->ToLeaf()->Render();
+    else
+      head_->ToBranch()->Render();
   }
   ImGui::Unindent(10);
   ImGui::PopID();
