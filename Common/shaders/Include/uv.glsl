@@ -28,7 +28,7 @@ vec2 cubicTextureMap(vec3 r, out uint cubeFace)
 		cubeFace = (r.x > 0)? 0 : 2;
 		r *= 1.f / abs(r.x);
 		r /= 2;
-		r += vec4(0.5, 0.5, 0.5, 0);
+		r += vec3(0.5, 0.5, 0.5);
 		return r.yz;
 	}
 	else if(abs(r.y) > abs(r.x) && abs(r.y) > abs(r.z))
@@ -36,7 +36,7 @@ vec2 cubicTextureMap(vec3 r, out uint cubeFace)
 		cubeFace = (r.y > 0)? 4 : 5;
 		r *= 1.f / abs(r.y);
 		r /= 2;
-		r += vec4(0.5, 0.5, 0.5, 0);
+		r += vec3(0.5, 0.5, 0.5);
 		return r.xz;
 	}
 	else if(abs(r.z) > abs(r.x) && abs(r.z) > abs(r.y))
@@ -44,7 +44,7 @@ vec2 cubicTextureMap(vec3 r, out uint cubeFace)
 		cubeFace = (r.z > 0)? 1 : 3;
 		r *= 1.f / abs(r.z);
 		r /= 2;
-		r += vec4(0.5, 0.5, 0.5, 0);
+		r += vec3(0.5, 0.5, 0.5);
 		return r.xy;
 	}
 }

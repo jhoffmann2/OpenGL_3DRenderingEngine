@@ -277,8 +277,9 @@ namespace ntg
     if (collide(h, r, t_out))
     {
       vec<vcl, vct> p = r.origin + t_out * r.direction;
-      for (vct barycentric : s.toBarycentric(p))
-        if (barycentric > 1 || barycentric < 0)
+      vec<vcl, vct> pb = s.toBarycentric(p);
+      for (auto barycentric = std::begin(pb); barycentric < std::end(pb); ++barycentric)
+        if (*barycentric > 1 || *barycentric < 0)
           return false;
       return true;
     }

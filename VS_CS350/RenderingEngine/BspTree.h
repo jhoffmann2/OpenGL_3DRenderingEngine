@@ -1,5 +1,6 @@
 #pragma once
 #include "SpacialTree.h"
+#include <vector>
 
 struct BspLeaf;
 struct BspBranch;

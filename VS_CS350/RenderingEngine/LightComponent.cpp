@@ -58,7 +58,7 @@ void LightComponent::ImGuiEditor()
   itemsitr = buffer;
   std::vector<LightHandle> unusedLights;
 
-  sprintf_s(*itemsitr, 16, "LIGHT: %llu", lightIndex);
+  sprintf_s(*itemsitr, 16, "LIGHT: %zu", lightIndex);
   unusedLights.push_back(*this);
   ++itemsitr;
   ++itemCount;

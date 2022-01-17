@@ -22,9 +22,8 @@ End Header --------------------------------------------------------*/
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <glm/gtx/vector_angle.hpp>
+
 #include "ntg/bounds.inl"
-
-
 #include "Utilities.h"
 
 #define LOG_ACTIVE false
@@ -65,14 +64,14 @@ namespace
   glm::vec3 FaceNormal(const glm::uvec3 &face, const std::vector<glm::vec3> &verticies)
   {
     return normalize(cross(
-      verticies[face[1]].xyz - verticies[face[0]].xyz,
-      verticies[face[2]].xyz - verticies[face[0]].xyz
+      verticies[face[1]] - verticies[face[0]],
+      verticies[face[2]] - verticies[face[0]]
     ));
   }
 
   glm::vec2 planarTextureMap(glm::vec3 pos)
   {
-    return pos.xy;
+    return glm::vec2(pos.x, pos.y);
   }
 
   glm::vec2 cylindricalTextureMap(glm::vec3 pos)
@@ -427,8 +426,8 @@ glm::mat4 CenterMeshTransform(const ntg::bounds3& bounds)
   glm::vec3 size = bounds.size();
 
   float max_distance = 0;
-  for (float v : size)
-    max_distance = glm::max(max_distance, abs(v));
+  for (auto vp = std::begin(size); vp < std::end(size); ++vp)
+    max_distance = glm::max(max_distance, abs(*vp));
   return glm::scale(1.f / max_distance) * translate(-bounds.center());
 }
 

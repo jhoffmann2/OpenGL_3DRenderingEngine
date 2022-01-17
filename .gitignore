@@ -21,3 +21,23 @@ VS_CS350/x64/
 VS_CS350/RenderingEngine/ntg/Release/
 
 VS_CS350/RenderingEngine/ntg/x64/
+
+Release/
+
+VS_CS350/cmake-build-debug/
+
+VS_CS350/.idea/
+
+VS_CS350/RenderingEngine/shaderOut/
+
+cmake-build-release/
+
+cmake-build-debug-visual-studio/
+
+cmake-build-debug-mingw-clang/
+
+cmake-build-debug/
+
+CMake/
+
+.idea/

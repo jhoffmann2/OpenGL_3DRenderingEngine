@@ -588,7 +588,7 @@ void OctreeBranch::ImguiDraw(const glm::mat4& transform, const ntg::ray3& mouseR
       if(children_[i]->isLeaf_)
       {
         char buffer[32]{ 0 };
-        sprintf_s(buffer, 32, "Leaf [%llu]", children_[i]->ToLeaf()->triangles_.size());
+        sprintf_s(buffer, 32, "Leaf [%zu]", children_[i]->ToLeaf()->triangles_.size());
         if (ImGui::CollapsingHeader(buffer))
           children_[i]->ToLeaf()->ImguiDraw(transform, mouseRay);
         else
@@ -654,7 +654,7 @@ void OctreeLeaf::ImguiDraw(const glm::mat4& transform, const ntg::ray3& mouseRay
     return;
   }
   char buffer[32]{0};
-  sprintf_s(buffer, 32, "Triangles [%llu]", triangles_.size());
+  sprintf_s(buffer, 32, "Triangles [%zu]", triangles_.size());
 
   if (ImGui::CollapsingHeader(buffer))
   {

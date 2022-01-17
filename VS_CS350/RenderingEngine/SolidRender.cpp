@@ -116,7 +116,7 @@ void SolidRender::draw(int mi, Texture& diffuseTex, Texture& specularTex)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, diffuseTex.TextureID());
 	glUniform1i(Instance().udiffuseTex, 0);
-
+	
 	// load specular texture
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, specularTex.TextureID());
@@ -126,7 +126,7 @@ void SolidRender::draw(int mi, Texture& diffuseTex, Texture& specularTex)
 	MeshData& data = Instance().meshData_[mi];
 	GLuint& vao = data.vertexArrayBuffer_;
 	size_t& face_count = data.faceCount_;
-
+	
 	// recall state
 	glBindVertexArray(vao);
 	glLineWidth(3.0f);

@@ -79,7 +79,6 @@ void GBuffer::Bind()
   glBindFramebuffer(GL_FRAMEBUFFER, gBufferFBO);
 
 
-
 }
 
 void GBuffer::UnBind()

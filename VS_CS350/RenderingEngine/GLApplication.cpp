@@ -36,9 +36,9 @@ End Header --------------------------------------------------------*/
 #include "../Common/Scene.h"
 #include "shader.hpp"
 #include "MainScene.h"
-#include "examples/imgui_impl_glfw.h"
-#include "examples/imgui_impl_opengl3.h"
-#include "imgui.h"
+#include "imgui/examples/imgui_impl_glfw.h"
+#include "imgui/examples/imgui_impl_opengl3.h"
+#include "imgui/imgui.h"
 
 // Function declarations
 bool savePPMImageFile(std::string &filepath, std::vector<GLfloat> &pixels, int width, int height);
@@ -50,8 +50,8 @@ void MouseCallback(GLFWwindow* window, double xpos, double ypos);
 GLFWwindow *window;
 Scene  *scene;
 
-int windowWidth = 1280*2;
-int windowHeight = 720*2;
+int windowWidth = 1280;
+int windowHeight = 720;
 
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
