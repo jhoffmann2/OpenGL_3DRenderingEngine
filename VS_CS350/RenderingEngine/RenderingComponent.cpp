@@ -2,11 +2,11 @@
 #include <filesystem>
 #include <utility>
 
+#include "FaceNormalRender.h"
+#include "GameObject.h"
 #include "MaterialSystem.h"
 #include "SolidRender.h"
 #include "VertexNormalRender.h"
-#include "FaceNormalRender.h"
-#include "GameObject.h"
 #include "imgui.h"
 
 RenderingComponent::~RenderingComponent() = default;
@@ -44,10 +44,21 @@ void RenderingComponent::Render()
 
 void RenderingComponent::DebugRender()
 {
-  if (solidRander_ && shader_ != SHADER::DEFFERED && !flags_[RENDER_FLAG_DISABLE_SOLID_RENDERING])
+  if (solidRander_
+      && shader_ != SHADER::DEFFERED
+      && shader_ != SHADER::LOCAL_LIGHT
+      && !flags_[RENDER_FLAG_DISABLE_SOLID_RENDERING])
   {
     SolidRender::SetShader(shader_);
     SolidRender::draw(meshIndex_, diffuseTexture_, specularTexture_);
+  }
+
+  if (solidRander_
+      && shader_ == SHADER::LOCAL_LIGHT
+      && !flags_[RENDER_FLAG_DISABLE_SOLID_RENDERING])
+  {
+    SolidRender::SetShader(shader_);
+    SolidRender::drawDeferredSolid(meshIndex_);
   }
 
   if (vnormRender_ && !flags_[RENDER_FLAG_DISABLE_VERTEX_NORMALS]) VertexNormalRender::draw(meshIndex_);

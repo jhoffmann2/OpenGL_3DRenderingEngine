@@ -226,10 +226,8 @@ MessageCallback(GLenum source,
 //////////////////////////////////////////////////////
 int MainScene::Init()
 {
-    std::cout << "Working Directory: " << std::filesystem::current_path() << std::endl;
-
-  // glEnable(GL_DEBUG_OUTPUT);
-  // glDebugMessageCallback(MessageCallback, 0);
+//   glEnable(GL_DEBUG_OUTPUT);
+//   glDebugMessageCallback(MessageCallback, 0);
 
   GBuffer::Init(viewportWidth_, viewportHeight_);
 
@@ -330,11 +328,15 @@ int MainScene::Init()
 
     const float hue = glm::linearRand(24.f, 40.f);
     MaterialHandle light_material(1);
-    light_material.SetEmissiveColor(rgbColor(glm::vec3{hue, 0.0f, 1.f}));
-    light_material.SetAmbientColor(glm::vec3{0});
-    light_material.SetDiffuseColor(glm::vec3{0});
-    light_material.SetSpecularColor(glm::vec3{0});
-    light_material.SetSpecularExponent(20);
+//    light_material.SetEmissiveColor(rgbColor(glm::vec3{hue, 0.0f, 1.f}));
+//    light_material.SetAmbientColor(glm::vec3{0});
+//    light_material.SetDiffuseColor(glm::vec3{0});
+//    light_material.SetSpecularColor(glm::vec3{0});
+//    light_material.SetSpecularExponent(20);
+
+    light_material.SetDiffuseColor(rgbColor(glm::vec3{hue, .25f, 1.f}));
+    light_material.SetSpecularColor(rgbColor(glm::vec3{hue, .1f, 1.f}));
+    light_material.SetAmbientColor(rgbColor(glm::vec3{hue, .25f, 0.2f}));
 
     for (size_t i = 0; i < LightSystem::lightCount; ++i)
     {
@@ -347,19 +349,19 @@ int MainScene::Init()
           {0, 0, 0},
           {2, 0, 0},
           {EY, 0},
-          .06f
+          5.f
         )
       );
 
-      auto* light = new LightComponent(i);
-      light->SetDiffuseColor(rgbColor(glm::vec3{hue, .25f, 1.f}));
-      light->SetSpecularColor(rgbColor(glm::vec3{hue, .1f, 1.f}));
-      light->SetAmbientColor(rgbColor(glm::vec3{hue, .25f, 0.2f}));
-      light->SetType(Light::POINT);
-      light->SetActive(true);
-      lightObj->AddComponent(light);
+//      auto* light = new LightComponent(i);
+//      light->SetDiffuseColor(rgbColor(glm::vec3{hue, .25f, 1.f}));
+//      light->SetSpecularColor(rgbColor(glm::vec3{hue, .1f, 1.f}));
+//      light->SetAmbientColor(rgbColor(glm::vec3{hue, .25f, 0.2f}));
+//      light->SetType(Light::POINT);
+//      light->SetActive(true);
+//      lightObj->AddComponent(light);
 
-      auto* rendering = new RenderingComponent(sphere_mesh, SolidRender::FLAT_EMISSION);
+      auto* rendering = new RenderingComponent(sphere_mesh, SolidRender::LOCAL_LIGHT);
       lightObj->AddComponent(rendering);
 
       lightObj->AddComponent(new MaterialComponent(light_material));

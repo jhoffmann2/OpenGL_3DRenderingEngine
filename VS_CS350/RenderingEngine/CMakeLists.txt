@@ -210,8 +210,8 @@ set(ROOT_NAMESPACE Assignment2)
 # Output directory
 ################################################################################
 set_target_properties(${PROJECT_NAME} PROPERTIES
-        OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/$<CONFIG>/"
-        OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/$<CONFIG>/"
+        OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/bin/$<CONFIG>/"
+        OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/bin/$<CONFIG>/"
         )
 set_target_properties(${PROJECT_NAME} PROPERTIES
         INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"
@@ -296,14 +296,14 @@ if (MSVC)
 
 endif ()
 
-add_custom_command(TARGET RenderingEngine POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-        "${CMAKE_BINARY_DIR}/Common/GLFW/src/glfw3.dll"
-        $<TARGET_FILE_DIR:RenderingEngine>)
+#add_custom_command(TARGET RenderingEngine POST_BUILD
+#        COMMAND ${CMAKE_COMMAND} -E copy
+#        "${CMAKE_BINARY_DIR}/Common/GLFW/src/glfw3.dll"
+#        $<TARGET_FILE_DIR:RenderingEngine>)
 
-add_custom_command(TARGET RenderingEngine POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-        "${CMAKE_BINARY_DIR}/Common/assimp/code/assimp-vc142-mt.dll"
-        $<TARGET_FILE_DIR:RenderingEngine>)
+#add_custom_command(TARGET RenderingEngine POST_BUILD
+#        COMMAND ${CMAKE_COMMAND} -E copy
+#        "${CMAKE_BINARY_DIR}/Common/assimp/code/assimp-vc142-mt.dll"
+#        $<TARGET_FILE_DIR:RenderingEngine>)
 
 

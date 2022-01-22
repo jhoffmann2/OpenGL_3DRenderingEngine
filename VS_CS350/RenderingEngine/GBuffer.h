@@ -21,6 +21,7 @@ public:
   static void Bind();
   static void UnBind();
   static void RenderFSQ();
+  static void RenderSolid(GLuint &vao, size_t &face_count);
   static void ImguiEditor();
 
   GBuffer(GBuffer &) = delete;

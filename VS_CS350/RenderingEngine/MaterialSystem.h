@@ -27,10 +27,23 @@ private:
   MaterialSystem() = default;
   static Material& GetRawMaterialData(size_t index);
   static size_t MaterialIndex(const Material& material);
-   
+
   // force 16 byte alignment between arrays
   __declspec(align(16)) struct ShaderData
   {
+//    union
+//    {
+//      __declspec(align(16)) struct
+//      {
+//        AlignData<16, GLuint> curMaterial_;
+//      } solidRender = {0}; // use when rendering solid objects
+//
+//      __declspec(align(16)) struct
+//      {
+//        AlignData<16, GLuint> curLight_;
+//      } lightRender; // use when rendering bounded lights
+//    };
+
     AlignData<16, GLuint> curMaterial_;
     AlignData<16, Material> materials_[materialCount];
     static constexpr GLuint binding_ = 1;

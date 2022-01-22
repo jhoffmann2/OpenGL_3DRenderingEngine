@@ -36,6 +36,7 @@ public:
     BLINN_SHADING,
     FLAT_EMISSION,
     DEFFERED,
+    LOCAL_LIGHT,
 
     SHADER_PROGRAM_COUNT
   };
@@ -44,6 +45,7 @@ public:
   static int loadMesh(const Mesh &m);
   static void unloadMesh(int mi);
   static void draw(int mi, Texture &diffuseTex, Texture &specularTex);
+  static void drawDeferredSolid(int mi);
   static SHADER GetShader();
   static void SetShader(SHADER shadertype);
   static void ReloadShaders();
