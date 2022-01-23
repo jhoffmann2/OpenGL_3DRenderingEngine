@@ -123,7 +123,7 @@ Simply launch application and use the imgui.
 
 ## Preview Images
 ### Local Lights vs Global Lights
-![Demonstrating the visual difference between a global light and a local one](D:\Digipen\2020-2021\CS350\Previews\GlobalLightConversion.gif "Local vs Global Lights")
+![Demonstrating the visual difference between a global light and a local one](Previews/GlobalLightConversion.gif "Local vs Global Lights")
 
 ## Which machine did you test your application on
 - OS: Microsoft Windows 10 Home 64-bit
