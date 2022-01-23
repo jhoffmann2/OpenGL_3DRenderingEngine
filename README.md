@@ -129,6 +129,10 @@ Simply launch application and use the imgui.
 
 ![Demonstrating the visual difference between a global light and a local one](Previews/GlobalLightConversion.gif "Local vs Global Lights")
 
+### Rendering 1k Local Lights
+
+![Rendering 1000 local lights](Previews/OneThousandLights.gif "Stress Testing 1000 global lights")
+
 ### GBuffer
 
 ![Debug view of the GBuffer](Previews/GBuffer.png "GBuffer")
