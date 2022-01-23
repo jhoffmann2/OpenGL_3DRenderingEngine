@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16.0 FATAL_ERROR)
 
 set(CMAKE_SYSTEM_VERSION 10.0 CACHE STRING "" FORCE)
 
-project(VS_CS350 C CXX)
+project(Projects C CXX)
 
 set (CMAKE_CXX_STANDARD 17)
 
@@ -102,4 +102,4 @@ link_directories(Common/lib)
 # Sub-projects
 ################################################################################
 add_subdirectory(Common)
-add_subdirectory(VS_CS350)
+add_subdirectory(Projects)

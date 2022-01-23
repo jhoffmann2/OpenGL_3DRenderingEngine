@@ -47,6 +47,7 @@ vec2 cubicTextureMap(vec3 r, out uint cubeFace)
 		r += vec3(0.5, 0.5, 0.5);
 		return r.xy;
 	}
+	return vec2(0,0);
 }
 
 vec2 calculateUV(vec3 pos, vec2 uv_frag, int textureMode_)
@@ -62,4 +63,5 @@ vec2 calculateUV(vec3 pos, vec2 uv_frag, int textureMode_)
 	case 3: // GPU_SPHYRICAL
 		return sphericalTextureMap(pos);
 	}
+	return vec2(0,0);
 }

@@ -1,0 +1,345 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Camera">
+      <UniqueIdentifier>{8bc8ed41-05ea-458a-8ff7-ea459ac4f9d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mesh">
+      <UniqueIdentifier>{db352928-76c5-4649-a57d-011800660d3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Lighting">
+      <UniqueIdentifier>{1a66eae9-1bc8-4c3b-8884-55549a728129}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering">
+      <UniqueIdentifier>{7e59f0b3-7c2a-4400-a6c1-421e53f34086}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Materials">
+      <UniqueIdentifier>{14998f40-7598-4e5f-a697-7ccae583edde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObject">
+      <UniqueIdentifier>{fa9b395a-8d12-45f4-afb8-409c3d20380a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObject\Components">
+      <UniqueIdentifier>{0536e69b-72a2-4009-a762-e0b01720406d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="VertexGlobals">
+      <UniqueIdentifier>{76605159-8c18-4a80-bd9e-17738b714922}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Texturing">
+      <UniqueIdentifier>{b556e699-e60b-46eb-b360-27e0abaf3ed0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utilities">
+      <UniqueIdentifier>{56071574-f908-40b7-b619-08ef07998179}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{5a5c6536-3dbc-4dea-bf12-71ab6acc8e73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common\Imgui">
+      <UniqueIdentifier>{61a528dc-90b3-460f-8e27-0baec7cfd8e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common\soil">
+      <UniqueIdentifier>{73cbae7d-cb34-4902-b99e-4679bdf40da2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utilities\ntg-math">
+      <UniqueIdentifier>{ff860034-ffd5-4230-b806-bd1ef7e97e10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SpacialPartitioning">
+      <UniqueIdentifier>{b5d7f80e-dd51-411a-ad62-66b5d3c50b5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SpacialPartitioning\Octrees">
+      <UniqueIdentifier>{e0b25db5-8bc8-4f4d-87e5-25b9629073a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SpacialPartitioning\BspTrees">
+      <UniqueIdentifier>{fd657610-95f7-47d8-a7f0-4c3ef4a8cf25}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraTransform.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="FaceNormalRender.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexNormalRender.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="GLApplication.cpp" />
+    <ClCompile Include="LightSystem.cpp">
+      <Filter>Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="LightHandle.cpp">
+      <Filter>Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialSystem.cpp">
+      <Filter>Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectComponent.cpp">
+      <Filter>GameObject\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderingComponent.cpp">
+      <Filter>GameObject\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="TransformComponent.cpp">
+      <Filter>GameObject\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="LightComponent.cpp">
+      <Filter>GameObject\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexGlobalSystem.cpp">
+      <Filter>VertexGlobals</Filter>
+    </ClCompile>
+    <ClCompile Include="SolidRender.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Texturing</Filter>
+    </ClCompile>
+    <ClCompile Include="GBuffer.cpp" />
+    <ClCompile Include="MaterialComponent.cpp">
+      <Filter>GameObject\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="material.cpp">
+      <Filter>Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\Scene.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\shader.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\imgui\examples\imgui_impl_glfw.cpp">
+      <Filter>Common\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\imgui\examples\imgui_impl_opengl3.cpp">
+      <Filter>Common\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\imgui\imgui.cpp">
+      <Filter>Common\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\imgui\imgui_demo.cpp">
+      <Filter>Common\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\imgui\imgui_draw.cpp">
+      <Filter>Common\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\imgui\imgui_widgets.cpp">
+      <Filter>Common\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\soil-master\src\image_dxt.c">
+      <Filter>Common\soil</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\soil-master\src\image_helper.c">
+      <Filter>Common\soil</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\soil-master\src\soil.c">
+      <Filter>Common\soil</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\soil-master\src\stb_image_aug.c">
+      <Filter>Common\soil</Filter>
+    </ClCompile>
+    <ClCompile Include="MainScene.cpp" />
+    <ClCompile Include="VolumeComponent.cpp">
+      <Filter>GameObject\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="ParentChildComponent.cpp">
+      <Filter>GameObject\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Octree.cpp">
+      <Filter>SpacialPartitioning\Octrees</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugDraw.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="SpacialTree.cpp">
+      <Filter>SpacialPartitioning</Filter>
+    </ClCompile>
+    <ClCompile Include="BspTree.cpp">
+      <Filter>SpacialPartitioning\BspTrees</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Camera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="FaceNormalRender.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexNormalRender.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="LightSystem.h">
+      <Filter>Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="LightHandle.h">
+      <Filter>Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialSystem.h">
+      <Filter>Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectComponent.h">
+      <Filter>GameObject\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderingComponent.h">
+      <Filter>GameObject\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="TransformComponent.h">
+      <Filter>GameObject\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="LightComponent.h">
+      <Filter>GameObject\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexGlobalSystem.h">
+      <Filter>VertexGlobals</Filter>
+    </ClInclude>
+    <ClInclude Include="SolidRender.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Texturing</Filter>
+    </ClInclude>
+    <ClInclude Include="GBuffer.h" />
+    <ClInclude Include="MaterialHandle.h">
+      <Filter>Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialComponent.h">
+      <Filter>GameObject\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\Scene.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\shader.hpp">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\imgui\examples\imgui_impl_glfw.h">
+      <Filter>Common\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\imgui\examples\imgui_impl_opengl3.h">
+      <Filter>Common\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\imgui\imconfig.h">
+      <Filter>Common\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\imgui\imgui.h">
+      <Filter>Common\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\imgui\imgui_internal.h">
+      <Filter>Common\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\imgui\imstb_rectpack.h">
+      <Filter>Common\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\imgui\imstb_textedit.h">
+      <Filter>Common\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\imgui\imstb_truetype.h">
+      <Filter>Common\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="MainScene.h" />
+    <ClInclude Include="GLHelper.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="ntg\bounds.h">
+      <Filter>Utilities\ntg-math</Filter>
+    </ClInclude>
+    <ClInclude Include="ntg\bounds_vertex_itrerator.h">
+      <Filter>Utilities\ntg-math</Filter>
+    </ClInclude>
+    <ClInclude Include="ntg\collision.h">
+      <Filter>Utilities\ntg-math</Filter>
+    </ClInclude>
+    <ClInclude Include="ntg\hyperplane.h">
+      <Filter>Utilities\ntg-math</Filter>
+    </ClInclude>
+    <ClInclude Include="ntg\radial.h">
+      <Filter>Utilities\ntg-math</Filter>
+    </ClInclude>
+    <ClInclude Include="ntg\ray.h">
+      <Filter>Utilities\ntg-math</Filter>
+    </ClInclude>
+    <ClInclude Include="ntg\simplex.h">
+      <Filter>Utilities\ntg-math</Filter>
+    </ClInclude>
+    <ClInclude Include="ntg\type_mat1x1.h">
+      <Filter>Utilities\ntg-math</Filter>
+    </ClInclude>
+    <ClInclude Include="VolumeComponent.h">
+      <Filter>GameObject\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="ParentChildComponent.h">
+      <Filter>GameObject\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Octree.h">
+      <Filter>SpacialPartitioning\Octrees</Filter>
+    </ClInclude>
+    <ClInclude Include="SpacialTree.h">
+      <Filter>SpacialPartitioning</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugDraw.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="ntg\hit.h">
+      <Filter>Utilities\ntg-math</Filter>
+    </ClInclude>
+    <ClInclude Include="BspTree.h">
+      <Filter>SpacialPartitioning\BspTrees</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ntg\bounds.inl">
+      <Filter>Utilities\ntg-math</Filter>
+    </None>
+    <None Include="ntg\bounds_vertex_iterator.inl">
+      <Filter>Utilities\ntg-math</Filter>
+    </None>
+    <None Include="ntg\collision.inl">
+      <Filter>Utilities\ntg-math</Filter>
+    </None>
+    <None Include="ntg\hyperplane.inl">
+      <Filter>Utilities\ntg-math</Filter>
+    </None>
+    <None Include="ntg\radial.inl">
+      <Filter>Utilities\ntg-math</Filter>
+    </None>
+    <None Include="ntg\ray.inl">
+      <Filter>Utilities\ntg-math</Filter>
+    </None>
+    <None Include="ntg\simplex.inl">
+      <Filter>Utilities\ntg-math</Filter>
+    </None>
+    <None Include="ntg\type_mat1x1.inl">
+      <Filter>Utilities\ntg-math</Filter>
+    </None>
+    <None Include="ntg\hit.inl">
+      <Filter>Utilities\ntg-math</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="octree.natvis">
+      <Filter>SpacialPartitioning\Octrees</Filter>
+    </Natvis>
+  </ItemGroup>
+</Project>

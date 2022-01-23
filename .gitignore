@@ -10,25 +10,25 @@ bin-int
 #------------------------------------
 Common/imgui/
 
-VS_CS350/Release/
+Projects/Release/
 
-VS_CS350/RenderingEngine/Release/
+Projects/RenderingEngine/Release/
 
-VS_CS350/RenderingEngine/x64/
+Projects/RenderingEngine/x64/
 
-VS_CS350/x64/
+Projects/x64/
 
-VS_CS350/RenderingEngine/ntg/Release/
+Projects/RenderingEngine/ntg/Release/
 
-VS_CS350/RenderingEngine/ntg/x64/
+Projects/RenderingEngine/ntg/x64/
 
 Release/
 
-VS_CS350/cmake-build-debug/
+Projects/cmake-build-debug/
 
-VS_CS350/.idea/
+Projects/.idea/
 
-VS_CS350/RenderingEngine/shaderOut/
+Projects/RenderingEngine/shaderOut/
 
 cmake-build-release/
 
