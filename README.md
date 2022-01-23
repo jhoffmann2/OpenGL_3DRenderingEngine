@@ -12,6 +12,8 @@ End Header ----------------------------------------------------------->
 
 ## [this readme is intended to be read from github for proper file links](https://github.com/jhoffmann2/CS350/blob/master/README.md)
 
+### [Download the latest Release Build Here](https://github.com/jhoffmann2/OpenGL_3DRenderingEngine/releases/tag/LatestBuild)
+
 ## How to use parts of your user interface that is NOT specified in the assignment description
 
 Simply launch application and use the imgui. 
