@@ -122,8 +122,16 @@ Simply launch application and use the imgui.
   - Methods for rendering local lights
 
 ## Preview Images
+
 ### Local Lights vs Global Lights
+
 ![Demonstrating the visual difference between a global light and a local one](Previews/GlobalLightConversion.gif "Local vs Global Lights")
+
+### GBuffer
+
+![Debug view of the GBuffer](Previews/GBuffer.png "GBuffer")
+Q: Where's the specular and diffuse material properties?<br />
+A: rather than putting the material properties in the gbuffer, I uploaded all the materials at once to an SSBO array and indexed into it with the alpha component of the WorldPosition render target.
 
 ## Which machine did you test your application on
 - OS: Microsoft Windows 10 Home 64-bit
