@@ -198,11 +198,6 @@ set(ALL_FILES
 add_executable(${PROJECT_NAME} ${ALL_FILES})
 
 use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
-################################################################################
-# Includes for CMake from *.props
-################################################################################
-use_props(${PROJECT_NAME} Debug "../../Common/Common.cmake")
-use_props(${PROJECT_NAME} Release "../../Common/Common.cmake")
 
 set(ROOT_NAMESPACE Assignment2)
 
