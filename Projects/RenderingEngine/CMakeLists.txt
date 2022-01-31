@@ -291,14 +291,30 @@ if (MSVC)
 
 endif ()
 
-#add_custom_command(TARGET RenderingEngine POST_BUILD
-#        COMMAND ${CMAKE_COMMAND} -E copy
-#        "${CMAKE_BINARY_DIR}/Common/GLFW/src/glfw3.dll"
-#        $<TARGET_FILE_DIR:RenderingEngine>)
+if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
+    message("Copying Release DLLs Enabled")
+    add_custom_command(TARGET RenderingEngine POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            "${CMAKE_BINARY_DIR}/Common/GLFW/src/glfw3.dll"
+            $<TARGET_FILE_DIR:RenderingEngine>)
 
-#add_custom_command(TARGET RenderingEngine POST_BUILD
-#        COMMAND ${CMAKE_COMMAND} -E copy
-#        "${CMAKE_BINARY_DIR}/Common/assimp/code/assimp-vc142-mt.dll"
-#        $<TARGET_FILE_DIR:RenderingEngine>)
+    add_custom_command(TARGET RenderingEngine POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            "${CMAKE_BINARY_DIR}/Common/assimp/code/assimp-vc142-mt.dll"
+            $<TARGET_FILE_DIR:RenderingEngine>)
+endif()
+
+if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    message("Copying Debug DLLs Enabled")
+    add_custom_command(TARGET RenderingEngine POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            "${CMAKE_BINARY_DIR}/Common/GLFW/src/glfw3d.dll"
+            $<TARGET_FILE_DIR:RenderingEngine>)
+
+    add_custom_command(TARGET RenderingEngine POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            "${CMAKE_BINARY_DIR}/Common/assimp/code/assimp-vc142-mtd.dll"
+            $<TARGET_FILE_DIR:RenderingEngine>)
+endif()
 
 
