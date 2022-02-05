@@ -4,8 +4,8 @@ set(PROJECT_NAME RenderingEngine)
 # Source groups
 ################################################################################
 set(no_group_source_files
-        "GBuffer.cpp"
-        "GBuffer.h"
+        "Rendering/GBuffer.cpp"
+        "Rendering/GBuffer.h"
         "GLApplication.cpp"
         "MainScene.cpp"
         "MainScene.h"
@@ -13,9 +13,9 @@ set(no_group_source_files
 source_group("" FILES ${no_group_source_files})
 
 set(Camera
-        "Camera.cpp"
-        "Camera.h"
-        "CameraTransform.cpp"
+        "camera/Camera.cpp"
+        "camera/Camera.h"
+        "camera/CameraTransform.cpp"
         )
 source_group("Camera" FILES ${Camera})
 
@@ -54,92 +54,92 @@ set(Common__soil
 source_group("Common\\soil" FILES ${Common__soil})
 
 set(GameObject
-        "GameObject.cpp"
-        "GameObject.h"
+        "GameObjects/GameObject.cpp"
+        "GameObjects/GameObject.h"
         )
 source_group("GameObject" FILES ${GameObject})
 
 set(GameObject__Components
-        "LightComponent.cpp"
-        "LightComponent.h"
-        "MaterialComponent.cpp"
-        "MaterialComponent.h"
-        "ObjectComponent.cpp"
-        "ObjectComponent.h"
-        "ParentChildComponent.cpp"
-        "ParentChildComponent.h"
-        "RenderingComponent.cpp"
-        "RenderingComponent.h"
-        "TransformComponent.cpp"
-        "TransformComponent.h"
-        "VolumeComponent.cpp"
-        "VolumeComponent.h"
+        "Lighting/LightComponent.cpp"
+        "Lighting/LightComponent.h"
+        "Materials/MaterialComponent.cpp"
+        "Materials/MaterialComponent.h"
+        "GameObjects/ObjectComponent.cpp"
+        "GameObjects/ObjectComponent.h"
+        "Hierarchy/ParentChildComponent.cpp"
+        "Hierarchy/ParentChildComponent.h"
+        "Rendering/RenderingComponent.cpp"
+        "Rendering/RenderingComponent.h"
+        "Transform/TransformComponent.cpp"
+        "Transform/TransformComponent.h"
+        "Collision/VolumeComponent.cpp"
+        "Collision/VolumeComponent.h"
         )
 source_group("GameObject\\Components" FILES ${GameObject__Components})
 
 set(Lighting
-        "Light.h"
-        "LightHandle.cpp"
-        "LightHandle.h"
-        "LightSystem.cpp"
-        "LightSystem.h"
+        "Lighting/Light.h"
+        "Lighting/LightHandle.cpp"
+        "Lighting/LightHandle.h"
+        "Lighting/LightSystem.cpp"
+        "Lighting/LightSystem.h"
         )
 source_group("Lighting" FILES ${Lighting})
 
 set(Materials
-        "material.cpp"
-        "Material.h"
-        "MaterialHandle.h"
-        "MaterialSystem.cpp"
-        "MaterialSystem.h"
+        "Materials/material.cpp"
+        "Materials/Material.h"
+        "Materials/MaterialHandle.h"
+        "Materials/MaterialSystem.cpp"
+        "Materials/MaterialSystem.h"
         )
 source_group("Materials" FILES ${Materials})
 
 set(Mesh
-        "Mesh.cpp"
-        "Mesh.h"
+        "Mesh/Mesh.cpp"
+        "Mesh/Mesh.h"
         )
 source_group("Mesh" FILES ${Mesh})
 
 set(Rendering
-        "DebugDraw.cpp"
-        "DebugDraw.h"
-        "FaceNormalRender.cpp"
-        "FaceNormalRender.h"
-        "SolidRender.cpp"
-        "SolidRender.h"
-        "VertexNormalRender.cpp"
-        "VertexNormalRender.h"
+        "Rendering/DebugDraw.cpp"
+        "Rendering/DebugDraw.h"
+        "Rendering/FaceNormalRender.cpp"
+        "Rendering/FaceNormalRender.h"
+        "Rendering/SolidRender.cpp"
+        "Rendering/SolidRender.h"
+        "Rendering/VertexNormalRender.cpp"
+        "Rendering/VertexNormalRender.h"
         )
 source_group("Rendering" FILES ${Rendering})
 
 set(SpacialPartitioning
-        "SpacialTree.cpp"
-        "SpacialTree.h"
+        "SpacialPartitioning/SpacialTree.cpp"
+        "SpacialPartitioning/SpacialTree.h"
         )
 source_group("SpacialPartitioning" FILES ${SpacialPartitioning})
 
 set(SpacialPartitioning__BspTrees
-        "BspTree.cpp"
-        "BspTree.h"
+        "SpacialPartitioning/BspTree.cpp"
+        "SpacialPartitioning/BspTree.h"
         )
 source_group("SpacialPartitioning\\BspTrees" FILES ${SpacialPartitioning__BspTrees})
 
 set(SpacialPartitioning__Octrees
-        "Octree.cpp"
-        "Octree.h"
+        "SpacialPartitioning/Octree.cpp"
+        "SpacialPartitioning/Octree.h"
         )
 source_group("SpacialPartitioning\\Octrees" FILES ${SpacialPartitioning__Octrees})
 
 set(Texturing
-        "Texture.cpp"
-        "Texture.h"
+        "Materials/Texture.cpp"
+        "Materials/Texture.h"
         )
 source_group("Texturing" FILES ${Texturing})
 
 set(Utilities
-        "GLHelper.h"
-        "Utilities.h"
+        "Utilities/GLHelper.h"
+        "Utilities/Utilities.h"
         )
 source_group("Utilities" FILES ${Utilities})
 
@@ -166,8 +166,8 @@ set(Utilities__ntg-math
 source_group("Utilities\\ntg-math" FILES ${Utilities__ntg-math})
 
 set(VertexGlobals
-        "VertexGlobalSystem.cpp"
-        "VertexGlobalSystem.h"
+        "Transform/VertexGlobalSystem.cpp"
+        "Transform/VertexGlobalSystem.h"
         )
 source_group("VertexGlobals" FILES ${VertexGlobals})
 
@@ -191,6 +191,8 @@ set(ALL_FILES
         ${Utilities__ntg-math}
         ${VertexGlobals}
         )
+
+include_directories(".")
 
 ################################################################################
 # Target

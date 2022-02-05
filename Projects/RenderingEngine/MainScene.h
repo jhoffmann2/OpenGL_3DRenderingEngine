@@ -14,19 +14,18 @@ End Header --------------------------------------------------------*/
 #ifndef SIMPLE_SCENE_SIMPLESCENE_Obj_H
 #define SIMPLE_SCENE_SIMPLESCENE_Obj_H
 
-#include "../Common/Scene.h"
+#include "Scene.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <bitset>
 #include <vector>
 
+#include "GameObjects/GameObject.h"
+#include "Hierarchy/ParentChildComponent.h"
+#include "Lighting/Light.h"
+#include "Rendering/SolidRender.h"
+#include "camera/Camera.h"
 #include "ntg/bounds.h"
-#include "SolidRender.h"
-#include "Camera.h"
-#include "GameObject.h"
-#include "Light.h"
-#include "ParentChildComponent.h"
-
 
 class MainScene : public Scene
 {

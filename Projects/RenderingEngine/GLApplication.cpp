@@ -33,7 +33,7 @@ End Header --------------------------------------------------------*/
 #include <glm/gtx/transform.hpp>
 
 // Local / project headers
-#include "../Common/Scene.h"
+#include "Scene.h"
 #include "shader.hpp"
 #include "MainScene.h"
 #include "imgui/examples/imgui_impl_glfw.h"
