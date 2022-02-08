@@ -13,10 +13,12 @@ End Header --------------------------------------------------------*/
 #version 460
 #include ../Include/lightingUniforms.glsl
 #include ../Include/phong.glsl
+#include ../Include/ShaderGlobals.glsl
 
-uniform sampler2D diffuseTex;  // = { kd.r, kd.g, kd.b, ks }
-uniform sampler2D worldPosTex; // = { P.x, P.y, P.z, materialIndex }
-uniform sampler2D normalTex;   // = { N.x, N.y, N.z, 0 }
+layout (location = 1) uniform sampler2D diffuseTex;  // = { kd.r, kd.g, kd.b, ks }
+layout (location = 2) uniform sampler2D worldPosTex; // = { P.x, P.y, P.z, materialIndex }
+layout (location = 3) uniform sampler2D normalTex;   // = { N.x, N.y, N.z, 0 }
+layout (location = 4) uniform sampler2D shadowMap;
 
 in vec2 uv_frag;
 out vec4 frag_color;
@@ -31,7 +33,7 @@ void main(void)
 		frag_color = vec4(fogColor , 1);
 		return;
 	}
-	
+
 	vec4 N = texture(normalTex, uv_frag);
 
 	uint material = uint(P.w * 10);
@@ -43,4 +45,8 @@ void main(void)
 	vec3 i_local = (S < 1)? phongLight(P.xyz, N.xyz, kd.rgb, ks, material) : vec3(0);
 
 	frag_color = vec4(mix(fogColor, i_local, S), 1);
+	vec4 shadowNDC = shadowWorldToNDC * P;
+	shadowNDC /= shadowNDC.w;
+	const vec2 shadowUV = (shadowNDC.xy + 1) * 0.5;
+	frag_color = vec4(1) - vec4(texture(shadowMap, shadowUV).xyz, 2);
 }

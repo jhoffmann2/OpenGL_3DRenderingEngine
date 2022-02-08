@@ -15,7 +15,7 @@ void ObjectComponent::Render()
 {
 }
 
-void ObjectComponent::DebugRender()
+void ObjectComponent::ForwardRender()
 {
 }
 

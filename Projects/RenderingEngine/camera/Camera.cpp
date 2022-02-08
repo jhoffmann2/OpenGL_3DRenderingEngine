@@ -12,7 +12,7 @@ Creation date: 9/28/2020
 End Header --------------------------------------------------------*/
 
 #include "Camera.h"
-#include "Transform/VertexGlobalSystem.h"
+#include "Rendering/ShaderGlobalSystem.h"
 #include "Utilities/Utilities.h"
 #include <glm/gtx/rotate_vector.hpp>
 
@@ -92,6 +92,6 @@ Camera& Camera::roll(float angle)
 
 void Camera::UpdateGPUCamera() const
 {
-	VertexGlobalSystem::SetWorldToCam(view(*this));
-	VertexGlobalSystem::SetCamToNDC(perspective(*this));
+  ShaderGlobalSystem::SetCamToWorld(model(*this));
+  ShaderGlobalSystem::SetCamToNDC(perspective(*this));
 }

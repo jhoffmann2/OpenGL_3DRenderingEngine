@@ -21,7 +21,6 @@ End Header --------------------------------------------------------*/
 #include <glm/gtx/color_space.hpp>
 #include <glm/gtx/easing.hpp>
 
-#include "Collision/VolumeComponent.h"
 #include "Hierarchy/ParentChildComponent.h"
 #include "Lighting/LightComponent.h"
 #include "Lighting/LightSystem.h"
@@ -32,13 +31,14 @@ End Header --------------------------------------------------------*/
 #include "Rendering/FaceNormalRender.h"
 #include "Rendering/GBuffer.h"
 #include "Rendering/RenderingComponent.h"
+#include "Rendering/ShaderGlobalSystem.h"
 #include "Rendering/VertexNormalRender.h"
 #include "SpacialPartitioning/BspTree.h"
 #include "SpacialPartitioning/Octree.h"
 #include "SpacialPartitioning/SpacialTree.h"
 #include "Transform/TransformComponent.h"
-#include "Transform/VertexGlobalSystem.h"
 #include "Utilities/Utilities.h"
+#include "Volumes/BoxVolumeComponent.h"
 #include "glm/gtc/random.hpp"
 #include "glm/gtx/rotate_vector.hpp"
 #include "imgui.h"
@@ -105,7 +105,7 @@ void MainScene::initMembers()
   objects_.clear();
 }
 
-ntg::bounds3 MainScene::ActivePowerPlantBounds() const
+ntg::bounds3 MainScene::CalculateActivePowerPlantBounds() const
 {
   ntg::bounds3 out;
   for (const auto* pc : PowerPlantGroup())
@@ -163,13 +163,12 @@ void MainScene::UpdateActivePowerPlants()
     }
   }
 
-  static ntg::bounds3 prev_bounds;
-  ntg::bounds3 cur_bounds = ActivePowerPlantBounds();
-  if (cur_bounds != prev_bounds)
+  ntg::bounds3 cur_bounds = CalculateActivePowerPlantBounds();
+  if (cur_bounds != activePowerPlantBounds)
   {
     cur_lerp = lerp_time + 1;
-    prev_bounds = cur_bounds;
-  }
+    activePowerPlantBounds = cur_bounds;
+    }
 
   // update the pivot so powerplant is centered;
   static glm::vec3 destination_pivot;
@@ -179,6 +178,8 @@ void MainScene::UpdateActivePowerPlants()
     cur_lerp = 1;
 
     ntg::bounds3 bounds = transform->GetModelToWorld() * cur_bounds;
+    ShaderGlobalSystem::SetSceneBounds(bounds);
+
     glm::vec3 center = bounds.center();
     if (bounds.valid())
       center.y = bounds.min.y + 0.25f * bounds.size().y; // favor looking toward the ground
@@ -207,30 +208,14 @@ void MainScene::CleanUp()
   }
 }
 
-void GLAPIENTRY
-MessageCallback(GLenum source,
-                GLenum type,
-                GLuint id,
-                GLenum severity,
-                GLsizei length,
-                const GLchar* message,
-                const void* userParam)
-{
-  fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-          (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
-          type, severity, message);
-}
 
 //////////////////////////////////////////////////////
 //////////////////////////////////////////////////////
 int MainScene::Init()
 {
-//   glEnable(GL_DEBUG_OUTPUT);
-//   glDebugMessageCallback(MessageCallback, 0);
-
   GBuffer::Init(viewportWidth_, viewportHeight_);
 
-  VertexGlobalSystem::Init();
+  ShaderGlobalSystem::Init();
 
   const auto sphere_meshData(generateSphereMesh(30));
 
@@ -334,7 +319,7 @@ int MainScene::Init()
       lightObj->AddComponent(
         new TransformComponent(
           {0, 0, 0},
-          {2, 0, 0},
+          {3.7, 0, 0},
           {EY, 0},
           3.f
         )
@@ -388,15 +373,17 @@ int MainScene::Render()
   {
     ImGui::PushItemWidth(400);
 
-    ImGui::SliderFloat("X rotation", &x_polar, -180, 180, "%.1f degrees");
-    ImGui::SliderFloat("Y rotation", &y_polar, -89.9f, 89.9f, "%.1f degrees");
-    ImGui::DragFloat("Radius", &radius, 0.002f);
-    glm::vec3 direction{1, 0, 0};
-    direction = glm::rotate(direction, glm::radians(x_polar), glm::vec3{0, 1, 0});
-    direction = glm::rotate(direction, glm::radians(y_polar), glm::cross(glm::vec3{direction}, glm::vec3{0, 1, 0}));
+    ImGui::SliderFloat("X rotation", &camPolarX, -180, 180, "%.1f degrees");
+    ImGui::SliderFloat("Y rotation", &camPolarY, -89.9f, 89.9f, "%.1f degrees");
+    ImGui::DragFloat("Radius", &camRadius, 0.002f);
+    ImGui::SliderFloat("FOV", &camFOV, 0, 180, "%.1f degrees");
 
-    direction *= radius;
-    cam = Camera{direction, -direction, EY, 60.f, static_cast<float>(viewportWidth_) / viewportHeight_, 0.1f, 100};
+    glm::vec3 direction{1, 0, 0};
+    direction = glm::rotate(direction, glm::radians(camPolarX), glm::vec3{0, 1, 0});
+    direction = glm::rotate(direction, glm::radians(camPolarY), glm::cross(glm::vec3{direction}, glm::vec3{0, 1, 0}));
+
+    direction *= camRadius;
+    cam = Camera{direction, -direction, EY, camFOV, static_cast<float>(viewportWidth_) / viewportHeight_, 0.1f, 100};
 
     ImGui::PopItemWidth();
   }
@@ -523,10 +510,6 @@ int MainScene::Render()
     ImGui::EndMainMenuBar();
   }
 
-  cam.UpdateGPUCamera();
-  VertexNormalRender::setCamera(cam);
-  FaceNormalRender::setCamera(cam);
-
   LightSystem::SetEyePos(cam.eye());
   LightSystem::Update();
 
@@ -540,17 +523,38 @@ int MainScene::Render()
   }
 
   SolidRender::clear(glm::vec4(LightSystem::GetFogColor(), 1));
+
+
 #if DEFERRED
   GBuffer::Bind();
+
+  glViewport(0, 0, viewportHeight_, viewportHeight_);
   SolidRender::clear(glm::vec4(std::numeric_limits<float>::max()));
+  for(GameObject* light : lights_)
+  {
+    if(light->HasComponent<LightComponent>())
+    {
+      light->GetComponent<LightComponent>()->RenderShadowMap(objects_);
+      break;
+    }
+  }
 #endif
+
+  cam.UpdateGPUCamera();
+  VertexNormalRender::setCamera(cam);
+  FaceNormalRender::setCamera(cam);
+
+#if DEFERRED
+  glViewport(0, 0, viewportWidth_, viewportHeight_);
+  glClearDepth(1);
+  glClear(GL_DEPTH_BUFFER_BIT);
+
   for (GameObject* o : objects_)
   {
     o->PreRender();
     o->Render();
   }
 
-#if DEFERRED
   GBuffer::UnBind();
   GBuffer::RenderFSQ();
 #endif
@@ -558,19 +562,18 @@ int MainScene::Render()
   for (GameObject* o : objects_)
   {
     o->PreRender();
-    o->DebugRender();
+    o->ForwardRender();
   }
 
 
-  glm::mat4 NDCToWorld = inverse(
-  VertexGlobalSystem::GetCamToNDC() * transpose(inverse(VertexGlobalSystem::GetWorldToCam())));
+  glm::mat4 NDCToWorld = inverse(ShaderGlobalSystem::GetCamToNDC() * transpose(inverse(ShaderGlobalSystem::GetWorldToCam())));
   ntg::ray3 r = {cam.eye(), NDCToWorld * mouse_ndc};
 
   ntg::hit3 hit;
   if (SpacialTreeHierarchy::Raycast(objects_[POWER_PLANT], r, hit))
   {
     DebugDraw::SetColor({1.f, 1.f, 1.f, 1.f});
-    VertexGlobalSystem::SetModelToWorld(glm::mat4{1.f});
+    ShaderGlobalSystem::SetModelToWorld(glm::mat4{1.f});
     DebugDraw::DrawTriangleList({hit.triangle}, GL_FILL);
     DebugDraw::SetColor({0.f, 1.f, 0.f, 1.f});
     DebugDraw::DrawLineList({{hit.point, hit.point + hit.normal() * .5f}});
@@ -599,29 +602,29 @@ void MainScene::KeyCallback(GLFWwindow* window, int key, int scancode, int actio
     switch (key)
     {
     case GLFW_KEY_W:
-      y_polar += 3.f;
-      y_polar = glm::clamp(y_polar, -89.9f, 89.9f);
+      camPolarY += 3.f;
+      camPolarY = glm::clamp(camPolarY, -89.9f, 89.9f);
       break;
     case GLFW_KEY_S:
-      y_polar -= 3.f;
-      y_polar = glm::clamp(y_polar, -89.9f, 89.9f);
+      camPolarY -= 3.f;
+      camPolarY = glm::clamp(camPolarY, -89.9f, 89.9f);
       break;
     case GLFW_KEY_A:
-      x_polar -= 3.f;
-      if (x_polar < -180)
-        x_polar += 360.f;
+      camPolarX -= 3.f;
+      if (camPolarX < -180)
+        camPolarX += 360.f;
       break;
     case GLFW_KEY_D:
-      x_polar += 3.f;
-      if (x_polar > 180)
-        x_polar -= 360.f;
+      camPolarX += 3.f;
+      if (camPolarX > 180)
+        camPolarX -= 360.f;
       break;
     case GLFW_KEY_E:
-      radius -= .2f;
-      radius = glm::clamp(radius, 0.f, std::numeric_limits<float>::max());
+      camRadius -= .2f;
+      camRadius = glm::clamp(camRadius, 0.f, std::numeric_limits<float>::max());
       break;
     case GLFW_KEY_Q:
-      radius += .2f;
+      camRadius += .2f;
       break;
     }
   }

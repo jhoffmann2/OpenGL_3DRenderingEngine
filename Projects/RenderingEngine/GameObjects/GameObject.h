@@ -20,7 +20,7 @@ public:
   virtual void Init();
   virtual void PreRender();
   virtual void Render();
-  virtual void DebugRender();
+  virtual void ForwardRender();
   virtual void Kill();
   virtual void ImGuiEditor();
   virtual void OnActivated();

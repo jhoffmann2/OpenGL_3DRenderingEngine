@@ -94,7 +94,7 @@
     <ClCompile Include="LightComponent.cpp">
       <Filter>GameObject\Components</Filter>
     </ClCompile>
-    <ClCompile Include="VertexGlobalSystem.cpp">
+    <ClCompile Include="ShaderGlobalSystem.cpp">
       <Filter>VertexGlobals</Filter>
     </ClCompile>
     <ClCompile Include="SolidRender.cpp">
@@ -147,7 +147,7 @@
       <Filter>Common\soil</Filter>
     </ClCompile>
     <ClCompile Include="MainScene.cpp" />
-    <ClCompile Include="VolumeComponent.cpp">
+    <ClCompile Include="BoxVolumeComponent.cpp">
       <Filter>GameObject\Components</Filter>
     </ClCompile>
     <ClCompile Include="ParentChildComponent.cpp">
@@ -209,7 +209,7 @@
     <ClInclude Include="LightComponent.h">
       <Filter>GameObject\Components</Filter>
     </ClInclude>
-    <ClInclude Include="VertexGlobalSystem.h">
+    <ClInclude Include="ShaderGlobalSystem.h">
       <Filter>VertexGlobals</Filter>
     </ClInclude>
     <ClInclude Include="SolidRender.h">
@@ -286,7 +286,7 @@
     <ClInclude Include="ntg\type_mat1x1.h">
       <Filter>Utilities\ntg-math</Filter>
     </ClInclude>
-    <ClInclude Include="VolumeComponent.h">
+    <ClInclude Include="BoxVolumeComponent.h">
       <Filter>GameObject\Components</Filter>
     </ClInclude>
     <ClInclude Include="ParentChildComponent.h">

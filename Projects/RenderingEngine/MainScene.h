@@ -36,7 +36,6 @@ public:
 
   void SetupNanoGUI(GLFWwindow* pWwindow) override{}
 
-
 public:
   int Init() override;
   void CleanUp() override;
@@ -51,7 +50,8 @@ private:
   // member functions
   void initMembers();
 
-  ntg::bounds3 ActivePowerPlantBounds() const;
+  ntg::bounds3 CalculateActivePowerPlantBounds() const;
+  ntg::bounds3 activePowerPlantBounds;
   void UpdateActivePowerPlants();
   [[nodiscard]] const std::unordered_set<ParentChildComponent*>& PowerPlantGroup() const;
 
@@ -65,9 +65,10 @@ private:
   Camera cam;
 
   // camera controls:
-  float x_polar = 0;
-  float y_polar = 20;
-  float radius = 10.f;
+  float camPolarX = 0;
+  float camPolarY = 20;
+  float camRadius = 10.f;
+  float camFOV = 60.f;
 
   enum BaseObjects
   {

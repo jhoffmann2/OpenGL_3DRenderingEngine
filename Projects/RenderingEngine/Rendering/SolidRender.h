@@ -35,6 +35,7 @@ public:
     FLAT_EMISSION,
     DEFFERED,
     LOCAL_LIGHT,
+    DEPTH_MAP,
 
     SHADER_PROGRAM_COUNT
   };

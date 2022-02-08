@@ -12,6 +12,7 @@ public:
     TARGET_DIFFUSE,
     TARGET_WORLD_POS,
     TARGET_NORMAL,
+    TARGET_SHADOW,
 
     RenderTargetCount,
     DEPTH_TEXTURE
@@ -37,8 +38,6 @@ private:
   GBuffer() = default;
   ~GBuffer() = default;
 
-  SolidRender::SHADER unbindShader_;
-
   GLuint gBufferFBO;
   GLuint depthTexture;
   GLuint rboDepth;
@@ -60,9 +59,6 @@ private:
     int faceCount_;
 
   } FSQ;
-
-  struct MeshData {
-  };
 
 };
 

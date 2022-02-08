@@ -14,9 +14,9 @@ End Header --------------------------------------------------------*/
 #include ../Include/lightingUniforms.glsl
 #include ../Include/phongLocal.glsl
 
-uniform sampler2D diffuseTex;  // = { kd.r, kd.g, kd.b, ks }
-uniform sampler2D worldPosTex; // = { P.x, P.y, P.z, materialIndex }
-uniform sampler2D normalTex;   // = { N.x, N.y, N.z, 0 }
+layout (location = 1) uniform sampler2D diffuseTex;  // = { kd.r, kd.g, kd.b, ks }
+layout (location = 2) uniform sampler2D worldPosTex; // = { P.x, P.y, P.z, materialIndex }
+layout (location = 3) uniform sampler2D normalTex;   // = { N.x, N.y, N.z, 0 }
 
 
 out vec4 frag_color;

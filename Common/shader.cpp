@@ -16,8 +16,25 @@ using namespace std;
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
+
+void GLAPIENTRY
+MessageCallback(GLenum source,
+                GLenum type,
+                GLuint id,
+                GLenum severity,
+                GLsizei length,
+                const GLchar* message,
+                const void* userParam)
+{
+  fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+          (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+          type, severity, message);
+}
+
 GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path)
 {
+  glEnable(GL_DEBUG_OUTPUT);
+  glDebugMessageCallback(MessageCallback, 0);
 
   std::string VertexShaderCode = Shadinclude::load(vertex_file_path);
   std::string FragmentShaderCode = Shadinclude::load(fragment_file_path);
@@ -33,7 +50,9 @@ GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path
   fragDebugFile << FragmentShaderCode;
 #endif
 
-  return LoadShaders(VertexShaderCode, FragmentShaderCode);
+  const GLuint output = LoadShaders(VertexShaderCode, FragmentShaderCode);
+  glDisable(GL_DEBUG_OUTPUT);
+  return output;
 }
 
 GLuint LoadShaders(const std::string& VertexShaderCode, const std::string& FragmentShaderCode)

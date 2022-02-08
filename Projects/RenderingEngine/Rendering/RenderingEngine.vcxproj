@@ -131,9 +131,9 @@
     <ClCompile Include="SpacialTree.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TransformComponent.cpp" />
-    <ClCompile Include="VertexGlobalSystem.cpp" />
+    <ClCompile Include="ShaderGlobalSystem.cpp" />
     <ClCompile Include="VertexNormalRender.cpp" />
-    <ClCompile Include="VolumeComponent.cpp" />
+    <ClCompile Include="BoxVolumeComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Common\imgui\examples\imgui_impl_glfw.h" />
@@ -181,9 +181,9 @@
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TransformComponent.h" />
     <ClInclude Include="Utilities.h" />
-    <ClInclude Include="VertexGlobalSystem.h" />
+    <ClInclude Include="ShaderGlobalSystem.h" />
     <ClInclude Include="VertexNormalRender.h" />
-    <ClInclude Include="VolumeComponent.h" />
+    <ClInclude Include="BoxVolumeComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ntg\bounds.inl" />

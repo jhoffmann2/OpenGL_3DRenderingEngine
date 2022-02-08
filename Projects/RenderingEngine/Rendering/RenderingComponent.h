@@ -13,7 +13,8 @@ public:
   ~RenderingComponent() override;
   RenderingComponent(int meshIndex, SHADER shader = SHADER::DEFFERED);
   void Render() override;
-  void DebugRender() override;
+  void PreRender() override;
+  void ForwardRender() override;
 
   void SetTextures(const Texture& diffuse, const Texture& specular);
   void SetDiffuseTexture(const Texture& t);

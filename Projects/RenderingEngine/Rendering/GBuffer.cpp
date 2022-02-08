@@ -29,8 +29,16 @@ void GBuffer::Init(size_t width, size_t height) {
 
   for (size_t i = 0; i < RenderTargetCount; ++i) {
     glBindTexture(GL_TEXTURE_2D, textures[i]);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, (GLsizei)width, (GLsizei)height,
-                 0, GL_RGBA, GL_FLOAT, nullptr);
+    if(i == TARGET_SHADOW)
+    {
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, (GLsizei)height, (GLsizei)height,
+                   0, GL_RGBA, GL_FLOAT, nullptr);
+    }
+    else
+    {
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, (GLsizei)width, (GLsizei)height,
+                   0, GL_RGBA, GL_FLOAT, nullptr);
+    }
 
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -57,13 +65,7 @@ void GBuffer::Init(size_t width, size_t height) {
 }
 
 void GBuffer::Bind() {
-  GBuffer &instance = Instance();
-
-  GLuint &gBufferFBO = instance.gBufferFBO;
-  SolidRender::SHADER &unbindShader = instance.unbindShader_;
-
-  unbindShader = SolidRender::GetShader();
-  SolidRender::SetShader(SolidRender::DEFFERED);
+  GLuint &gBufferFBO = Instance().gBufferFBO;
 
   glBindFramebuffer(GL_FRAMEBUFFER, gBufferFBO);
 }
@@ -71,14 +73,12 @@ void GBuffer::Bind() {
 void GBuffer::UnBind() {
   GBuffer &instance = Instance();
 
-  GLuint &gBufferFBO = instance.gBufferFBO;
-  SolidRender::SHADER &unbindShader = instance.unbindShader_;
-  size_t &width = instance.width;
-  size_t &height = instance.height;
-
-  SolidRender::SetShader(unbindShader);
-
   if (Instance().copyDepth_) {
+
+    GLuint &gBufferFBO = instance.gBufferFBO;
+    size_t &width = instance.width;
+    size_t &height = instance.height;
+
     // copy gbuffer depth info over to default FBO
     glBindFramebuffer(GL_READ_FRAMEBUFFER, gBufferFBO);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -163,7 +163,6 @@ void GBuffer::RenderSolid(GLuint &vao, size_t &face_count) {
 
 void GBuffer::ImguiEditor() {
   if (ImGui::Begin("Deferred Shading")) {
-    ImGui::Checkbox("copy depth buffer", &Instance().copyDepth_);
 
     ImGui::Text("Normal Target");
     ImGuiImage(TARGET_NORMAL);
@@ -187,6 +186,10 @@ void GBuffer::ImguiEditor() {
     ImGuiImage(TARGET_DIFFUSE, difforspec);
     ImGui::TextWrapped("^^ Note that im not using any textures right now so "
                        "all white is correct output");
+
+
+    ImGui::Text("Shadow Depth Target");
+    ImGuiImage(TARGET_SHADOW);
   }
   ImGui::End();
 }
@@ -194,10 +197,15 @@ void GBuffer::ImguiEditor() {
 void GBuffer::ImGuiImage(RenderTarget target, int swizzle_id) {
   auto &instance = Instance();
   const float width = ImGui::GetWindowContentRegionWidth();
-  const float aratio =
+  float aratio =
       static_cast<float>(instance.height) / static_cast<float>(instance.width);
+
+  if(target == TARGET_SHADOW)
+    aratio = 1.f;
+
   const GLuint texture = (target != DEPTH_TEXTURE) ? instance.textures[target]
                                                    : instance.depthTexture;
+
 
   switch (swizzle_id) {
   case 0:
@@ -294,4 +302,6 @@ void GBuffer::SetupFSQ() {
       glGetUniformLocation(FSQ.shader_program, "normalTex");
   FSQ.uTex[TARGET_WORLD_POS] =
       glGetUniformLocation(FSQ.shader_program, "worldPosTex");
+  FSQ.uTex[TARGET_SHADOW] =
+      glGetUniformLocation(FSQ.shader_program, "shadowMap");
 }

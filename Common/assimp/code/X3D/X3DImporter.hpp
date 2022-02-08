@@ -102,7 +102,7 @@ namespace Assimp {
 ///		Layout component:
 ///			"Layout", "LayoutGroup", "LayoutLayer", "ScreenFontStyle", "ScreenGroup"
 ///		Navigation component:
-///			"Billboard", "Collision", "LOD", "NavigationInfo", "OrthoViewpoint", "Viewpoint", "ViewpointGroup"
+///			"Billboard", "Volumes", "LOD", "NavigationInfo", "OrthoViewpoint", "Viewpoint", "ViewpointGroup"
 ///		Networking component:
 ///			"EXPORT", "IMPORT", "Anchor", "LoadSensor"
 ///		NURBS component:

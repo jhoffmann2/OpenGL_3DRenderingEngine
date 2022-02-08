@@ -6,10 +6,10 @@
 #include "GameObjects/GameObject.h"
 #include "Mesh/Mesh.h"
 #include "Rendering/DebugDraw.h"
-#include "Transform/VertexGlobalSystem.h"
+#include "Rendering/ShaderGlobalSystem.h"
+#include "imgui.h"
 #include "ntg/collision.inl"
 #include "ntg/hyperplane.inl"
-#include "imgui.h"
 
 struct BspNode
 {
@@ -120,7 +120,7 @@ void BspTree::ImguiDraw(GameObject* gameobject, const ntg::ray3& mouseRay)
   ImGui::Indent(10);
   const std::string name = gameobject->Name() + " BspTree";
   const glm::mat4x4 t = gameobject->GetParentedComponent<TransformComponent>()->GetModelToWorld();
-  VertexGlobalSystem::SetModelToWorld(t);
+  ShaderGlobalSystem::SetModelToWorld(t);
   if (ImGui::CollapsingHeader(name.c_str()))
   {
 

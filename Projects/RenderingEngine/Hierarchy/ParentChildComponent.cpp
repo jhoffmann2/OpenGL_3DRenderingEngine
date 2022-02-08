@@ -57,7 +57,7 @@ void ParentChildComponent::AddChildrenFromMeshes(const std::vector<Mesh>& meshes
     children_.emplace(parentChild);
     obj->AddComponent(parentChild);
 
-    auto* rendering = new RenderingComponent(mesh_id);
+    auto* rendering = new RenderingComponent(mesh_id, SolidRender::DEFFERED);
     rendering->flags_.set(RenderingComponent::RENDER_FLAG_DISABLE_FACE_NORMALS);
     obj->AddComponent(rendering);
   }
@@ -97,12 +97,12 @@ void ParentChildComponent::Init()
   }
 }
 
-void ParentChildComponent::DebugRender()
+void ParentChildComponent::ForwardRender()
 {
   for (ParentChildComponent* child : children_)
   {
     child->GetGameObject()->PreRender();
-    child->GetGameObject()->DebugRender();
+    child->GetGameObject()->ForwardRender();
   }
 }
 

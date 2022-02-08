@@ -36,20 +36,28 @@ RenderingComponent::SHADER RenderingComponent::GetShader()
   return shader_;
 }
 
+
+void RenderingComponent::PreRender() {
+
+  if(SolidRender::GetShader() != SolidRender::DEPTH_MAP)
+  {
+    SolidRender::SetShader(shader_);
+  }
+}
+
 void RenderingComponent::Render()
 {
   if (solidRander_ && shader_ == SHADER::DEFFERED && !flags_[RENDER_FLAG_DISABLE_SOLID_RENDERING])
     SolidRender::draw(meshIndex_, diffuseTexture_, specularTexture_);
 }
 
-void RenderingComponent::DebugRender()
+void RenderingComponent::ForwardRender()
 {
   if (solidRander_
-      && shader_ != SHADER::DEFFERED
-      && shader_ != SHADER::LOCAL_LIGHT
-      && !flags_[RENDER_FLAG_DISABLE_SOLID_RENDERING])
+    && (shader_ != SHADER::DEFFERED || SolidRender::GetShader() == SolidRender::DEPTH_MAP)
+    && shader_ != SHADER::LOCAL_LIGHT
+    && !flags_[RENDER_FLAG_DISABLE_SOLID_RENDERING])
   {
-    SolidRender::SetShader(shader_);
     SolidRender::draw(meshIndex_, diffuseTexture_, specularTexture_);
   }
 
@@ -106,8 +114,8 @@ void RenderingComponent::ImGuiEditor()
   ImGui::SameLine();
   static UV_MAPPING mapping = UV_NONE;
   ImGui::Combo(
-    "CPU UV Mapping", 
-    reinterpret_cast<int *>(&mapping), 
+    "CPU UV Mapping",
+    reinterpret_cast<int *>(&mapping),
     "NONE\0"
     "PLANAR\0"
     "CYLINDRICAL\0"
@@ -143,6 +151,7 @@ void RenderingComponent::ImGuiEditor()
         "FlatEmission\0"
         "Deferred Phong\0"
         "Local Light\0"
+        "Depth Map\0"
       );
       if (ImGui::Button("Reload Shaders"))
         SolidRender::ReloadShaders();

@@ -72,8 +72,8 @@ set(GameObject__Components
         "Rendering/RenderingComponent.h"
         "Transform/TransformComponent.cpp"
         "Transform/TransformComponent.h"
-        "Collision/VolumeComponent.cpp"
-        "Collision/VolumeComponent.h"
+        "Volumes/BoxVolumeComponent.cpp"
+        "Volumes/BoxVolumeComponent.h"
         )
 source_group("GameObject\\Components" FILES ${GameObject__Components})
 
@@ -166,8 +166,8 @@ set(Utilities__ntg-math
 source_group("Utilities\\ntg-math" FILES ${Utilities__ntg-math})
 
 set(VertexGlobals
-        "Transform/VertexGlobalSystem.cpp"
-        "Transform/VertexGlobalSystem.h"
+        "Rendering/ShaderGlobalSystem.cpp"
+        "Rendering/ShaderGlobalSystem.h"
         )
 source_group("VertexGlobals" FILES ${VertexGlobals})
 

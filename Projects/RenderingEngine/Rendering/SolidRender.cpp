@@ -106,6 +106,7 @@ void SolidRender::unloadMesh(int mi)
 
 void SolidRender::draw(int mi, Texture &diffuseTex, Texture &specularTex)
 {
+  glDisable(GL_BLEND);
   glUseProgram(GetProgram());
 
   // load diffuse texture
@@ -180,6 +181,9 @@ void SolidRender::LoadShaders()
   programs_[LOCAL_LIGHT] =
       ::LoadShaders("../../Common/shaders/Deferred/LocalLight.vert",
                     "../../Common/shaders/Deferred/LocalLight.frag");
+  programs_[DEPTH_MAP] =
+      ::LoadShaders("../../Common/shaders/Forward/DepthMap.vert",
+                    "../../Common/shaders/Forward/DepthMap.frag");
 }
 
 GLuint SolidRender::GetProgram()

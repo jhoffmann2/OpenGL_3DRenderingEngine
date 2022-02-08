@@ -1,53 +1,43 @@
 #include "LightComponent.h"
 
-#include <vector>
-
+#include "Rendering/SolidRender.h"
+#include "Rendering/ShaderGlobalSystem.h"
+#include "camera/Camera.h"
 #include "GameObjects/GameObject.h"
 #include "Transform/TransformComponent.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 
-LightComponent::LightComponent() : LightHandle()
-{
-}
+#include <vector>
 
-LightComponent::LightComponent(size_t index) : LightHandle(index)
-{
-}
+LightComponent::LightComponent() : LightHandle() {}
 
-void LightComponent::PreRender()
-{
-  glm::vec3 pos = GetGameObject()->GetComponent<TransformComponent>()->GetPosition();
+LightComponent::LightComponent(size_t index) : LightHandle(index) {}
+
+void LightComponent::PreRender() {
+  glm::vec3 pos =
+      GetGameObject()->GetComponent<TransformComponent>()->GetPosition();
   SetPosition(pos);
-  if(pointToTarget_)
-  {
+  if (pointToTarget_) {
     glm::vec3 dir = target_ - pos;
     SetDirection(dir);
   }
 }
 
-void LightComponent::OnObjectActivated()
-{
-  Activate();
-}
+void LightComponent::OnObjectActivated() { Activate(); }
 
-void LightComponent::OnObjectDeactivated()
-{
-  Deactivate();
-}
+void LightComponent::OnObjectDeactivated() { Deactivate(); }
 
-void LightComponent::ImGuiEditor()
-{
+void LightComponent::ImGuiEditor() {
   size_t lightIndex = GetIndex();
   size_t itemCount = 0;
   static char buffer[16][16]{{0}};
-  static char* items[16]{ nullptr };
+  static char *items[16]{nullptr};
   static bool items_setup = false;
   char(*itemsitr)[16] = buffer;
   if (!items_setup) // grr... dumb thing i have to do to make imgui happy
   {
-    for (auto& item : items)
-    {
+    for (auto &item : items) {
       item = *itemsitr;
       ++itemsitr;
     }
@@ -62,13 +52,11 @@ void LightComponent::ImGuiEditor()
   ++itemsitr;
   ++itemCount;
 
-  for(int i = 0; i < 16; ++i)
-  {
+  for (int i = 0; i < 16; ++i) {
     if (lightIndex == i)
       continue;
     LightHandle light(i);
-    if(!light.IsActive())
-    {
+    if (!light.IsActive()) {
       sprintf_s(*itemsitr, 16, "LIGHT: %i", i);
       unusedLights.push_back(light);
       ++itemsitr;
@@ -77,8 +65,7 @@ void LightComponent::ImGuiEditor()
   }
 
   int item_current = 0;
-  if(ImGui::Combo("Light ID", &item_current, items, (int)itemCount))
-  {
+  if (ImGui::Combo("Light ID", &item_current, items, (int)itemCount)) {
     bool temp = IsActive();
     Deactivate();
     SetIndex(unusedLights[item_current].GetIndex());
@@ -87,13 +74,12 @@ void LightComponent::ImGuiEditor()
 
   bool active = IsActive();
   ImGui::Checkbox("Active", &active);
-  if (active)
-  {
+  if (active) {
     ImGui::Indent(20);
     ImGui::PushItemWidth(400);
 
     LightType type = GetType();
-    const char* lightTypeNames[3] = { "POINT", "DIRECTIONAL", "SPOTLIGHT" };
+    const char *lightTypeNames[3] = {"POINT", "DIRECTIONAL", "SPOTLIGHT"};
     ImGui::Combo("Type", reinterpret_cast<int *>(&type), lightTypeNames, 3);
 
     ImGui::Separator();
@@ -102,7 +88,7 @@ void LightComponent::ImGuiEditor()
     glm::vec3 specularColor = GetSpecularColor();
     glm::vec3 ambientColor = GetAmbientColor();
     glm::vec3 direction = GetDirection();
-    std::pair<float,float> spotlightAngles = GetSpotlightAngles();
+    std::pair<float, float> spotlightAngles = GetSpotlightAngles();
     float spotlightFalloff = GetSpotlightFalloff();
 
     ImGui::ColorEdit3("Diffuse Color", data(diffuseColor));
@@ -111,29 +97,26 @@ void LightComponent::ImGuiEditor()
 
     ImGui::Separator();
 
-    unless(type == LightType::POINT)
-    {
+    unless(type == LightType::POINT) {
       ImGui::Checkbox("Point At", &pointToTarget_);
-      if(!pointToTarget_)
-      {
+      if (!pointToTarget_) {
         ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+        ImGui::PushStyleVar(ImGuiStyleVar_Alpha,
+                            ImGui::GetStyle().Alpha * 0.5f);
       }
       ImGui::SameLine();
       ImGui::DragFloat3("##target", data(target_), 0.001f);
-      if (!pointToTarget_)
-      {
+      if (!pointToTarget_) {
         ImGui::PopItemFlag();
         ImGui::PopStyleVar();
       }
-      if (pointToTarget_)
-      {
+      if (pointToTarget_) {
         ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+        ImGui::PushStyleVar(ImGuiStyleVar_Alpha,
+                            ImGui::GetStyle().Alpha * 0.5f);
       }
       ImGui::DragFloat3("Direction", data(direction), 0.001f, -1.f, 1.f);
-      if (pointToTarget_)
-      {
+      if (pointToTarget_) {
         ImGui::PopItemFlag();
         ImGui::PopStyleVar();
       }
@@ -141,14 +124,17 @@ void LightComponent::ImGuiEditor()
 
     ImGui::Separator();
 
-    if(type == LightType::SPOTLIGHT)
-    {
+    if (type == LightType::SPOTLIGHT) {
       ImGui::PushItemWidth(198);
-      ImGui::DragFloat("##minSpotlightAngle", &spotlightAngles.first, .05f, 0.f, spotlightAngles.second);
-      ImGui::SameLine(270); ImGui::DragFloat("Spotlight Angles", &spotlightAngles.second, .05f, spotlightAngles.first, 180.f);
+      ImGui::DragFloat("##minSpotlightAngle", &spotlightAngles.first, .05f, 0.f,
+                       spotlightAngles.second);
+      ImGui::SameLine(270);
+      ImGui::DragFloat("Spotlight Angles", &spotlightAngles.second, .05f,
+                       spotlightAngles.first, 180.f);
       ImGui::PopItemWidth();
 
-      ImGui::DragFloat("Spotlight Falloff", &spotlightFalloff, 0.01f, 0.001f, std::numeric_limits<float>::max());
+      ImGui::DragFloat("Spotlight Falloff", &spotlightFalloff, 0.01f, 0.001f,
+                       std::numeric_limits<float>::max());
     }
 
     SetType(type);
@@ -165,7 +151,30 @@ void LightComponent::ImGuiEditor()
   SetActive(active);
 }
 
-std::string LightComponent::Name()
-{
-  return "Light Component";
+std::string LightComponent::Name() { return "Light Component"; }
+
+void LightComponent::RenderShadowMap(const std::vector<GameObject *> &objects) {
+
+  SolidRender::SetShader(SolidRender::DEPTH_MAP);
+
+  const glm::vec3 &position = GetPosition();
+  const glm::vec3 look = -position;
+  Camera lightCamera = Camera(
+      position,
+      look,
+      glm::vec3(0, 1, 0), 92,
+      1.f,
+      0.01f,
+      10.f
+  );
+  lightCamera.UpdateGPUCamera();
+  ShaderGlobalSystem::SetShadowWorldToNDC(
+      ShaderGlobalSystem::GetCamToNDC() * ShaderGlobalSystem::GetWorldToCam()
+  );
+
+  for (GameObject *o : objects) {
+    o->PreRender();
+    o->ForwardRender();
+  }
+  SolidRender::SetShader(SolidRender::DEFFERED);
 }

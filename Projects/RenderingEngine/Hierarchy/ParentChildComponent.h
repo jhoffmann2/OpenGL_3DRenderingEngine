@@ -26,7 +26,7 @@ public:
   // component functions
   void Render() override;
   void Init() override;
-  void DebugRender() override;
+  void ForwardRender() override;
   void Kill() override;
   void OnObjectDeactivated() override;
   void OnObjectActivated() override;

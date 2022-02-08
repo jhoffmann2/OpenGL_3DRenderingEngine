@@ -5,12 +5,12 @@
 #include <glm/gtx/rotate_vector.hpp>
 
 #include "GameObjects/GameObject.h"
-#include "VertexGlobalSystem.h"
+#include "Rendering/ShaderGlobalSystem.h"
 #include "imgui.h"
 
 void TransformComponent::PreRender()
 {
-  VertexGlobalSystem::SetModelToWorld(GetModelToWorld());
+  ShaderGlobalSystem::SetModelToWorld(GetModelToWorld());
 }
 
 bool LockedDragFloat3(const char* label, glm::vec3 &v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f", ImGuiSliderFlags flags = 0)

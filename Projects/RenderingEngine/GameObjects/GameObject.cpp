@@ -34,14 +34,14 @@ void GameObject::Render()
   }
 }
 
-void GameObject::DebugRender()
+void GameObject::ForwardRender()
 {
   if (active_)
   {
     for (auto& pair : components_)
     {
       ObjectComponent* component = pair.second;
-      component->DebugRender();
+      component->ForwardRender();
     }
   }
 }

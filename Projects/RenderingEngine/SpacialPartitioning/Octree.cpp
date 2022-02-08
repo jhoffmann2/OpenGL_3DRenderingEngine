@@ -7,12 +7,12 @@
 #include "GameObjects/GameObject.h"
 #include "Mesh/Mesh.h"
 #include "Rendering/DebugDraw.h"
-#include "Transform/VertexGlobalSystem.h"
+#include "Rendering/ShaderGlobalSystem.h"
+#include "imgui.h"
 #include "ntg/bounds.inl"
 #include "ntg/collision.inl"
 #include "ntg/hyperplane.inl"
 #include "ntg/simplex.inl"
-#include "imgui.h"
 
 struct OctreeNode
 {
@@ -529,7 +529,7 @@ void Octree::ImguiDraw(GameObject* gameobject, const ntg::ray3& mouseRay)
   ImGui::Indent(10);
   const std::string name = gameobject->Name() + " Octree";
   const glm::mat4x4 t = gameobject->GetParentedComponent<TransformComponent>()->GetModelToWorld();
-  VertexGlobalSystem::SetModelToWorld(t);
+  ShaderGlobalSystem::SetModelToWorld(t);
   if (ImGui::CollapsingHeader(name.c_str()))
   {
     if (head_->isLeaf_)
