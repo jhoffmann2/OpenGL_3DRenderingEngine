@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/mat4x4.hpp>
+#include <ntg/bounds.h>
 #include <vector>
 
 #include "GameObjects/ObjectComponent.h"
@@ -18,7 +19,8 @@ public:
   void ImGuiEditor() override;
   std::string Name() override;
 
-  void RenderShadowMap(const std::vector<GameObject*>& objects);
+  void RenderShadowMap(const std::vector<GameObject*>& objects,
+                       const ntg::bounds3& sceneBounds);
 private:
   bool pointToTarget_ = true;
   glm::vec3 target_ = {};

@@ -71,7 +71,10 @@ public:
 	{
 		std::unordered_set<std::string> alreadyIncluded;
 		includeIndentifier += ' ';
-		return loadHelper(path, includeIndentifier, alreadyIncluded);
+		return loadHelper(
+                    filesystem::absolute(path).string(),
+                    includeIndentifier,
+                    alreadyIncluded);
 	}
 
 private:
@@ -104,13 +107,14 @@ private:
 				std::string pathOfThisFile;
 				getFilePath(path, pathOfThisFile);
 				lineBuffer.insert(0, pathOfThisFile);
+                                std::filesystem::path path = std::filesystem::absolute(lineBuffer);
 
-				if (alreadyIncluded.find(lineBuffer) == alreadyIncluded.end())
+				if (alreadyIncluded.find(path.string()) == alreadyIncluded.end())
 				{
 					// By using recursion, the new include file can be extracted
 					// and inserted at this location in the shader source code
 					isRecursiveCall = true;
-					fullSourceCode += loadHelper(lineBuffer, includeIndentifier, alreadyIncluded);
+					fullSourceCode += loadHelper(path.string(), includeIndentifier, alreadyIncluded);
 				}
 
 				// Do not add this line to the shader source code, as the include

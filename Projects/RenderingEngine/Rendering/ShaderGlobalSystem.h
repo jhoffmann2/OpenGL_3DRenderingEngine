@@ -1,5 +1,6 @@
 #pragma once
 #include <GL/glew.h>
+#include <camera/Camera.h>
 #include <glm/mat4x4.hpp>
 #include <ntg/bounds.h>
 
@@ -12,8 +13,8 @@ public:
   static void SetCamToNDC(const glm::mat4 &mat);
   static void SetCamToWorld(const glm::mat4 &mat);
   static void SetModelToWorld(const glm::mat4 &mat);
-  static void SetSceneBounds(const ntg::bounds3 &bounds);
   static void SetShadowWorldToNDC(const glm::mat4 &mat);
+  static void SetupForShadowMap(const Camera& cam, const ntg::bounds3 &world_bounds);
 
   [[nodiscard]] static const glm::mat4& GetCamToNDC();
   [[nodiscard]] static const glm::mat4& GetWorldToCam();
@@ -54,8 +55,7 @@ private:
     AlignData<64, glm::mat4> modelToWorld_ = glm::mat4{1};
     AlignData<64, glm::mat4> modelNToWorldN_ = glm::mat4{1};
     AlignData<64, glm::mat4> shadowWorldToNDC_ = glm::mat4{1};
-    AlignData<16, glm::vec4> sceneBoundsMin_;
-    AlignData<16, glm::vec4> sceneBoundsMax_;
+    AlignData<16, glm::vec2> depth_range = glm::vec2{0.f, 1.f};
     static constexpr GLuint binding_ = 2;
   } shaderData_;
   GLuint uboBlock_ = 0;

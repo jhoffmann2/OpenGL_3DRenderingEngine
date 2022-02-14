@@ -163,12 +163,13 @@ void MainScene::UpdateActivePowerPlants()
     }
   }
 
+  static ntg::bounds3 prev_bounds;
   ntg::bounds3 cur_bounds = CalculateActivePowerPlantBounds();
-  if (cur_bounds != activePowerPlantBounds)
+  if (cur_bounds != prev_bounds)
   {
     cur_lerp = lerp_time + 1;
-    activePowerPlantBounds = cur_bounds;
-    }
+    prev_bounds = cur_bounds;
+  }
 
   // update the pivot so powerplant is centered;
   static glm::vec3 destination_pivot;
@@ -177,12 +178,12 @@ void MainScene::UpdateActivePowerPlants()
   {
     cur_lerp = 1;
 
-    ntg::bounds3 bounds = transform->GetModelToWorld() * cur_bounds;
-    ShaderGlobalSystem::SetSceneBounds(bounds);
+    activePowerPlantBounds = transform->GetModelToWorld() * cur_bounds;
 
-    glm::vec3 center = bounds.center();
-    if (bounds.valid())
-      center.y = bounds.min.y + 0.25f * bounds.size().y; // favor looking toward the ground
+    glm::vec3 center = activePowerPlantBounds.center();
+    if (activePowerPlantBounds.valid())
+      center.y = activePowerPlantBounds.min.y +
+                 0.25f * activePowerPlantBounds.size().y; // favor looking toward the ground
 
     start_pivot = transform->GetPivot();
     destination_pivot = start_pivot - center;
@@ -310,7 +311,46 @@ int MainScene::Init()
     auto* pc = new ParentChildComponent();
     objects_.back()->AddComponent(pc);
 
-    for (size_t i = 0; i < LightSystem::lightCount; ++i)
+    {
+      sun_ = new GameObject("Sun");
+      sun_->AddComponent(
+          new TransformComponent(
+              {0, 0, 0},
+              {0.8974, 3.59, 0},
+              {EY, 0},
+              .3f
+              )
+      );
+
+      const float hue = glm::linearRand(0.f, 360.f);
+      MaterialHandle light_material(MaterialSystem::materialCount - LightSystem::lightCount);
+      light_material.SetEmissiveColor(rgbColor(glm::vec3{hue, .2f, 1.f}));
+      light_material.SetDiffuseColor(rgbColor(glm::vec3{hue, .25f, 1.f}));
+      light_material.SetSpecularColor(rgbColor(glm::vec3{hue, .1f, 1.f}));
+      light_material.SetAmbientColor(rgbColor(glm::vec3{hue, .25f, 0.2f}));
+      light_material.SetSpecularExponent(20);
+
+      auto* lightComponent = new LightComponent(0);
+      lightComponent->SetDiffuseColor(light_material.GetDiffuseColor());
+      lightComponent->SetSpecularColor(light_material.GetSpecularColor());
+      lightComponent->SetAmbientColor(light_material.GetAmbientColor());
+      lightComponent->SetType(Light::POINT);
+      lightComponent->SetActive(true);
+      sun_->AddComponent(lightComponent);
+
+      auto* rendering = new RenderingComponent(sphere_mesh, SolidRender::FLAT_EMISSION);
+      sun_->AddComponent(rendering);
+
+      sun_->AddComponent(new MaterialComponent(light_material));
+
+      auto* sun_pc = new ParentChildComponent(pc);
+      sun_->AddComponent(sun_pc);
+
+      pc->AddChild(sun_pc);
+      lights_.emplace_back(sun_);
+    }
+
+    for (size_t i = 1; i < LightSystem::lightCount; ++i)
     {
       std::stringstream name;
       name << "Light #" << i;
@@ -350,6 +390,7 @@ int MainScene::Init()
   for (int i = 0; i < activeLightCount_; ++i)
     lights_[i]->Activate();
 
+
   VertexNormalRender::setCamera(cam);
   FaceNormalRender::setCamera(cam);
 
@@ -388,6 +429,8 @@ int MainScene::Render()
     ImGui::PopItemWidth();
   }
   ImGui::End();
+
+  static int shadowBlurRadius = 10;
   if (ImGui::Begin("World Lighting"))
   {
     ImGui::PushItemWidth(400);
@@ -407,6 +450,8 @@ int MainScene::Render()
 
     ImGui::DragFloat3("Light Attenuation", data(attenuation), 0.01f, 0.f, 2.f);
 
+    ImGui::SliderInt("Shadow Blur", &shadowBlurRadius, 0, 64);
+
     LightSystem::SetAmbientColor(ambientColor);
     LightSystem::SetFog(fogColor, range.first, range.second);
     LightSystem::SetLightAttenuation(attenuation);
@@ -423,13 +468,14 @@ int MainScene::Render()
       }
     }
 
-    float distance = lights_[0]->GetComponent<TransformComponent>()->GetPivot().x;
+    float distance = glm::length(lights_[0]->GetComponent<TransformComponent>()->GetPivot());
     if (ImGui::SliderFloat("Global Light Distance", &distance, 1.5, 10))
     {
       for (GameObject* lightObject : lights_)
       {
         auto* lightTransform = lightObject->GetComponent<TransformComponent>();
-        lightTransform->SetPivot({distance, 0, 0});
+        glm::vec3 dir = glm::normalize(lightTransform->GetPivot());
+        lightTransform->SetPivot(distance * dir);
       }
     }
 
@@ -527,17 +573,10 @@ int MainScene::Render()
 
 #if DEFERRED
   GBuffer::Bind();
-
+  GBuffer::Clear();
   glViewport(0, 0, viewportHeight_, viewportHeight_);
-  SolidRender::clear(glm::vec4(std::numeric_limits<float>::max()));
-  for(GameObject* light : lights_)
-  {
-    if(light->HasComponent<LightComponent>())
-    {
-      light->GetComponent<LightComponent>()->RenderShadowMap(objects_);
-      break;
-    }
-  }
+  sun_->GetComponent<LightComponent>()->RenderShadowMap(objects_, activePowerPlantBounds);
+  GBuffer::BlurTarget(GBuffer::TARGET_SHADOW, shadowBlurRadius);
 #endif
 
   cam.UpdateGPUCamera();

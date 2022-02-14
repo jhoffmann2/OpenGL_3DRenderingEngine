@@ -11,11 +11,8 @@ Author: Jordan Hoffmann, jordan.h
 Creation date: 11/03/2020
 End Header --------------------------------------------------------*/ 
 #version 460
-#include ../Include/lightingUniforms.glsl
-#include ../Include/ShaderGlobals.glsl
 
 in float depth;
-
 layout (location = 3) out vec4 DepthMap;
 
 void main(void) {

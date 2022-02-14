@@ -25,6 +25,9 @@ public:
   static void RenderSolid(GLuint &vao, size_t &face_count);
   static void ImguiEditor();
 
+  static void BlurTarget(RenderTarget target, GLuint blurRadius);
+  static void Clear();
+
   GBuffer(GBuffer &) = delete;
   GBuffer& operator=(GBuffer&) = delete;
 

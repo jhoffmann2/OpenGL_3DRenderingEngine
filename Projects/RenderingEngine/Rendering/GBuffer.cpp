@@ -29,15 +29,12 @@ void GBuffer::Init(size_t width, size_t height) {
 
   for (size_t i = 0; i < RenderTargetCount; ++i) {
     glBindTexture(GL_TEXTURE_2D, textures[i]);
-    if(i == TARGET_SHADOW)
-    {
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, (GLsizei)height, (GLsizei)height,
-                   0, GL_RGBA, GL_FLOAT, nullptr);
-    }
-    else
-    {
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, (GLsizei)width, (GLsizei)height,
-                   0, GL_RGBA, GL_FLOAT, nullptr);
+    if (i == TARGET_SHADOW) {
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, (GLsizei)height,
+                   (GLsizei)height, 0, GL_RGBA, GL_FLOAT, nullptr);
+    } else {
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, (GLsizei)width,
+                   (GLsizei)height, 0, GL_RGBA, GL_FLOAT, nullptr);
     }
 
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -154,7 +151,6 @@ void GBuffer::RenderSolid(GLuint &vao, size_t &face_count) {
 
   glCullFace(GL_BACK);
   glDisable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   // turn depth buffer back on
   glDepthMask(GL_TRUE);
@@ -187,7 +183,6 @@ void GBuffer::ImguiEditor() {
     ImGui::TextWrapped("^^ Note that im not using any textures right now so "
                        "all white is correct output");
 
-
     ImGui::Text("Shadow Depth Target");
     ImGuiImage(TARGET_SHADOW);
   }
@@ -200,12 +195,11 @@ void GBuffer::ImGuiImage(RenderTarget target, int swizzle_id) {
   float aratio =
       static_cast<float>(instance.height) / static_cast<float>(instance.width);
 
-  if(target == TARGET_SHADOW)
+  if (target == TARGET_SHADOW)
     aratio = 1.f;
 
   const GLuint texture = (target != DEPTH_TEXTURE) ? instance.textures[target]
                                                    : instance.depthTexture;
-
 
   switch (swizzle_id) {
   case 0:
@@ -304,4 +298,153 @@ void GBuffer::SetupFSQ() {
       glGetUniformLocation(FSQ.shader_program, "worldPosTex");
   FSQ.uTex[TARGET_SHADOW] =
       glGetUniformLocation(FSQ.shader_program, "shadowMap");
+}
+
+void GBuffer::BlurTarget(GBuffer::RenderTarget target, GLuint blurRadius)
+{
+  if(blurRadius == 0)
+    return;
+
+  auto &instance = Instance();
+  GLuint w = (target != TARGET_SHADOW) ? Instance().width : Instance().height;
+  GLuint h = Instance().height;
+
+  static std::array<GLuint, 2> gaussianBlurShaders = {
+      LoadComputeShader("../../Common/shaders/Compute/GaussianBlurX.comp"),
+      LoadComputeShader("../../Common/shaders/Compute/GaussianBlurY.comp")};
+  static std::array<glm::uvec3, 2> dispatchDimensions {{
+      {w / 128u, h, 1u},
+      {w, h / 128u, 1u}
+  }};
+
+  glEnable(GL_DEBUG_OUTPUT);
+
+  // Set all uniform and image variables
+  static GLuint uboBlock = [programID = gaussianBlurShaders[0]]() -> GLuint {
+    GLuint uboBlock;
+    glGenBuffers(1, &uboBlock);
+    GLuint bindpoint = 3;
+
+    auto loc = glGetUniformBlockIndex(programID, "blurKernel");
+    glUniformBlockBinding(programID, loc, bindpoint);
+
+    glBindBuffer(GL_UNIFORM_BUFFER, uboBlock);
+    glBindBufferBase(GL_UNIFORM_BUFFER, bindpoint, uboBlock);
+    glBufferData(GL_UNIFORM_BUFFER, 16 * (2 * 100 + 1), nullptr, GL_STATIC_DRAW);
+
+    return uboBlock;
+  }();
+
+  static std::vector<glm::vec4> blurKernal;
+  if(blurKernal.size() != blurRadius * 2 + 1)
+  {
+    // recalculate blur kernal at new size
+    blurKernal.resize(blurRadius * 2 + 1);
+    float sum = 0;
+    for(size_t i = 0; i < blurKernal.size(); ++i)
+    {
+      const float s = blurRadius / 3.f;
+      const float frac = ((float)i-(float)blurRadius) / s;
+      blurKernal[i].x = glm::exp(-0.5f * frac * frac);
+      sum += blurKernal[i].x;
+    }
+
+    // normalize weights
+    for(size_t i = 0; i < blurKernal.size(); ++i)
+      blurKernal[i] /= sum;
+
+    // upload new blur kernal to gpu
+    glBindBuffer(GL_UNIFORM_BUFFER, uboBlock);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::vec4) * blurKernal.size(), blurKernal.data());
+  }
+
+  for(size_t i = 0; i < gaussianBlurShaders.size(); ++i)
+  {
+    const GLuint programID = gaussianBlurShaders[i];
+    const glm::uvec3& dim = dispatchDimensions[i];
+    glUseProgram(programID);
+    glUniform1ui(1, blurRadius);
+
+    static GLuint srcTex = [w, h, target, &instance](){
+      GLuint srcTex;
+      glCreateTextures(GL_TEXTURE_2D, 1, &srcTex);
+      glTextureStorage2D(srcTex, 1, GL_RGBA32F, w, h);
+      return srcTex;
+    }();
+
+    glCopyImageSubData(
+        instance.textures[target], GL_TEXTURE_2D, 0, 0, 0, 0,
+        srcTex, GL_TEXTURE_2D, 0, 0, 0, 0,
+        w, h, 1
+    );
+
+
+    GLuint imageUnit = 1;
+    GLuint loc = glGetUniformLocation(programID, "src");
+    glBindImageTexture(imageUnit, srcTex, 0, GL_FALSE, 0,
+                       GL_READ_ONLY, GL_RGBA32F);
+    glUniform1i(loc, imageUnit);
+
+    imageUnit = 2;
+    loc = glGetUniformLocation(programID, "dst");
+    glBindImageTexture(imageUnit, instance.textures[target], 0, GL_FALSE, 0,
+                       GL_READ_ONLY, GL_RGBA32F);
+    glUniform1i(loc, imageUnit);
+
+    glDispatchCompute(dim.x, dim.y, dim.z);
+    glUseProgram(0);
+  }
+  glDisable(GL_DEBUG_OUTPUT);
+}
+
+void GBuffer::Clear()
+{
+  auto &instance = Instance();
+
+  glm::vec4 clearColor(std::numeric_limits<float>::max());
+  glClearTexSubImage(
+      instance.textures[TARGET_DIFFUSE],
+      0, // level
+      0,0,0, // offset
+      instance.width, instance.height, // size
+      1, // depth
+      GL_RGBA, GL_FLOAT, // format & type
+      &clearColor
+  );
+
+  glClearTexSubImage(
+      instance.textures[TARGET_WORLD_POS],
+      0, // level
+      0,0,0, // offset
+      instance.width, instance.height, // size
+      1, // depth
+      GL_RGBA, GL_FLOAT, // format & type
+      &clearColor
+  );
+
+  glClearTexSubImage(
+      instance.textures[TARGET_NORMAL],
+      0, // level
+      0,0,0, // offset
+      instance.width, instance.height, // size
+      1, // depth
+      GL_RGBA, GL_FLOAT, // format & type
+      &clearColor
+  );
+
+  clearColor = glm::vec4(1.f, 1.f, 1.f, 1.f);
+  glClearTexSubImage(
+      instance.textures[TARGET_SHADOW],
+      0, // level
+      0,0,0, // offset
+      instance.height, instance.height, // size
+      1, // depth
+      GL_RGBA, GL_FLOAT, // format & type
+      &clearColor
+  );
+
+  glClearDepth(1);
+  glClear(GL_DEPTH_BUFFER_BIT);
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
 }

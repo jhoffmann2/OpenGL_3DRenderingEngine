@@ -13,6 +13,8 @@ GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path
 
 GLuint LoadShaders(const std::string &vertex, const std::string &fragment);
 
+GLuint LoadComputeShader(const char* compute_file_path);
+
 ///////////////////
 GLuint LoadPipeline(const char * vertex_file_path,const char * fragment_file_path, GLuint * programIDs );
 

@@ -28,8 +28,6 @@ Projects/cmake-build-debug/
 
 Projects/.idea/
 
-Projects/RenderingEngine/shaderOut/
-
 cmake-build-release/
 
 cmake-build-debug-visual-studio/

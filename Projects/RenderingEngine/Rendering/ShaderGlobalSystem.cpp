@@ -49,16 +49,29 @@ void ShaderGlobalSystem::SetModelToWorld(const glm::mat4& mat)
   WriteToGPU(&m2w, 2 * sizeof(glm::mat4));
 }
 
-void ShaderGlobalSystem::SetSceneBounds(const ntg::bounds3 &bounds)
+void ShaderGlobalSystem::SetupForShadowMap(const Camera &cam, const ntg::bounds3 &sceneBounds)
 {
   ShaderGlobalSystem & instance = Instance();
 
-  glm::vec4& boundsMin = instance.shaderData_.sceneBoundsMin_;
-  glm::vec4& boundsMax = instance.shaderData_.sceneBoundsMax_;
-  boundsMin = glm::vec4(bounds.min, 1);
-  boundsMax = glm::vec4(bounds.max, 1);
+  cam.UpdateGPUCamera();
+  ShaderGlobalSystem::SetShadowWorldToNDC(
+      ShaderGlobalSystem::GetCamToNDC() * ShaderGlobalSystem::GetWorldToCam()
+  );
 
-  WriteToGPU(&boundsMin, 2 * sizeof(glm::vec4));
+  const float scene_radius = glm::length(sceneBounds.half_size());
+  const float cam_world_distance = length(sceneBounds.center() - cam.eye());
+  const glm::vec4 cam_forward = glm::vec4(-cam.back(), 0);
+  const glm::vec4 world_scene_near = glm::vec4(cam.eye(), 1) + ((cam_world_distance - scene_radius) * cam_forward);
+  const glm::vec4 world_scene_far = glm::vec4(cam.eye(), 1) + ((cam_world_distance + scene_radius) * cam_forward);
+
+  const glm::vec4 ndc_scene_near = (instance.shaderData_.shadowWorldToNDC_() * world_scene_near);
+  const glm::vec4 ndc_scene_far = (instance.shaderData_.shadowWorldToNDC_() * world_scene_far);
+
+  glm::vec2& element = instance.shaderData_.depth_range;
+  element[0] = ndc_scene_near.z / abs(ndc_scene_near.w);
+  element[1] = ndc_scene_far.z / abs(ndc_scene_far.w);
+
+  WriteToGPU(&element);
 }
 
 void ShaderGlobalSystem::SetShadowWorldToNDC(const glm::mat4 &mat)

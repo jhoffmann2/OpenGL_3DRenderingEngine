@@ -75,7 +75,7 @@ int main()
 
     // Open a window and create its OpenGL context
     window = glfwCreateWindow(windowWidth, windowHeight, // window dimensions
-                              "CS350 Jordan Hoffmann", // window title
+                              "Rendering Engine - Jordan Hoffmann", // window title
                               nullptr, // which monitor (if full-screen mode)
                               nullptr); // if sharing context with another window
     if (window == nullptr)
@@ -86,6 +86,9 @@ int main()
         glfwTerminate();
         return -1;
     }
+
+    // put window in upper left corner
+    glfwSetWindowPos(window, 0, 30);
 
     // OpenGL resource model - "glfwCreateWindow" creates the necessary data storage for the OpenGL
     // context but does NOT make the created context "current". We MUST make it current with the following

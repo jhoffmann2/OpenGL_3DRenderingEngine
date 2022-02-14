@@ -7,6 +7,7 @@
 #include "Transform/TransformComponent.h"
 #include "imgui.h"
 #include "imgui_internal.h"
+#include "Rendering/GBuffer.h"
 
 #include <vector>
 
@@ -153,8 +154,8 @@ void LightComponent::ImGuiEditor() {
 
 std::string LightComponent::Name() { return "Light Component"; }
 
-void LightComponent::RenderShadowMap(const std::vector<GameObject *> &objects) {
-
+void LightComponent::RenderShadowMap(const std::vector<GameObject *> &objects,
+                                     const ntg::bounds3& sceneBounds) {
   SolidRender::SetShader(SolidRender::DEPTH_MAP);
 
   const glm::vec3 &position = GetPosition();
@@ -165,11 +166,11 @@ void LightComponent::RenderShadowMap(const std::vector<GameObject *> &objects) {
       glm::vec3(0, 1, 0), 92,
       1.f,
       0.01f,
-      10.f
+      50.f
   );
   lightCamera.UpdateGPUCamera();
-  ShaderGlobalSystem::SetShadowWorldToNDC(
-      ShaderGlobalSystem::GetCamToNDC() * ShaderGlobalSystem::GetWorldToCam()
+  ShaderGlobalSystem::SetupForShadowMap(
+      lightCamera, sceneBounds
   );
 
   for (GameObject *o : objects) {

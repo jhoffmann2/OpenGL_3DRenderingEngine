@@ -57,8 +57,8 @@ private:
 
   std::vector<GameObject*> lights_;
   int activeLightCount_ = 3;
+  GameObject *sun_;
 
-  
   GLfloat angleOfRotation;
   size_t viewportWidth_;
   size_t viewportHeight_;
