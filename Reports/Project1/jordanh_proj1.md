@@ -37,7 +37,7 @@ The first goal was to establish a hybrid rendering pipeline. This project works 
 
 To accomplish this, I rendered the world geometry into a GBuffer rather than to the screen. This way I could store important geometry info such as position and normal of the nearest fragment in every pixel of the screen and defer it's lighting calculations until after we know exactly which fragment is nearest to the camera.
 
-<img src="D:\Digipen\2021-2022\CS562\Reports\Project1\GBuffer.png" width="24%"/>
+<img src="GBuffer.png" width="24%"/>
 
 As an experiment, I actually made my GBuffer slightly a-typical. I wanted to challenge myself to cap the memory of the GBuffer in such a way that even if I wanted to add more material properties later, the GBuffer would always stay the same size. Traditionally, 2-4 of the render targets of the GBuffer would be the diffuse, specular, ambient, and emissive colors of the material. This is a ton of textures to pass through the pipeline however and if I ever want to add a new property, bloom for example, I would need to create a whole new target or find a way to compress the data somehow. To solve this, I decided to instead create a 'Materials' SSBO that stores an array of every material used in the scene. This way I can just extend the material struct if I ever want to add interesting properties to materials. The material index is then stored inside the GBuffer as the w component of the world position render target
 
@@ -47,8 +47,8 @@ As an experiment, I actually made my GBuffer slightly a-typical. I wanted to cha
 
 The second goal was to extend the above pipeline to support both global and localized lighting. this involved doing a third render pass where I render a sphere at the location of each localized light by accessing the GBuffer and performing an additive lighting calculation on top of the global lighting in that region
 
-<img src="D:\Digipen\2021-2022\CS562\Reports\Project1\GlobalLightConversion.gif" width="45%"/>
-<img src="D:\Digipen\2021-2022\CS562\Reports\Project1\OneThousandLights.gif" width="45%"/>
+<img src="GlobalLightConversion.gif" width="45%"/>
+<img src="OneThousandLights.gif" width="45%"/>
 
 
 ---
@@ -62,15 +62,15 @@ The second goal was to extend the above pipeline to support both global and loca
 
 ### Local Lights vs Global Lights
 
-<img src="D:\Digipen\2021-2022\CS562\Reports\Project1\GlobalLightConversion.gif" width="70%"/>
+<img src="GlobalLightConversion.gif" width="70%"/>
 
 ### Rendering 1k Local Lights
 
-<img src="D:\Digipen\2021-2022\CS562\Reports\Project1\OneThousandLights.gif" width="70%"/>
+<img src="OneThousandLights.gif" width="70%"/>
 
 ### GBuffer
 
-<img src="D:\Digipen\2021-2022\CS562\Reports\Project1\GBuffer.png" width="30%"/>
+<img src="GBuffer.png" width="30%"/>
 
 Q: Where's the specular and diffuse material properties?<br/>
 A: rather than putting the material properties in the GBuffer, I uploaded all the materials at once to an SSBO array and indexed into it with the alpha component of the WorldPosition render target.
