@@ -127,15 +127,15 @@ Simply launch application and use the imgui.
 
 ### Local Lights vs Global Lights
 
-![Demonstrating the visual difference between a global light and a local one](Previews/GlobalLightConversion.gif "Local vs Global Lights")
+![Demonstrating the visual difference between a global light and a local one](Reports/Project1/GlobalLightConversion.gif "Local vs Global Lights")
 
 ### Rendering 1k Local Lights
 
-![Rendering 1000 local lights](Previews/OneThousandLights.gif "Stress Testing 1000 global lights")
+![Rendering 1000 local lights](Reports/Project1/OneThousandLights.gif "Stress Testing 1000 global lights")
 
 ### GBuffer
 
-![Debug view of the GBuffer](Previews/GBuffer.png "GBuffer")
+![Debug view of the GBuffer](Reports/Project1/GBuffer.png "GBuffer")
 Q: Where's the specular and diffuse material properties?<br />
 A: rather than putting the material properties in the gbuffer, I uploaded all the materials at once to an SSBO array and indexed into it with the alpha component of the WorldPosition render target.
 
