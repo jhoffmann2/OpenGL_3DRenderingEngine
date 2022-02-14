@@ -9,8 +9,6 @@ End Header ----------------------------------------------------------->
 
 ## [this report is intended to be read from GitHub for proper file links and image rendering](https://github.com/jhoffmann2/OpenGL_3DRenderingEngine/blob/master/Reports/Project1/jordanh_proj1.md)
 
-### [Download the latest Release Build Here](https://github.com/jhoffmann2/OpenGL_3DRenderingEngine/releases/tag/LatestBuild)
-
 ---
 ## Table Of Contents
 
