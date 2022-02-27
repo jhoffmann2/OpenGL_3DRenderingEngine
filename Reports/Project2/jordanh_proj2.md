@@ -114,8 +114,8 @@ Shadow Blur Radius = 10  |  Shadow Blur Radius = 64
   - add light by 1-P(fragment is in shadow)
 
 ### Relevant C++ Code
-- [GBuffer.cpp](../../Projects/RenderingEngine/Rendering/GBuffer.cpp) / [GBuffer.h](../../Projects/RenderingEngine/Rendering/GBuffer.h)
+- [GBuffer.cpp](../../RenderingEngine/Rendering/GBuffer.cpp) / [GBuffer.h](../../RenderingEngine/Rendering/GBuffer.h)
   - Includes shadowMap as one of the GBuffer render targets
   - Functionality to blur a texture using the Gaussian blur compute shaders
-- [LightComponent.cpp](../../Projects/RenderingEngine/Lighting/LightComponent.cpp)
+- [LightComponent.cpp](../../RenderingEngine/Lighting/LightComponent.cpp)
   - Functionality to render the shadow map for a light

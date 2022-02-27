@@ -12,15 +12,15 @@ Common/imgui/
 
 Projects/Release/
 
-Projects/RenderingEngine/Release/
+RenderingEngine/Release/
 
-Projects/RenderingEngine/x64/
+RenderingEngine/x64/
 
 Projects/x64/
 
-Projects/RenderingEngine/ntg/Release/
+RenderingEngine/ntg/Release/
 
-Projects/RenderingEngine/ntg/x64/
+RenderingEngine/ntg/x64/
 
 Release/
 

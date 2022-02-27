@@ -102,4 +102,4 @@ link_directories(Common/lib)
 # Sub-projects
 ################################################################################
 add_subdirectory(Common)
-add_subdirectory(Projects)
+add_subdirectory(RenderingEngine)

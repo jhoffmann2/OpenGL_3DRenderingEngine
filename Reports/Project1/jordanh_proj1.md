@@ -103,7 +103,7 @@ A: rather than putting the material properties in the GBuffer, I uploaded all th
   - Includes: [phongLocal.glsl](../../Common/shaders/Include/phongLocal.glsl) so we can calculate the color contribution of the light
 
 ### Relevant C++ Code
-- deferred shading and local lights: [GBuffer.cpp](../../Projects/RenderingEngine/Rendering/GBuffer.cpp) / [GBuffer.h](../../Projects/RenderingEngine/Rendering/GBuffer.h)
+- deferred shading and local lights: [GBuffer.cpp](../../RenderingEngine/Rendering/GBuffer.cpp) / [GBuffer.h](../../RenderingEngine/Rendering/GBuffer.h)
   - Defines, constructs, and manages the GBuffer
   - Methods for binding/unbinding the GBuffer
   - Methods for deferred rendering on to the FSQ

@@ -17,39 +17,39 @@ set(Camera
         "camera/Camera.h"
         "camera/CameraTransform.cpp"
         )
-source_group("Camera" FILES ${Camera})
+source_group("camera" FILES ${Camera})
 
 set(Common
-        "../../Common/Scene.cpp"
-        "../../Common/Scene.h"
-        "../../Common/shader.cpp"
-        "../../Common/shader.hpp"
+        "../Common/Scene.cpp"
+        "../Common/Scene.h"
+        "../Common/shader.cpp"
+        "../Common/shader.hpp"
         )
 source_group("Common" FILES ${Common})
 
 set(Common__Imgui
-        "../../Common/imgui/examples/imgui_impl_glfw.cpp"
-        "../../Common/imgui/examples/imgui_impl_glfw.h"
-        "../../Common/imgui/examples/imgui_impl_opengl3.cpp"
-        "../../Common/imgui/examples/imgui_impl_opengl3.h"
-        "../../Common/imgui/imconfig.h"
-        "../../Common/imgui/imgui.cpp"
+        "../Common/imgui/examples/imgui_impl_glfw.cpp"
+        "../Common/imgui/examples/imgui_impl_glfw.h"
+        "../Common/imgui/examples/imgui_impl_opengl3.cpp"
+        "../Common/imgui/examples/imgui_impl_opengl3.h"
+        "../Common/imgui/imconfig.h"
+        "../Common/imgui/imgui.cpp"
         "../../Common/imgui/imgui.h"
-        "../../Common/imgui/imgui_demo.cpp"
-        "../../Common/imgui/imgui_draw.cpp"
-        "../../Common/imgui/imgui_internal.h"
-        "../../Common/imgui/imgui_widgets.cpp"
-        "../../Common/imgui/imstb_rectpack.h"
-        "../../Common/imgui/imstb_textedit.h"
-        "../../Common/imgui/imstb_truetype.h"
+        "../Common/imgui/imgui_demo.cpp"
+        "../Common/imgui/imgui_draw.cpp"
+        "../Common/imgui/imgui_internal.h"
+        "../Common/imgui/imgui_widgets.cpp"
+        "../Common/imgui/imstb_rectpack.h"
+        "../Common/imgui/imstb_textedit.h"
+        "../Common/imgui/imstb_truetype.h"
         )
 source_group("Common\\Imgui" FILES ${Common__Imgui})
 
 set(Common__soil
-        "../../Common/soil-master/src/image_dxt.c"
-        "../../Common/soil-master/src/image_helper.c"
-        "../../Common/soil-master/src/soil.c"
-        "../../Common/soil-master/src/stb_image_aug.c"
+        "../Common/soil-master/src/image_dxt.c"
+        "../Common/soil-master/src/image_helper.c"
+        "../Common/soil-master/src/soil.c"
+        "../Common/soil-master/src/stb_image_aug.c"
         )
 source_group("Common\\soil" FILES ${Common__soil})
 
@@ -227,16 +227,16 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
         "UNICODE;"
         "_UNICODE"
         )
-set_source_files_properties(../../Common/soil-master/src/image_dxt.c PROPERTIES
+set_source_files_properties(../Common/soil-master/src/image_dxt.c PROPERTIES
         COMPILE_DEFINITIONS "_CRT_SECURE_NO_WARNINGS"
         )
-set_source_files_properties(../../Common/soil-master/src/image_helper.c PROPERTIES
+set_source_files_properties(../Common/soil-master/src/image_helper.c PROPERTIES
         COMPILE_DEFINITIONS "_CRT_SECURE_NO_WARNINGS"
         )
-set_source_files_properties(../../Common/soil-master/src/soil.c PROPERTIES
+set_source_files_properties(../Common/soil-master/src/soil.c PROPERTIES
         COMPILE_DEFINITIONS "_CRT_SECURE_NO_WARNINGS"
         )
-set_source_files_properties(../../Common/soil-master/src/stb_image_aug.c PROPERTIES
+set_source_files_properties(../Common/soil-master/src/stb_image_aug.c PROPERTIES
         COMPILE_DEFINITIONS "_CRT_SECURE_NO_WARNINGS"
         )
 ################################################################################
@@ -265,19 +265,19 @@ if (MSVC)
     string(CONCAT FILE_CL_OPTIONS
             "/w"
             )
-    source_file_compile_options(../../Common/soil-master/src/image_dxt.c ${FILE_CL_OPTIONS})
+    source_file_compile_options(../Common/soil-master/src/image_dxt.c ${FILE_CL_OPTIONS})
     string(CONCAT FILE_CL_OPTIONS
             "/w"
             )
-    source_file_compile_options(../../Common/soil-master/src/image_helper.c ${FILE_CL_OPTIONS})
+    source_file_compile_options(../Common/soil-master/src/image_helper.c ${FILE_CL_OPTIONS})
     string(CONCAT FILE_CL_OPTIONS
             "/w"
             )
-    source_file_compile_options(../../Common/soil-master/src/soil.c ${FILE_CL_OPTIONS})
+    source_file_compile_options(../Common/soil-master/src/soil.c ${FILE_CL_OPTIONS})
     string(CONCAT FILE_CL_OPTIONS
             "/w"
             )
-    source_file_compile_options(../../Common/soil-master/src/stb_image_aug.c ${FILE_CL_OPTIONS})
+    source_file_compile_options(../Common/soil-master/src/stb_image_aug.c ${FILE_CL_OPTIONS})
     target_link_options(${PROJECT_NAME} PRIVATE
             $<$<CONFIG:Debug>:
             /INCREMENTAL
