@@ -9,6 +9,7 @@ set(common_files
         "Scene.h"
         "shader.cpp"
         "shader.h"
+        "rgbe.cpp"
         )
 source_group("" FILES ${no_group_source_files})
 

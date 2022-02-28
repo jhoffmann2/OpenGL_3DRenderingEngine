@@ -12,7 +12,7 @@ Creation date: 9/28/2020
 End Header --------------------------------------------------------*/
 #include "VertexNormalRender.h"
 #include "Utilities/GLHelper.h"
-#include "camera/Camera.h"
+#include "Camera/Camera.h"
 #include "shader.hpp"
 #include <numeric>
 #include <streambuf>

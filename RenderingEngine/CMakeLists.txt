@@ -5,25 +5,21 @@ set(PROJECT_NAME RenderingEngine)
 ################################################################################
 set(no_group_source_files
         "Rendering/GBuffer.cpp"
-        "Rendering/GBuffer.h"
         "GLApplication.cpp"
         "MainScene.cpp"
-        "MainScene.h"
         )
 source_group("" FILES ${no_group_source_files})
 
 set(Camera
-        "camera/Camera.cpp"
-        "camera/Camera.h"
-        "camera/CameraTransform.cpp"
+        "Camera/Camera.cpp"
+        "Camera/CameraTransform.cpp"
         )
 source_group("camera" FILES ${Camera})
 
 set(Common
         "../Common/Scene.cpp"
-        "../Common/Scene.h"
         "../Common/shader.cpp"
-        "../Common/shader.hpp"
+        "../Common/rgbe.cpp"
         )
 source_group("Common" FILES ${Common})
 

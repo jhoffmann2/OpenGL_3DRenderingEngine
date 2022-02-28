@@ -24,7 +24,7 @@ End Header --------------------------------------------------------*/
 #include "Hierarchy/ParentChildComponent.h"
 #include "Lighting/Light.h"
 #include "Rendering/SolidRender.h"
-#include "camera/Camera.h"
+#include "Camera/Camera.h"
 #include "ntg/bounds.h"
 
 class MainScene : public Scene
@@ -74,6 +74,7 @@ private:
   {
     POWER_PLANT = 0,
     LIGHTS = 1,
+    ENVIRONMENT = 2,
     BaseObjectsCount
   };
 

@@ -13,6 +13,9 @@ End Header --------------------------------------------------------*/
 #version 460
 #include ../Include/MeshProperties.glsl
 
+out vec3 model_pos;
+
 void main() {
+	model_pos = position;
 	gl_Position = camToNDC * worldToCam * modelToWorld * vec4(position, 1);
 }

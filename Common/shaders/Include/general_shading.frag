@@ -4,8 +4,8 @@ in vec2 uv_frag;
 in vec3 world_position;
 in vec3 world_normal;
 
-uniform sampler2D diffuseTexture;
-uniform sampler2D specularTexture;
+layout (location = 5) uniform sampler2D diffuseTexture;
+layout (location = 6) uniform sampler2D specularTexture;
 
 out vec4 frag_color;
 

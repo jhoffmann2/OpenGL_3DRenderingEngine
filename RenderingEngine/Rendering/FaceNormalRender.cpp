@@ -20,7 +20,7 @@ End Header --------------------------------------------------------*/
 #include <stdexcept>
 
 #include "Utilities/GLHelper.h"
-#include "camera/Camera.h"
+#include "Camera/Camera.h"
 #include "shader.hpp"
 
 FaceNormalRender::FaceNormalRender()

@@ -2,7 +2,7 @@
 
 #include "Rendering/SolidRender.h"
 #include "Rendering/ShaderGlobalSystem.h"
-#include "camera/Camera.h"
+#include "Camera/Camera.h"
 #include "GameObjects/GameObject.h"
 #include "Transform/TransformComponent.h"
 #include "imgui.h"

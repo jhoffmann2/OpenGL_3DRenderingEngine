@@ -1,6 +1,6 @@
 #pragma once
 #include <GL/glew.h>
-#include <camera/Camera.h>
+#include <Camera/Camera.h>
 #include <glm/mat4x4.hpp>
 #include <ntg/bounds.h>
 
