@@ -277,33 +277,34 @@ int MainScene::Init()
     );
     objects_.back()->AddComponent(transform);
 
-
-    MaterialHandle material(0);
-    material.SetEmissiveColor(glm::vec3{0});
-    material.SetAmbientColor(glm::vec3{.0742f});
-    material.SetDiffuseColor(glm::vec3{.6392f, .5412f, .4118f});
-    material.SetSpecularColor(glm::vec3{0.3176f});
-    material.SetSpecularExponent(20);
-    objects_.back()->AddComponent(new MaterialComponent(material));
-    auto *pc = new ParentChildComponent();
-
-    powerPlantTransformation_ = CenterMeshTransform(powerPlantBounds.back());
-    SpacialTreeHierarchy::SetTree(
-        objects_.back(),
-        new Octree(powerPlantTransformation_ * powerPlantBounds.back())
-    );
-
-    for (size_t i = 0; i < powerPlantGroupCount; ++i)
     {
-        const std::string name = "Section" + std::to_string(i + 1);
-        auto *section = new GameObject(name);
-        section->SetActive(i == 9); // start w/ only section 10 loaded
-        auto *section_pc = new ParentChildComponent(pc);
-        section->AddComponent(section_pc);
-        section->AddComponent(new BoxVolumeComponent(powerPlantTransformation_ * powerPlantBounds[i]));
-        pc->AddChild(section_pc);
+        MaterialHandle material(0);
+        material.SetEmissiveColor(glm::vec3{0});
+        material.SetAmbientColor(glm::vec3{.0742f});
+        material.SetDiffuseColor(glm::vec3{.6392f, .5412f, .4118f});
+        material.SetSpecularColor(glm::vec3{0.3176f});
+        material.SetSpecularExponent(200);
+        objects_.back()->AddComponent(new MaterialComponent(material));
+        auto *pc = new ParentChildComponent();
+
+        powerPlantTransformation_ = CenterMeshTransform(powerPlantBounds.back());
+        SpacialTreeHierarchy::SetTree(
+            objects_.back(),
+            new Octree(powerPlantTransformation_ * powerPlantBounds.back())
+        );
+
+        for (size_t i = 0; i < powerPlantGroupCount; ++i)
+        {
+            const std::string name = "Section" + std::to_string(i + 1);
+            auto *section = new GameObject(name);
+            section->SetActive(i == 9); // start w/ only section 10 loaded
+            auto *section_pc = new ParentChildComponent(pc);
+            section->AddComponent(section_pc);
+            section->AddComponent(new BoxVolumeComponent(powerPlantTransformation_ * powerPlantBounds[i]));
+            pc->AddChild(section_pc);
+        }
+        objects_.back()->AddComponent(pc);
     }
-    objects_.back()->AddComponent(pc);
 
     {
         objects_.emplace_back(new GameObject("Lights"));
@@ -405,11 +406,35 @@ int MainScene::Init()
         rendering->flags_[RenderingComponent::RENDER_FLAG_RENDER_INSIDE_OUT] = true;
         objects_.back()->AddComponent(rendering);
 
-        MaterialHandle environmentMaterial(1);
-        environmentMaterial.SetEmissiveColor({1.f, 1.f, 1.f});
-        environmentMaterial.SetTextureMode(Material::TM_GPU_SPHYRICAL);
-        objects_.back()->AddComponent(new MaterialComponent(environmentMaterial));
+        MaterialHandle material(2);
+        material.SetEmissiveColor({1.f, 1.f, 1.f});
+        material.SetTextureMode(Material::TM_GPU_SPHYRICAL);
+        objects_.back()->AddComponent(new MaterialComponent(material));
     }
+
+    {
+        objects_.emplace_back(new GameObject("sphere"));
+        objects_.back()->AddComponent(new TransformComponent(
+            {0, 0, 0},
+            {0, 0, 0},
+            {EY, 0},
+            1
+        ));
+        RenderingComponent *rendering = new RenderingComponent(
+            sphere_mesh,
+            SolidRender::DEFFERED
+        );
+        objects_.back()->AddComponent(rendering);
+
+        MaterialHandle material(1);
+        material.SetEmissiveColor(glm::vec3{0});
+        material.SetAmbientColor(glm::vec3{0});
+        material.SetDiffuseColor(glm::vec3{0});
+        material.SetSpecularColor(glm::vec3{1});
+        material.SetSpecularExponent(0);
+        objects_.back()->AddComponent(new MaterialComponent(material));
+    }
+
 
 
     VertexNormalRender::setCamera(cam);
@@ -461,6 +486,8 @@ int MainScene::Render()
         glm::vec3 fogColor = LightSystem::GetFogColor();
         std::pair<float, float> range = LightSystem::GetFogRange();
         glm::vec3 attenuation = LightSystem::GetLightAttenuation();
+        float environmentLightStrength = LightSystem::GetEnvironmentLightStrength();
+        int specularSampling = LightSystem::GetSpecularSamplingLevel();
 
         ImGui::ColorEdit3("Ambient Color", data(ambientColor));
         ImGui::ColorEdit3("Fog Color", data(fogColor));
@@ -475,9 +502,15 @@ int MainScene::Render()
 
         ImGui::SliderInt("Shadow Blur", &shadowBlurRadius, 0, 64);
 
+        ImGui::DragFloat("Environment Light Strength", &environmentLightStrength, 0.1f, 0.f, FLT_MAX);
+
+        ImGui::SliderInt("Specular Sampling Level", &specularSampling, 0, LightSystem::MaxSpecularSamplingLevel());
+
         LightSystem::SetAmbientColor(ambientColor);
         LightSystem::SetFog(fogColor, range.first, range.second);
         LightSystem::SetLightAttenuation(attenuation);
+        LightSystem::SetEnvironmentLightStrength(environmentLightStrength);
+        LightSystem::SetSpecularSamplingLevel(specularSampling);
 
         ImGui::Separator();
 
@@ -577,6 +610,19 @@ int MainScene::Render()
             ImGui::PopItemFlag();
             ImGui::EndMenu();
         }
+        if (ImGui::BeginMenu("Actions"))
+        {
+            if (ImGui::MenuItem("Reload Forward Shaders"))
+                SolidRender::ReloadShaders();
+            if (ImGui::MenuItem("Reload Deferred Shaders"))
+                GBuffer::ReloadShaders();
+            if (ImGui::MenuItem("Reload All Shaders"))
+            {
+                SolidRender::ReloadShaders();
+                GBuffer::ReloadShaders();
+            }
+            ImGui::EndMenu();
+        }
         ImGui::EndMainMenuBar();
     }
 
@@ -594,6 +640,18 @@ int MainScene::Render()
 
     SolidRender::clear(glm::vec4(LightSystem::GetFogColor(), 1));
 
+    const Texture &environmentTex = objects_[ENVIRONMENT]->GetComponent<RenderingComponent>()->GetDiffuseTexture();
+
+    std::filesystem::path irradianceTexPath = environmentTex.Path();
+    irradianceTexPath.replace_filename(
+        irradianceTexPath.stem().string()
+        + ".irr"
+        + irradianceTexPath.extension().string()
+    );
+    const Texture irradianceTex =
+        exists(irradianceTexPath)?
+        Texture(irradianceTexPath.string()) :
+        Texture();
 
 #if DEFERRED
     GBuffer::Bind();
@@ -619,8 +677,9 @@ int MainScene::Render()
     }
 
     GBuffer::UnBind();
-    GBuffer::RenderFSQ();
+    GBuffer::RenderFSQ(environmentTex, irradianceTex);
 #endif
+
 
     for (GameObject *o: objects_)
     {

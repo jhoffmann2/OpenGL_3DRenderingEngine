@@ -244,6 +244,7 @@ target_link_libraries(${PROJECT_NAME}
         libglew_static
         opengl32
         assimp::assimp
+        glu32
         )
 
 if (MSVC)

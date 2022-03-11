@@ -22,8 +22,8 @@ in vec3 model_pos;
 in vec2 uv_frag;
 in float local_mat;
 
-uniform sampler2D diffuseTexture;
-uniform sampler2D specularTexture;
+layout (location = 5) uniform sampler2D diffuseTexture;
+layout (location = 6) uniform sampler2D specularTexture;
 
 layout (location = 0) out vec4 DiffuseOut;
 layout (location = 1) out vec4 WorldPosOut;

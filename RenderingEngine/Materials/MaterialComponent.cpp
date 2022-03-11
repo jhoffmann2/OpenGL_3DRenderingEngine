@@ -32,7 +32,7 @@ void MaterialComponent::ImGuiEditor()
   ImGui::ColorEdit3("Ambient Color", data(ka));
   ImGui::ColorEdit3("Diffuse Color", data(kd));
   ImGui::ColorEdit3("Specular Color", data(ks));
-  ImGui::SliderFloat("specular Exponent ", &ns, 0.001f, 40.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
+  ImGui::DragFloat("specular Exponent ", &ns, 2.f, FLT_MIN, FLT_MAX, "%.1f");
 
   ImGui::Combo(
     "Texture UV Mapping",

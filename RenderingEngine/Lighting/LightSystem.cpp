@@ -93,6 +93,21 @@ void LightSystem::SetEyePos(const glm::vec3& pos)
   instance.dirtyGlobalProps_ = true;
 }
 
+void LightSystem::SetEnvironmentLightStrength(float strength)
+{
+    LightSystem& instance = Instance();
+    instance.shaderData_.globalProperties_.environmentLightStrength_ = strength;
+    instance.dirtyGlobalProps_ = true;
+}
+
+void LightSystem::SetSpecularSamplingLevel(int level)
+{
+    LightSystem& instance = Instance();
+    level = glm::clamp(level, 0, (int)MaxSpecularSamplingLevel());
+    instance.shaderData_.globalProperties_.specularSamplingLevel = level;
+    instance.dirtyGlobalProps_ = true;
+}
+
 const glm::vec3& LightSystem::GetLightAttenuation()
 {
   return Instance().shaderData_.globalProperties_.lightAttenuation_;
@@ -121,6 +136,11 @@ const glm::vec3& LightSystem::GetEyePos()
   return Instance().shaderData_.globalProperties_.eyePos_;
 }
 
+float LightSystem::GetEnvironmentLightStrength()
+{
+    return Instance().shaderData_.globalProperties_.environmentLightStrength_;
+}
+
 Light& LightSystem::GetRawLightData(size_t index)
 {
   return Instance().shaderData_.lights_[index];
@@ -130,4 +150,14 @@ size_t LightSystem::LightIndex(const Light& light)
 {
   // use the pointer offset to calculate the index of the light
   return reinterpret_cast<const AlignData<16, Light>*>(&light) - &Instance().shaderData_.lights_[0];
+}
+
+int LightSystem::GetSpecularSamplingLevel()
+{
+    return Instance().shaderData_.globalProperties_.specularSamplingLevel;
+}
+
+size_t LightSystem::MaxSpecularSamplingLevel()
+{
+    return Instance().shaderData_.globalProperties_.hammersley.size();
 }

@@ -2,7 +2,9 @@
 
 #include <bitset>
 #include <GL/glew.h>
+#include <Materials/Texture.h>
 #include "Light.h"
+#include "Utilities/LowDiscrepancyRandom.h"
 
 class LightSystem
 {
@@ -18,12 +20,17 @@ public:
   static void SetFog(const glm::vec3& color, float near, float far);
   static void SetAmbientColor(const glm::vec3& color);
   static void SetEyePos(const glm::vec3& pos);
+  static void SetEnvironmentLightStrength(float strength);
+  static void SetSpecularSamplingLevel(int level);
 
   [[nodiscard]] static const glm::vec3& GetLightAttenuation();
   [[nodiscard]] static const glm::vec3& GetFogColor();
   [[nodiscard]] static std::pair<float,float> GetFogRange();
   [[nodiscard]] static const glm::vec3& GetAmbientColor();
   [[nodiscard]] static const glm::vec3& GetEyePos();
+  [[nodiscard]] static float GetEnvironmentLightStrength();
+  [[nodiscard]] static int GetSpecularSamplingLevel();
+  [[nodiscard]] static size_t MaxSpecularSamplingLevel();
 
 private:
   static LightSystem& Instance();
@@ -44,7 +51,11 @@ private:
       AlignData<16, float> fogFar_;
 
       AlignData<16, glm::vec3> ambientColor_;
-      AlignData<16, glm::vec3> eyePos_;
+      AlignData<12, glm::vec3> eyePos_;
+
+      AlignData<4, float> environmentLightStrength_ = 1.f;
+      AlignData<16, GLuint> specularSamplingLevel = 40;
+      std::array<glm::vec4, 100> hammersley = Hammersley2D<100>();
     } globalProperties_;
 
     AlignData<16, Light> lights_[lightCount];

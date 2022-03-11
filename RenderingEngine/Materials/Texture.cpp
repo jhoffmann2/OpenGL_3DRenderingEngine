@@ -6,6 +6,9 @@
 #include "SOIL/SOIL.h"
 #include "rgbe.h"
 
+#include <windows.h>
+#include <GL/GLU.h>
+
 Texture::Texture()
 {
     if (file.extension() != ".hdr")
@@ -45,7 +48,7 @@ void Texture::LoadTextureFile(const std::filesystem::path &file)
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureID_);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -61,6 +64,8 @@ void Texture::LoadTextureFile(const std::filesystem::path &file)
         GL_UNSIGNED_BYTE,
         image
     );
+    glGenerateMipmap(GL_TEXTURE_2D);
+
     loadedTextures[file.string()] = textureID_;
 }
 
@@ -109,7 +114,7 @@ void Texture::LoadHDRTextureFile(const std::filesystem::path &file)
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureID_);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -125,10 +130,12 @@ void Texture::LoadHDRTextureFile(const std::filesystem::path &file)
         GL_FLOAT,
         image.data()
     );
+    glGenerateMipmap(GL_TEXTURE_2D);
+
     loadedTextures[file.string()] = textureID_;
 }
 
-GLuint Texture::TextureID()
+GLuint Texture::TextureID() const
 {
     return textureID_;
 }

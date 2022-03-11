@@ -24,11 +24,14 @@ public:
 
     void ForwardRender() override;
 
-    void SetTextures(const Texture &diffuse, const Texture &specular);
+    void SetTextures(const Texture& diffuse, const Texture& specular);
 
-    void SetDiffuseTexture(const Texture &t);
+    void SetDiffuseTexture(const Texture& t);
 
-    void SetSpecularTexture(const Texture &t);
+    void SetSpecularTexture(const Texture& t);
+
+    [[nodiscard]] const Texture& GetDiffuseTexture() const;
+    [[nodiscard]] const Texture& GetSpecularTexture() const;
 
     void ImGuiEditor() override;
 

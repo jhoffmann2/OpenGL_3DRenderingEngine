@@ -21,12 +21,14 @@ public:
   static void Init(size_t width, size_t height);
   static void Bind();
   static void UnBind();
-  static void RenderFSQ();
+  static void RenderFSQ(const Texture& environmentTex, const Texture& irradianceTex);
   static void RenderSolid(GLuint &vao, size_t &face_count);
   static void ImguiEditor();
 
   static void BlurTarget(RenderTarget target, GLuint blurRadius);
   static void Clear();
+
+  static void ReloadShaders();
 
   GBuffer(GBuffer &) = delete;
   GBuffer& operator=(GBuffer&) = delete;

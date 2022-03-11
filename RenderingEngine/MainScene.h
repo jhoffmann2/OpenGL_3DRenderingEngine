@@ -56,7 +56,7 @@ private:
   [[nodiscard]] const std::unordered_set<ParentChildComponent*>& PowerPlantGroup() const;
 
   std::vector<GameObject*> lights_;
-  int activeLightCount_ = 3;
+  int activeLightCount_ = 0;
   GameObject *sun_;
 
   GLfloat angleOfRotation;

@@ -12,8 +12,8 @@ public:
   Texture(const std::string& filename);
   void LoadHDRTextureFile(const std::filesystem::path &file);
   void LoadTextureFile(const std::filesystem::path &file);
-  GLuint TextureID();
-  const std::filesystem::path& Path() {return file;}
+  GLuint TextureID() const;
+  const std::filesystem::path& Path() const {return file;}
 private:
   constexpr static GLuint NULL_TEXTURE = std::numeric_limits<GLuint>::max();
   static inline std::unordered_map<std::string, GLuint> loadedTextures = {};

@@ -102,6 +102,16 @@ void RenderingComponent::SetSpecularTexture(const Texture &t)
     specularTexture_ = t;
 }
 
+const Texture &RenderingComponent::GetDiffuseTexture() const
+{
+    return diffuseTexture_;
+}
+
+const Texture &RenderingComponent::GetSpecularTexture() const
+{
+    return specularTexture_;
+}
+
 void RenderingComponent::ImGuiEditor()
 {
     namespace fs = std::filesystem;
