@@ -15,24 +15,19 @@ float D(vec3 N, vec3 H, float alpha)
 
 vec3 F(vec3 L, vec3 H, vec3 ks)
 {
-    return ks + (vec3(1,1,1) - ks) * (1 - pow(dot(L, H), 5));
+    return ks + (vec3(1,1,1) - ks) * pow(1 - dot(L, H), 5);
 }
 
-float G(vec3 L, vec3 V, vec3 H, vec3 N, float alpha)
+float V(vec3 L, vec3 H)
 {
-    float theta = clamp(dot(V,N), -1.f, 1.f);
-    float tan_theta = tan(theta);
-    if(tan_theta  == 0.f)
-        return 1.f;
-    float a = (sqrt(alpha / 2.f + 1.f) / tan_theta);
-    if(a < 1.6f)
-        return 1.f;
-    return (3.535f * a + 2.181f * a * a) / (1.f + 2.276f * a + 2.577f * a * a);
+    float ldoth = dot(L, H);
+    return 1.f / (ldoth * ldoth);
 }
 
-vec3 specularLight(vec3 N, vec3 H, vec3 L, vec3 ks_total, float ns, float theta)
+vec3 specularLight(vec3 N, vec3 H, vec3 L, vec3 ks_total, float ns)
 {
-    return 0.25f * D(N, H, ns) * F(L, H, ks_total) * (1.f / (theta * theta));
+    vec3 c = 0.25f * F(L, H, ks_total) * V(L, H) * D(N, H, ns);
+    return clamp(c, vec3(0,0,0), ks_total);
 }
 
 vec3 PseudoRand_SpecDir(uint i, float ns)
@@ -54,15 +49,13 @@ vec3 EnvironmentSpecular(vec3 V, vec3 N, vec3 ks, float ns)
     const uint count = specularSamplingLevel;
 
     const vec3 R = 2 * dot(N,V) * N - V;
+    const vec3 A = normalize(vec3(R.z, 0, -R.x));
+    const vec3 B = normalize(cross(R,A));
 
     for(uint i = 0; i < count; ++i)
     {
-        const vec3 C = normalize(PseudoRand_SpecDir(i, ns));
-        const vec3 A = normalize(vec3(C.z, 0, -C.x));
-        const vec3 B = normalize(cross(C,A));
-        const mat3 M = inverse(mat3(A,B,C));
-
-        vec3 L = normalize(M * R);
+        vec3 L = PseudoRand_SpecDir(i, ns);
+        L = normalize(L.x * A + L.y * B + L.z * R);
         const vec2 environmentUV = sphericalTextureMap(L);
 
         const vec3 H = normalize(L + V);
@@ -73,10 +66,7 @@ vec3 EnvironmentSpecular(vec3 V, vec3 N, vec3 ks, float ns)
         const vec3 lightColor = textureLod(environmentTex, environmentUV, lod).rgb;
         const float alpha = ns;
         const float ndotl = clamp(dot(N,L), -1, 1);
-        const float ndotv = clamp(dot(N,V), -1, 1);
-        const float ldoth = clamp(dot(L,H), -1, 1);
-        const vec3 brdf = (G(L,V,H,N,alpha) * F(L, H, ks * ks)) / (4 * ndotl * ndotv);
-        total += lightColor * brdf * ndotl;
+        total += lightColor * specularLight(N, H, L, ks, ns) * ndotl;
     }
     return total / count;
 }
@@ -105,11 +95,9 @@ vec3 brdfLight(vec3 P, vec3 N, vec3 kd_tex, vec3 ks_tex, uint materialIndex)
     // take light from the environment
     const vec2 environmentUV = sphericalTextureMap(N);
 
-    i_local += environmentLightStrength
-                * (kd_total / PI)
-                * vec3(texture(environmentIrradianceTex, environmentUV));
+    i_local += (kd_total / PI) * vec3(texture(environmentIrradianceTex, environmentUV));
 
-    i_local += environmentLightStrength * EnvironmentSpecular(V, N, ks_total, ns);
+    i_local += material.specularStrenth * EnvironmentSpecular(V, N, ks_total, ns);
 
     for (int i = 0; i < lights.length(); ++i)
     {
@@ -160,7 +148,7 @@ vec3 brdfLight(vec3 P, vec3 N, vec3 kd_tex, vec3 ks_tex, uint materialIndex)
         vec3 i_effect = { 0, 0, 0 }; // the effect that a single light source has on the object
         i_effect += lights[i].ambientColor * ka; // ambient
         i_effect += kd_total / PI; // diffuse
-        i_effect += specularLight(N, H, L, ks_total, ns, ndotl); // specular
+        i_effect += material.specularStrenth * specularLight(N, H, L, ks_total, ns); // specular
 
         i_effect *= lights[i].diffuseColor; // light illumination/color
         i_effect *= SpotlightEffect; // spotlight

@@ -58,7 +58,7 @@ void ShaderGlobalSystem::SetupForShadowMap(const Camera &cam, const ntg::bounds3
       ShaderGlobalSystem::GetCamToNDC() * ShaderGlobalSystem::GetWorldToCam()
   );
 
-  const float scene_radius = glm::length(sceneBounds.half_size());
+  const float scene_radius = glm::max(glm::length(sceneBounds.half_size()), 1.f);
   const float cam_world_distance = length(sceneBounds.center() - cam.eye());
   const glm::vec4 cam_forward = glm::vec4(-cam.back(), 0);
   const glm::vec4 world_scene_near = glm::vec4(cam.eye(), 1) + ((cam_world_distance - scene_radius) * cam_forward);

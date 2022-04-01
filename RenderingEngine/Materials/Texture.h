@@ -9,9 +9,10 @@ class Texture
 {
 public:
   Texture();
-  Texture(const std::string& filename);
-  void LoadHDRTextureFile(const std::filesystem::path &file);
-  void LoadTextureFile(const std::filesystem::path &file);
+  Texture(const std::filesystem::path& path, bool mipmap = false);
+  Texture(const Texture& other, bool mipmap);
+  void LoadHDRTextureFile(bool mipmap = false);
+  void LoadTextureFile(bool mipmap = false);
   GLuint TextureID() const;
   const std::filesystem::path& Path() const {return file;}
 private:

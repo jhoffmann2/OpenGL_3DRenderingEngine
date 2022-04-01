@@ -12,24 +12,34 @@
 Texture::Texture()
 {
     if (file.extension() != ".hdr")
-        LoadTextureFile(file);
+        LoadTextureFile();
     else
-        LoadHDRTextureFile(file);
+        LoadHDRTextureFile();
 }
 
-Texture::Texture(const std::string &filename)
-    :file(std::filesystem::absolute(filename))
+Texture::Texture(const std::filesystem::path &path, bool mipmap)
+    :file(std::filesystem::absolute(path))
 {
     if (file.extension() != ".hdr")
-        LoadTextureFile(file);
+        LoadTextureFile(mipmap);
     else
-        LoadHDRTextureFile(file);
+        LoadHDRTextureFile(mipmap);
 }
 
-void Texture::LoadTextureFile(const std::filesystem::path &file)
+Texture::Texture(const Texture& other, bool mipmap)
+    :file(other.file)
 {
-    if (auto found = loadedTextures.find(file.string());
-        found != loadedTextures.end())
+    if (file.extension() != ".hdr")
+        LoadTextureFile(mipmap);
+    else
+        LoadHDRTextureFile(mipmap);
+}
+
+void Texture::LoadTextureFile(bool mipmap)
+{
+
+    std::string key = file.string() + (mipmap? "_mipmapped" : "");
+    if (auto found = loadedTextures.find(key); found != loadedTextures.end())
     {
         textureID_ = found->second;
         return;
@@ -48,7 +58,7 @@ void Texture::LoadTextureFile(const std::filesystem::path &file)
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureID_);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmap? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -64,15 +74,18 @@ void Texture::LoadTextureFile(const std::filesystem::path &file)
         GL_UNSIGNED_BYTE,
         image
     );
-    glGenerateMipmap(GL_TEXTURE_2D);
+    if(mipmap)
+    {
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
 
-    loadedTextures[file.string()] = textureID_;
+    loadedTextures[key] = textureID_;
 }
 
-void Texture::LoadHDRTextureFile(const std::filesystem::path &file)
+void Texture::LoadHDRTextureFile(bool mipmap)
 {
-    if (auto found = loadedTextures.find(file.string());
-        found != loadedTextures.end())
+    std::string key = file.string() + (mipmap? "_mipmapped" : "");
+    if (auto found = loadedTextures.find(key); found != loadedTextures.end())
     {
         textureID_ = found->second;
         return;
@@ -114,7 +127,7 @@ void Texture::LoadHDRTextureFile(const std::filesystem::path &file)
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureID_);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmap? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -130,9 +143,12 @@ void Texture::LoadHDRTextureFile(const std::filesystem::path &file)
         GL_FLOAT,
         image.data()
     );
-    glGenerateMipmap(GL_TEXTURE_2D);
+    if(mipmap)
+    {
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
 
-    loadedTextures[file.string()] = textureID_;
+    loadedTextures[key] = textureID_;
 }
 
 GLuint Texture::TextureID() const

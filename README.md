@@ -106,7 +106,7 @@ Simply launch application and use the imgui.
 - [DeferredPhong.vert](Common/shaders/Deferred/DeferredPhong.vert)
   - Includes: [lightingUniforms.glsl](Common/shaders/Include/lightingUniforms.glsl) so we can access the meterial and global light SSBOs and use them in the lighting calculations
 - [DeferredPhong.frag](Common/shaders/Deferred/DeferredPhong.frag)
-  - Includes: [phong.glsl](Common/shaders/Include/phongLocal.glsl) so we can perform the lighting calculations
+  - Includes: [phong.glsl](Common/shaders/Include/brdfLocal.glsl) so we can perform the lighting calculations
 
 #### Render Local Light with GBuffer
 
@@ -114,7 +114,7 @@ Simply launch application and use the imgui.
   - Includes: [MeshProperties.glsl](Common/shaders/Include/MeshProperties.glsl) so the spherical mesh can be transformed to world space
 - [LocalLight.frag](Common/shaders/Deferred/LocalLight.frag)
   - Includes: [lightingUniforms.glsl](Common/shaders/Include/lightingUniforms.glsl) so we can access the meterial SSBOs and use them in the lighting calculations
-  - Includes: [phongLocal.glsl](Common/shaders/Include/phongLocal.glsl) so we can calculate the color contribution of the light
+  - Includes: [phongLocal.glsl](Common/shaders/Include/brdfLocal.glsl) so we can calculate the color contribution of the light
 
 ### Relevant C++ Code
 - deferred shading and local lights: [GBuffer.cpp](RenderingEngine/Rendering/GBuffer.cpp) / [GBuffer.h](RenderingEngine/Rendering/GBuffer.h)

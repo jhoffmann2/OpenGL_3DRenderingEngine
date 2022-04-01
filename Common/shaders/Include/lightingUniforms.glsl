@@ -18,12 +18,13 @@ struct Light
 layout (std140, binding = 0) buffer Lighting
 {
 	vec3 lightAttenuation;
-	vec3 fogColor;
 	float fogNear;
+	vec3 fogColor;
 	float fogFar;
 	vec3 globalAmbientColor;
+	float exposure;
 	vec3 eyePos;
-	float environmentLightStrength;
+	float contrast;
 	uint specularSamplingLevel;
 	vec4 hammersley[100];
 	Light lights[];
@@ -37,6 +38,7 @@ struct Material
 	vec3 ks;
 	float ns;
 	int textureMode_;
+	float specularStrenth;
 };
 
 layout (std140, binding = 1) buffer Materials

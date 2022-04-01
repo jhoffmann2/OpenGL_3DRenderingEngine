@@ -255,7 +255,7 @@ void RenderingComponent::TextureCombo(std::filesystem::path path, Texture *textu
 
             const bool is_selected = (itemPath == texture->Path());
             if (ImGui::Selectable(itemPath.filename().string().c_str(), is_selected))
-                *texture = itemPath.string();
+                *texture = itemPath;
 
             // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
             if (is_selected)

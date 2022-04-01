@@ -13,6 +13,7 @@ End Header --------------------------------------------------------*/
 #version 460
 #include ../Include/lightingUniforms.glsl
 #include ../Include/uv.glsl
+#include ../Include/toneMapping.glsl
 
 in vec3 model_pos;
 layout (location = 5) uniform sampler2D diffuseTexture;
@@ -24,6 +25,5 @@ void main(void) {
 	const vec2 uv = calculateUV(model_pos, vec2(0, 0), materials[curMaterial].textureMode_);
 	const vec3 kd_tex = texture(diffuseTexture, uv).rgb;
 
-
-	frag_color = vec4(materials[curMaterial].EmissiveColor * kd_tex, 1);
+	frag_color = vec4(ToneMap(materials[curMaterial].EmissiveColor * kd_tex, exposure), 1);
 }

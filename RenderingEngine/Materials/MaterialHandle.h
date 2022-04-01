@@ -19,6 +19,7 @@ public:
   [[nodiscard]] const glm::vec3& GetAmbientColor() const;
 
   [[nodiscard]] float GetSpecularExponent() const;
+  [[nodiscard]] float GetSpecularStrength() const;
 
   [[nodiscard]] TextureMode GetTextureMode() const;
 
@@ -31,6 +32,7 @@ public:
   void SetAmbientColor(const glm::vec3& color);
 
   void SetSpecularExponent(float exp);
+  void SetSpecularStrenth(float strength);
 
   void SetTextureMode(TextureMode mode);
 

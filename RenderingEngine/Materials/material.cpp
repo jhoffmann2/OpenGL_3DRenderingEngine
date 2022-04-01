@@ -45,6 +45,12 @@ float MaterialHandle::GetSpecularExponent() const
   return getData().ns_;
 }
 
+float MaterialHandle::GetSpecularStrength() const
+{
+    return getData().specularStrength;
+}
+
+
 MaterialHandle::TextureMode MaterialHandle::GetTextureMode() const
 {
   return getData().textureMode_;
@@ -108,6 +114,18 @@ void MaterialHandle::SetSpecularExponent(float exp)
     curr = exp;
     MaterialSystem::SetDirty(index_);
   }
+}
+
+void MaterialHandle::SetSpecularStrenth(float strength)
+{
+
+    Material& data = getData();
+    auto& curr = data.specularStrength;
+    if (curr != strength)
+    {
+        curr = strength;
+        MaterialSystem::SetDirty(index_);
+    }
 }
 
 void MaterialHandle::SetTextureMode(TextureMode mode)

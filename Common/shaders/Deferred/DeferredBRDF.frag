@@ -13,6 +13,7 @@ End Header --------------------------------------------------------*/
 #version 460
 #include ../Include/lightingUniforms.glsl
 #include ../Include/brdf.glsl
+#include ../Include/toneMapping.glsl
 
 layout (location = 1) uniform sampler2D diffuseTex;  // = { kd.r, kd.g, kd.b, ks }
 layout (location = 2) uniform sampler2D worldPosTex; // = { P.x, P.y, P.z, materialIndex }
@@ -43,5 +44,8 @@ void main(void)
 
 	vec3 i_local = (S < 1)? brdfLight(P.xyz, normalize(N.xyz), kd.rgb, ks, material) : vec3(0);
 
-	frag_color = vec4(mix(fogColor, i_local, S), 1);
+
+	// note: fog looks bad w/ environmet map so i commented out that part of the calculation
+	//frag_color = vec4(ToneMap(mix(fogColor, i_local, S), exposure), 1);
+	frag_color = vec4(ToneMap(i_local, exposure), 1);
 }

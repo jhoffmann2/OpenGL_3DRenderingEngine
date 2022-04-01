@@ -1,7 +1,7 @@
 #include lightingUniforms.glsl
+#include brdf.glsl
 in vec3 light_pos;
 in float light_radius;
-#define PI 3.1415926538
 
 float SinEaseInOut(float t)
 {
@@ -15,7 +15,7 @@ float ExpEaseIn(float t, float exp)
     return pow(t, exp);
 }
 
-vec3 phongLocal(vec3 P, vec3 N, vec3 kd_tex, vec3 ks_tex, uint materialIndex, uint lightMaterialIndex)
+vec3 brdfLocal(vec3 P, vec3 N, vec3 kd_tex, vec3 ks_tex, uint materialIndex, uint lightMaterialIndex)
 {
     if (materialIndex >= materials.length())
     {
@@ -45,8 +45,8 @@ vec3 phongLocal(vec3 P, vec3 N, vec3 kd_tex, vec3 ks_tex, uint materialIndex, ui
     const vec3 L = (light_pos - P) / Llen;
 
     const float ndotl = dot(N, L);
-    const vec3 R = 2 * N * ndotl - L;
-    const float rdotv = dot(R, V);
+    const vec3 H = normalize(L + V);
+
     const float Attenuation = min(
     1/(
     lightAttenuation[0] +
@@ -58,8 +58,11 @@ vec3 phongLocal(vec3 P, vec3 N, vec3 kd_tex, vec3 ks_tex, uint materialIndex, ui
 
     vec3 i_effect = { 0, 0, 0 };// the effect that a single light source has on the object
     i_effect += lightAmbient * ka;// ambient
-    i_effect += (lightDiffuse * kd_total * max(ndotl, 0));// diffuse
-    i_effect += (lightSpecular * ks_total * pow(max(rdotv, 0), ns));// specular
+    i_effect += kd_total / PI;// diffuse
+    i_effect += material.specularStrenth * specularLight(N, H, L, ks_total, ns);// specular
+
+    i_effect *= lightDiffuse; // light illumination/color
+    i_effect *= max(ndotl, 0); // light angle
     i_effect *= Attenuation;// Attenuation
 
     i_local += i_effect;

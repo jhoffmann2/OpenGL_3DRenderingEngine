@@ -50,6 +50,7 @@ End Header --------------------------------------------------------*/
 #include "ntg/simplex.inl"
 
 #include <filesystem>
+#include <Utilities/IrradianceMap.h>
 
 #define DEFERRED true
 #define LOG_ACTIVE true
@@ -284,6 +285,7 @@ int MainScene::Init()
         material.SetDiffuseColor(glm::vec3{.6392f, .5412f, .4118f});
         material.SetSpecularColor(glm::vec3{0.3176f});
         material.SetSpecularExponent(200);
+        material.SetSpecularStrenth(1.f);
         objects_.back()->AddComponent(new MaterialComponent(material));
         auto *pc = new ParentChildComponent();
 
@@ -328,7 +330,7 @@ int MainScene::Init()
             light_material.SetDiffuseColor(rgbColor(glm::vec3{hue, .25f, 1.f}));
             light_material.SetSpecularColor(rgbColor(glm::vec3{hue, .1f, 1.f}));
             light_material.SetAmbientColor(rgbColor(glm::vec3{hue, .25f, 0.2f}));
-            light_material.SetSpecularExponent(20);
+            light_material.SetSpecularExponent(200);
 
             auto *lightComponent = new LightComponent(0);
             lightComponent->SetDiffuseColor(light_material.GetDiffuseColor());
@@ -345,6 +347,7 @@ int MainScene::Init()
 
             auto *sun_pc = new ParentChildComponent(pc);
             sun_->AddComponent(sun_pc);
+            sun_->SetActive(false);
 
             pc->AddChild(sun_pc);
             lights_.emplace_back(sun_);
@@ -369,7 +372,7 @@ int MainScene::Init()
             light_material.SetDiffuseColor(rgbColor(glm::vec3{hue, .25f, 1.f}));
             light_material.SetSpecularColor(rgbColor(glm::vec3{hue, .1f, 1.f}));
             light_material.SetAmbientColor(rgbColor(glm::vec3{hue, .25f, 0.2f}));
-            light_material.SetSpecularExponent(20);
+            light_material.SetSpecularExponent(200);
             lightObj->AddComponent(new MaterialComponent(light_material));
 
             auto *rendering = new RenderingComponent(sphere_mesh, SolidRender::LOCAL_LIGHT);
@@ -429,9 +432,10 @@ int MainScene::Init()
         MaterialHandle material(1);
         material.SetEmissiveColor(glm::vec3{0});
         material.SetAmbientColor(glm::vec3{0});
-        material.SetDiffuseColor(glm::vec3{0});
+        material.SetDiffuseColor(glm::vec3{1});
         material.SetSpecularColor(glm::vec3{1});
-        material.SetSpecularExponent(0);
+        material.SetSpecularExponent(200);
+        material.SetSpecularStrenth(1.f);
         objects_.back()->AddComponent(new MaterialComponent(material));
     }
 
@@ -486,7 +490,8 @@ int MainScene::Render()
         glm::vec3 fogColor = LightSystem::GetFogColor();
         std::pair<float, float> range = LightSystem::GetFogRange();
         glm::vec3 attenuation = LightSystem::GetLightAttenuation();
-        float environmentLightStrength = LightSystem::GetEnvironmentLightStrength();
+        float exposure = LightSystem::GetExposure();
+        float contrast = LightSystem::GetContrast();
         int specularSampling = LightSystem::GetSpecularSamplingLevel();
 
         ImGui::ColorEdit3("Ambient Color", data(ambientColor));
@@ -502,14 +507,16 @@ int MainScene::Render()
 
         ImGui::SliderInt("Shadow Blur", &shadowBlurRadius, 0, 64);
 
-        ImGui::DragFloat("Environment Light Strength", &environmentLightStrength, 0.1f, 0.f, FLT_MAX);
+        ImGui::DragFloat("Exposure", &exposure, 0.001f, 0.f, FLT_MAX, "%.3f");
+        ImGui::DragFloat("Contrast", &contrast, 0.001f, 0.f, FLT_MAX, "%.3f");
 
         ImGui::SliderInt("Specular Sampling Level", &specularSampling, 0, LightSystem::MaxSpecularSamplingLevel());
 
         LightSystem::SetAmbientColor(ambientColor);
         LightSystem::SetFog(fogColor, range.first, range.second);
         LightSystem::SetLightAttenuation(attenuation);
-        LightSystem::SetEnvironmentLightStrength(environmentLightStrength);
+        LightSystem::SetExposure(exposure);
+        LightSystem::SetContrast(contrast);
         LightSystem::SetSpecularSamplingLevel(specularSampling);
 
         ImGui::Separator();
@@ -642,6 +649,8 @@ int MainScene::Render()
 
     const Texture &environmentTex = objects_[ENVIRONMENT]->GetComponent<RenderingComponent>()->GetDiffuseTexture();
 
+    const Texture specularTex(environmentTex, true);
+
     std::filesystem::path irradianceTexPath = environmentTex.Path();
     irradianceTexPath.replace_filename(
         irradianceTexPath.stem().string()
@@ -651,7 +660,7 @@ int MainScene::Render()
     const Texture irradianceTex =
         exists(irradianceTexPath)?
         Texture(irradianceTexPath.string()) :
-        Texture();
+        IrradianceMap::Generate(environmentTex.Path());
 
 #if DEFERRED
     GBuffer::Bind();
@@ -677,7 +686,7 @@ int MainScene::Render()
     }
 
     GBuffer::UnBind();
-    GBuffer::RenderFSQ(environmentTex, irradianceTex);
+    GBuffer::RenderFSQ(specularTex, irradianceTex);
 #endif
 
 

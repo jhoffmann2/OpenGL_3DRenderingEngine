@@ -26,13 +26,15 @@ void MaterialComponent::ImGuiEditor()
   glm::vec3 kd = GetDiffuseColor();
   glm::vec3 ks = GetSpecularColor();
   float ns = GetSpecularExponent();
+  float specularStrength = GetSpecularStrength();
   TextureMode textureMode = GetTextureMode();
 
   ImGui::ColorEdit3("Emmisive Color", data(ke));
   ImGui::ColorEdit3("Ambient Color", data(ka));
   ImGui::ColorEdit3("Diffuse Color", data(kd));
   ImGui::ColorEdit3("Specular Color", data(ks));
-  ImGui::DragFloat("specular Exponent ", &ns, 2.f, FLT_MIN, FLT_MAX, "%.1f");
+  ImGui::DragFloat("specular Exponent", &ns, 2.f, FLT_MIN, FLT_MAX, "%.1f");
+  ImGui::DragFloat("specular Strength", &specularStrength, 0.001f, 0, FLT_MAX, "%.001f");
 
   ImGui::Combo(
     "Texture UV Mapping",
@@ -48,6 +50,7 @@ void MaterialComponent::ImGuiEditor()
   SetDiffuseColor(kd);
   SetSpecularColor(ks);
   SetSpecularExponent(ns);
+  SetSpecularStrenth(specularStrength);
   SetTextureMode(textureMode);
 }
 

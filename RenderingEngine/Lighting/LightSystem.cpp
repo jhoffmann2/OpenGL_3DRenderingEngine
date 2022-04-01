@@ -93,10 +93,17 @@ void LightSystem::SetEyePos(const glm::vec3& pos)
   instance.dirtyGlobalProps_ = true;
 }
 
-void LightSystem::SetEnvironmentLightStrength(float strength)
+void LightSystem::SetExposure(float strength)
 {
     LightSystem& instance = Instance();
-    instance.shaderData_.globalProperties_.environmentLightStrength_ = strength;
+    instance.shaderData_.globalProperties_.exposure_ = strength;
+    instance.dirtyGlobalProps_ = true;
+}
+
+void LightSystem::SetContrast(float strength)
+{
+    LightSystem& instance = Instance();
+    instance.shaderData_.globalProperties_.contrast_ = strength;
     instance.dirtyGlobalProps_ = true;
 }
 
@@ -136,9 +143,14 @@ const glm::vec3& LightSystem::GetEyePos()
   return Instance().shaderData_.globalProperties_.eyePos_;
 }
 
-float LightSystem::GetEnvironmentLightStrength()
+float LightSystem::GetExposure()
 {
-    return Instance().shaderData_.globalProperties_.environmentLightStrength_;
+    return Instance().shaderData_.globalProperties_.exposure_;
+}
+
+float LightSystem::GetContrast()
+{
+    return Instance().shaderData_.globalProperties_.contrast_;
 }
 
 Light& LightSystem::GetRawLightData(size_t index)

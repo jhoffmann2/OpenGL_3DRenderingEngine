@@ -136,6 +136,8 @@ source_group("Texturing" FILES ${Texturing})
 set(Utilities
         "Utilities/GLHelper.h"
         "Utilities/Utilities.h"
+        "Utilities/IrradianceMap.cpp"
+        "Utilities/IrradianceMap.h"
         )
 source_group("Utilities" FILES ${Utilities})
 

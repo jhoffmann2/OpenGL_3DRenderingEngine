@@ -12,7 +12,8 @@ Creation date: 11/03/2020
 End Header --------------------------------------------------------*/ 
 #version 460
 #include ../Include/lightingUniforms.glsl
-#include ../Include/phongLocal.glsl
+#include ../Include/brdfLocal.glsl
+#include ../Include/toneMapping.glsl
 
 layout (location = 1) uniform sampler2D diffuseTex;  // = { kd.r, kd.g, kd.b, ks }
 layout (location = 2) uniform sampler2D worldPosTex; // = { P.x, P.y, P.z, materialIndex }
@@ -41,7 +42,7 @@ void main(void) {
 	const vec4 kd = texture(diffuseTex, uv_frag);
 	const vec3 ks = vec3(kd.w);
 
-	vec3 i_local = (S < 1)? phongLocal(P.xyz, N.xyz, kd.rgb, ks, material, curMaterial) : vec3(0);
+	vec3 i_local = (S < 1)? brdfLocal(P.xyz, N.xyz, kd.rgb, ks, material, curMaterial) : vec3(0);
 
-	frag_color = vec4(i_local, S);
+	frag_color = vec4(ToneMap(i_local, exposure), S);
 }
