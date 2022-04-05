@@ -27,4 +27,5 @@ vec3 EnvironmentMap(vec3 direction)
 	case 5:
 		return texture(environment5, cubeUV).xyz;
 	}
+	return vec3(0.f);
 }

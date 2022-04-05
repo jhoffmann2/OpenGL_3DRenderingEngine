@@ -1,0 +1,65 @@
+#version 430
+layout (local_size_x = 128, local_size_y = 1, local_size_z = 1) in; // Declares thread group size
+#define maxW 64
+
+#include ../Include/ShaderGlobals.glsl
+#define PI 3.14159265359f
+
+layout (location = 1) uniform uint w;
+
+layout (std140, binding = 3) uniform blurKernel {
+    float weights[(2 * maxW) + 1];
+}; // Declares a uniform block
+
+struct fragment
+{
+    vec4 value;
+    vec3 N;
+    float d;
+};
+
+layout (rgba32f, binding = 4) uniform readonly image2D src; // src image as 4 channel 32bit float readonly
+layout (rgba32f, binding = 5) uniform writeonly image2D dst; // dst image as 4 channel 32bit float writeonly
+layout (rgba32f, binding = 6) uniform readonly image2D normals; // src image as 4 channel 32bit float readonly
+layout (rgba32f, binding = 7) uniform readonly image2D positions; // src image as 4 channel 32bit float readonly
+
+shared fragment v[128 + (2 * maxW) + 1]; // Variable shared with other threads in the 128x1 thread group
+
+const float s = 0.01f;
+
+void main() {
+    const ivec2 gpos = ivec2(gl_GlobalInvocationID.xy); // Combo of groupID, groupSize and localID
+    const uint i = gl_LocalInvocationID.x; // Local thread id in the 128x1 thread groups128x1
+
+    v[i].value = imageLoad(src, gpos + ivec2(-w, 0));
+    v[i].N = imageLoad(normals, gpos + ivec2(-w, 0)).xyz;
+    v[i].d = (worldToCam * imageLoad(positions, gpos + ivec2(-w, 0))).z;
+
+    if (i<2*w)
+    {
+        v[i+128].value = imageLoad(src, gpos + ivec2(128-w, 0)); // read extra 2*w pixels
+        v[i+128].N = imageLoad(normals, gpos + ivec2(128-w, 0)).xyz;
+        v[i+128].d = (worldToCam * imageLoad(positions, gpos + ivec2(128-w, 0))).z;
+    }
+    barrier(); // Wait for all threads to catchup before reading v[]
+
+    // sum up blurKernel[0 ... 2w] * v[i ... i+2w]
+    vec4 average = vec4(0, 0, 0, 0);
+    float weightSum = 0.0f;
+    for(int j = 0; j <= 2 * w; ++j)
+    {
+        const float d_dist = abs(v[i + j].d - v[i + w].d);
+        if(d_dist > 100)
+            continue;
+        const float R =
+            (max(0, dot(v[i + j].N, v[i + w].N)) * exp(-(d_dist * d_dist) / (2 * s))) /
+            sqrt(2.f * PI * s);
+        if(isnan(R))
+            continue;
+        const float weight = weights[j] * R;
+        average += weight * v[i + j].value;
+        weightSum += weight;
+    }
+    average /= weightSum;
+    imageStore(dst, gpos, average); // Write to destination image
+}

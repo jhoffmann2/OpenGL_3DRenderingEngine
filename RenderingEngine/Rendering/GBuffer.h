@@ -13,6 +13,7 @@ public:
     TARGET_WORLD_POS,
     TARGET_NORMAL,
     TARGET_SHADOW,
+    TARGET_AMBIENT_OCCLUSION,
 
     RenderTargetCount,
     DEPTH_TEXTURE
@@ -26,6 +27,7 @@ public:
   static void ImguiEditor();
 
   static void BlurTarget(RenderTarget target, GLuint blurRadius);
+  static void EdgeAwareBlurTarget(RenderTarget target, GLuint blurRadius);
   static void Clear();
 
   static void ReloadShaders();
@@ -43,6 +45,9 @@ private:
   GBuffer() = default;
   ~GBuffer() = default;
 
+
+  void RenderFSQ_Internal(const Texture& environmentTex, const Texture& irradianceTex);
+
   GLuint gBufferFBO;
   GLuint depthTexture;
   GLuint rboDepth;
@@ -55,7 +60,8 @@ private:
 
   struct FSQ_DATA
   {
-    GLuint shader_program;
+    GLuint deferred_shader;
+    GLuint ambient_occlusion_shader;
     std::array<GLint, RenderTargetCount> uTex;
 
     enum { VERT = 0, FACE = 1, UV = 2 };

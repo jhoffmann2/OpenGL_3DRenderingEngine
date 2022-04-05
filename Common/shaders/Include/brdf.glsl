@@ -71,7 +71,7 @@ vec3 EnvironmentSpecular(vec3 V, vec3 N, vec3 ks, float ns)
     return total / count;
 }
 
-vec3 brdfLight(vec3 P, vec3 N, vec3 kd_tex, vec3 ks_tex, uint materialIndex)
+vec3 brdfLight(vec3 P, vec3 N, vec3 kd_tex, vec3 ks_tex, uint materialIndex, float ambientOcclusion)
 {
     if (materialIndex >= materials.length())
     return vec3(0.f);
@@ -90,14 +90,13 @@ vec3 brdfLight(vec3 P, vec3 N, vec3 kd_tex, vec3 ks_tex, uint materialIndex)
 
     vec3 i_local = vec3(0, 0, 0);
     i_local += EmissiveColor;
-    i_local += globalAmbientColor * ka;
 
     // take light from the environment
     const vec2 environmentUV = sphericalTextureMap(N);
 
-    i_local += (kd_total / PI) * vec3(texture(environmentIrradianceTex, environmentUV));
+    i_local += ambientOcclusion * (kd_total / PI) * vec3(texture(environmentIrradianceTex, environmentUV));
 
-    i_local += material.specularStrenth * EnvironmentSpecular(V, N, ks_total, ns);
+    i_local += ambientOcclusion * material.specularStrenth * EnvironmentSpecular(V, N, ks_total, ns);
 
     for (int i = 0; i < lights.length(); ++i)
     {

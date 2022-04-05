@@ -18,6 +18,7 @@ End Header --------------------------------------------------------*/
 layout (location = 1) uniform sampler2D diffuseTex;  // = { kd.r, kd.g, kd.b, ks }
 layout (location = 2) uniform sampler2D worldPosTex; // = { P.x, P.y, P.z, materialIndex }
 layout (location = 3) uniform sampler2D normalTex;   // = { N.x, N.y, N.z, 0 }
+layout (location = 5) uniform sampler2D ambientOcclusionTex;
 
 in vec2 uv_frag;
 out vec4 frag_color;
@@ -42,7 +43,9 @@ void main(void)
 	vec4 kd = texture(diffuseTex, uv_frag);
 	vec3 ks = vec3(kd.w);
 
-	vec3 i_local = (S < 1)? brdfLight(P.xyz, normalize(N.xyz), kd.rgb, ks, material) : vec3(0);
+	float A = texture(ambientOcclusionTex, uv_frag).x;
+
+	vec3 i_local = (S < 1)? brdfLight(P.xyz, normalize(N.xyz), kd.rgb, ks, material, A) : vec3(0);
 
 
 	// note: fog looks bad w/ environmet map so i commented out that part of the calculation

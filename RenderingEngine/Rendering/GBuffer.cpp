@@ -104,25 +104,38 @@ void GBuffer::UnBind()
 void GBuffer::RenderFSQ(const Texture &environmentTex, const Texture &irradianceTex)
 {
     auto &instance = Instance();
-    auto &FSQ = instance.FSQ;
-    glUseProgram(FSQ.shader_program);
+    GBuffer::Bind();
+
+    glUseProgram(instance.FSQ.ambient_occlusion_shader);
+    glUniform1ui(6, instance.width);
+    glUniform1ui(7, instance.height);
+    instance.RenderFSQ_Internal(environmentTex, irradianceTex);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    EdgeAwareBlurTarget(TARGET_AMBIENT_OCCLUSION, 10.f);
+
+    glUseProgram(instance.FSQ.deferred_shader);
+    instance.RenderFSQ_Internal(environmentTex, irradianceTex);
+}
+
+void GBuffer::RenderFSQ_Internal(const Texture &environmentTex, const Texture &irradianceTex)
+{
 
     // load textures
     for (int i = 0; i < RenderTargetCount; ++i)
     {
         glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(GL_TEXTURE_2D, instance.textures[i]);
+        glBindTexture(GL_TEXTURE_2D, textures[i]);
         glUniform1i(FSQ.uTex[i], i);
     }
 
     // load environmentTex textures
-    glActiveTexture(GL_TEXTURE4);
+    glActiveTexture(GL_TEXTURE10);
     glBindTexture(GL_TEXTURE_2D, environmentTex.TextureID());
-    glUniform1i(7, 4);
+    glUniform1i(7, 10);
 
-    glActiveTexture(GL_TEXTURE5);
+    glActiveTexture(GL_TEXTURE11);
     glBindTexture(GL_TEXTURE_2D, irradianceTex.TextureID());
-    glUniform1i(8, 5);
+    glUniform1i(8, 11);
 
     // references to inside of data to avoid rewriting code
     GLuint &vao = FSQ.vertexArrayBuffer_;
@@ -206,8 +219,13 @@ void GBuffer::ImguiEditor()
         ImGui::TextWrapped("^^ Note that im not using any textures right now so "
                            "all white is correct output");
 
+        ImGui::NewLine();
         ImGui::Text("Shadow Depth Target");
         ImGuiImage(TARGET_SHADOW);
+
+        ImGui::NewLine();
+        ImGui::Text("Ambient Occlusion");
+        ImGuiImage(TARGET_AMBIENT_OCCLUSION);
     }
     ImGui::End();
 }
@@ -252,9 +270,7 @@ GBuffer &GBuffer::Instance()
 
 void GBuffer::SetupFSQ()
 {
-    FSQ.shader_program =
-        LoadShaders("../../Common/shaders/Deferred/DeferredBRDF.vert",
-            "../../Common/shaders/Deferred/DeferredBRDF.frag");
+    ReloadShaders();
 
     static const std::array<glm::vec3, 6> vertices = {{
         {-1.0f, -1.0f, 0.0f},
@@ -301,13 +317,13 @@ void GBuffer::SetupFSQ()
 
     // assign postion attribute to vertex_buffer
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-    const GLint aposition = glGetAttribLocation(FSQ.shader_program, "position");
+    const GLint aposition = glGetAttribLocation(FSQ.deferred_shader, "position");
     glVertexAttribPointer(aposition, 3, GL_FLOAT, false, 0, nullptr);
     glEnableVertexAttribArray(aposition);
 
     // assign uv attribute to uv_buffer
     glBindBuffer(GL_ARRAY_BUFFER, uv_buffer);
-    const GLint auv = glGetAttribLocation(FSQ.shader_program, "uv_vert");
+    const GLint auv = glGetAttribLocation(FSQ.deferred_shader, "uv_vert");
     glVertexAttribPointer(auv, 2, GL_FLOAT, false, 0, nullptr);
     glEnableVertexAttribArray(auv);
 
@@ -319,13 +335,15 @@ void GBuffer::SetupFSQ()
     face_count = static_cast<int>(faces.size());
 
     FSQ.uTex[TARGET_DIFFUSE] =
-        glGetUniformLocation(FSQ.shader_program, "diffuseTex");
+        glGetUniformLocation(FSQ.deferred_shader, "diffuseTex");
     FSQ.uTex[TARGET_NORMAL] =
-        glGetUniformLocation(FSQ.shader_program, "normalTex");
+        glGetUniformLocation(FSQ.deferred_shader, "normalTex");
     FSQ.uTex[TARGET_WORLD_POS] =
-        glGetUniformLocation(FSQ.shader_program, "worldPosTex");
+        glGetUniformLocation(FSQ.deferred_shader, "worldPosTex");
     FSQ.uTex[TARGET_SHADOW] =
-        glGetUniformLocation(FSQ.shader_program, "shadowMap");
+        glGetUniformLocation(FSQ.deferred_shader, "shadowMap");
+    FSQ.uTex[TARGET_AMBIENT_OCCLUSION] =
+        glGetUniformLocation(FSQ.deferred_shader, "ambientOcclusionTex");
 }
 
 void GBuffer::BlurTarget(GBuffer::RenderTarget target, GLuint blurRadius)
@@ -427,6 +445,113 @@ void GBuffer::BlurTarget(GBuffer::RenderTarget target, GLuint blurRadius)
     glDisable(GL_DEBUG_OUTPUT);
 }
 
+void GBuffer::EdgeAwareBlurTarget(GBuffer::RenderTarget target, GLuint blurRadius)
+{
+    if (blurRadius == 0)
+        return;
+
+    auto &instance = Instance();
+    GLuint w = (target != TARGET_SHADOW) ? Instance().width : Instance().height;
+    GLuint h = Instance().height;
+
+    static std::array<GLuint, 2> gaussianBlurShaders = {
+        LoadComputeShader("../../Common/shaders/Compute/EdgeAwareGaussianBlurX.comp"),
+        LoadComputeShader("../../Common/shaders/Compute/EdgeAwareGaussianBlurY.comp")};
+    static std::array<glm::uvec3, 2> dispatchDimensions{{
+        {w / 128u, h, 1u},
+        {w, h / 128u, 1u}
+    }};
+
+    glEnable(GL_DEBUG_OUTPUT);
+
+    // Set all uniform and image variables
+    static GLuint uboBlock = [programID = gaussianBlurShaders[0]]() -> GLuint
+    {
+        GLuint uboBlock;
+        glGenBuffers(1, &uboBlock);
+        GLuint bindpoint = 3;
+
+        auto loc = glGetUniformBlockIndex(programID, "blurKernel");
+        glUniformBlockBinding(programID, loc, bindpoint);
+
+        glBindBuffer(GL_UNIFORM_BUFFER, uboBlock);
+        glBindBufferBase(GL_UNIFORM_BUFFER, bindpoint, uboBlock);
+        glBufferData(GL_UNIFORM_BUFFER, 16 * (2 * 100 + 1), nullptr, GL_STATIC_DRAW);
+
+        return uboBlock;
+    }();
+
+    static std::vector<glm::vec4> blurKernal;
+    if (blurKernal.size() != blurRadius * 2 + 1)
+    {
+        // recalculate blur kernal at new size
+        blurKernal.resize(blurRadius * 2 + 1);
+        float sum = 0;
+        for (size_t i = 0; i < blurKernal.size(); ++i)
+        {
+            const float s = blurRadius / 3.f;
+            const float frac = ((float) i - (float) blurRadius) / s;
+            blurKernal[i].x = glm::exp(-0.5f * frac * frac);
+            sum += blurKernal[i].x;
+        }
+
+        // normalize weights
+        for (size_t i = 0; i < blurKernal.size(); ++i)
+            blurKernal[i] /= sum;
+
+        // upload new blur kernal to gpu
+        glBindBuffer(GL_UNIFORM_BUFFER, uboBlock);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::vec4) * blurKernal.size(), blurKernal.data());
+    }
+
+    for (size_t i = 0; i < gaussianBlurShaders.size(); ++i)
+    {
+        const GLuint programID = gaussianBlurShaders[i];
+        const glm::uvec3 &dim = dispatchDimensions[i];
+        glUseProgram(programID);
+        glUniform1ui(1, blurRadius);
+
+        static GLuint srcTex = [w, h]()
+        {
+            GLuint srcTex;
+            glCreateTextures(GL_TEXTURE_2D, 1, &srcTex);
+            glTextureStorage2D(srcTex, 1, GL_RGBA32F, w, h);
+            return srcTex;
+        }();
+
+        glCopyImageSubData(
+            instance.textures[target], GL_TEXTURE_2D, 0, 0, 0, 0,
+            srcTex, GL_TEXTURE_2D, 0, 0, 0, 0,
+            w, h, 1
+        );
+
+        GLuint imageUnit = 1;
+        GLuint loc = glGetUniformLocation(programID, "src");
+        glBindImageTexture(imageUnit, srcTex, 0, GL_FALSE, 0,
+            GL_READ_ONLY, GL_RGBA32F);
+        glUniform1i(loc, imageUnit++);
+
+        loc = glGetUniformLocation(programID, "dst");
+        glBindImageTexture(imageUnit, instance.textures[target], 0, GL_FALSE, 0,
+            GL_READ_ONLY, GL_RGBA32F);
+        glUniform1i(loc, imageUnit++);
+
+        loc = glGetUniformLocation(programID, "normals");
+        glBindImageTexture(imageUnit, instance.textures[TARGET_NORMAL], 0, GL_FALSE, 0,
+            GL_READ_ONLY, GL_RGBA32F);
+        glUniform1i(loc, imageUnit++);
+
+        loc = glGetUniformLocation(programID, "positions");
+        glBindImageTexture(imageUnit, instance.textures[TARGET_WORLD_POS], 0, GL_FALSE, 0,
+            GL_READ_ONLY, GL_RGBA32F);
+        glUniform1i(loc, imageUnit++);
+
+        glDispatchCompute(dim.x, dim.y, dim.z);
+        glUseProgram(0);
+    }
+    glDisable(GL_DEBUG_OUTPUT);
+}
+
 void GBuffer::Clear()
 {
     auto &instance = Instance();
@@ -464,6 +589,18 @@ void GBuffer::Clear()
 
     clearColor = glm::vec4(1.f, 1.f, 1.f, 1.f);
     glClearTexSubImage(
+        instance.textures[TARGET_AMBIENT_OCCLUSION],
+        0, // level
+        0, 0, 0, // offset
+        instance.width, instance.height, // size
+        1, // depth
+        GL_RGBA, GL_FLOAT, // format & type
+        &clearColor
+    );
+
+
+    clearColor = glm::vec4(1.f, 1.f, 1.f, 1.f);
+    glClearTexSubImage(
         instance.textures[TARGET_SHADOW],
         0, // level
         0, 0, 0, // offset
@@ -472,7 +609,6 @@ void GBuffer::Clear()
         GL_RGBA, GL_FLOAT, // format & type
         &clearColor
     );
-
     glClearDepth(1);
     glClear(GL_DEPTH_BUFFER_BIT);
     glEnable(GL_CULL_FACE);
@@ -482,7 +618,10 @@ void GBuffer::Clear()
 void GBuffer::ReloadShaders()
 {
     auto &instance = Instance();
-    instance.FSQ.shader_program =
+    instance.FSQ.deferred_shader =
         LoadShaders("../../Common/shaders/Deferred/DeferredBRDF.vert",
             "../../Common/shaders/Deferred/DeferredBRDF.frag");
+    instance.FSQ.ambient_occlusion_shader =
+        LoadShaders("../../Common/shaders/Deferred/AmbientOcclusionPass.vert",
+            "../../Common/shaders/Deferred/AmbientOcclusionPass.frag");
 }
