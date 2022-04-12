@@ -111,7 +111,7 @@ void GBuffer::RenderFSQ(const Texture &environmentTex, const Texture &irradiance
     glUniform1ui(7, instance.height);
     instance.RenderFSQ_Internal(environmentTex, irradianceTex);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    EdgeAwareBlurTarget(TARGET_AMBIENT_OCCLUSION, 10.f);
+    //EdgeAwareBlurTarget(TARGET_AMBIENT_OCCLUSION, 10.f);
 
     glUseProgram(instance.FSQ.deferred_shader);
     instance.RenderFSQ_Internal(environmentTex, irradianceTex);

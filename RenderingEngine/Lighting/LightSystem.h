@@ -9,66 +9,101 @@
 class LightSystem
 {
 public:
-  static constexpr size_t lightCount = 75;
-  friend class LightHandle;
-  static void Init();
-  static void Update();
-  static void SetDirty(const Light& light);
-  static void SetDirty(size_t index);
+    static constexpr size_t lightCount = 75;
 
-  static void SetLightAttenuation(const glm::vec3& attenuation);
-  static void SetFog(const glm::vec3& color, float near, float far);
-  static void SetAmbientColor(const glm::vec3& color);
-  static void SetEyePos(const glm::vec3& pos);
-  static void SetExposure(float strength);
-  static void SetContrast(float strength);
-  static void SetSpecularSamplingLevel(int level);
+    friend class LightHandle;
 
-  [[nodiscard]] static const glm::vec3& GetLightAttenuation();
-  [[nodiscard]] static const glm::vec3& GetFogColor();
-  [[nodiscard]] static std::pair<float,float> GetFogRange();
-  [[nodiscard]] static const glm::vec3& GetAmbientColor();
-  [[nodiscard]] static const glm::vec3& GetEyePos();
-  [[nodiscard]] static float GetExposure();
-  [[nodiscard]] static float GetContrast();
-  [[nodiscard]] static int GetSpecularSamplingLevel();
-  [[nodiscard]] static size_t MaxSpecularSamplingLevel();
+    static void Init();
+
+    static void Update();
+
+    static void SetDirty(const Light &light);
+
+    static void SetDirty(size_t index);
+
+    static void SetLightAttenuation(const glm::vec3 &attenuation);
+
+    static void SetFog(const glm::vec3 &color, float near, float far);
+
+    static void SetAmbientColor(const glm::vec3 &color);
+
+    static void SetEyePos(const glm::vec3 &pos);
+
+    static void SetExposure(float strength);
+
+    static void SetContrast(float strength);
+
+    static void SetSpecularSamplingLevel(int level);
+
+    static void SetAmbientOcclusionRadius(float radius);
+
+    static void SetAmbientOcclusionIntensity(float intensity);
+
+    static void SetAmbientOcclusionContrast(float contrast);
+
+    [[nodiscard]] static const glm::vec3 &GetLightAttenuation();
+
+    [[nodiscard]] static const glm::vec3 &GetFogColor();
+
+    [[nodiscard]] static std::pair<float, float> GetFogRange();
+
+    [[nodiscard]] static const glm::vec3 &GetAmbientColor();
+
+    [[nodiscard]] static const glm::vec3 &GetEyePos();
+
+    [[nodiscard]] static float GetExposure();
+
+    [[nodiscard]] static float GetContrast();
+
+    [[nodiscard]] static int GetSpecularSamplingLevel();
+
+    [[nodiscard]] static size_t MaxSpecularSamplingLevel();
+
+    [[nodiscard]] static float GetAmbientOcclusionRadius();
+    [[nodiscard]] static float GetAmbientOcclusionIntensity();
+    [[nodiscard]] static float GetAmbientOcclusionContrast();
 
 private:
-  static LightSystem& Instance();
-  LightSystem() = default;
-  static Light& GetRawLightData(size_t index);
-  static size_t LightIndex(const Light& light);
+    static LightSystem &Instance();
 
-  // force 16 byte alignment between arrays
-  __declspec(align(16)) struct ShaderData
-  {
-    static constexpr GLuint binding_ = 0;
-    struct GlobalProperties
+    LightSystem() = default;
+
+    static Light &GetRawLightData(size_t index);
+
+    static size_t LightIndex(const Light &light);
+
+    // force 16 byte alignment between arrays
+    __declspec(align(16)) struct ShaderData
     {
-      AlignData<12, glm::vec3> lightAttenuation_;
-      AlignData<4, float> fogNear_;
+        static constexpr GLuint binding_ = 0;
+        struct GlobalProperties
+        {
+            AlignData<12, glm::vec3> lightAttenuation_;
+            AlignData<4, float> fogNear_;
 
-      AlignData<12, glm::vec3> fogColor_;
-      AlignData<4, float> fogFar_;
+            AlignData<12, glm::vec3> fogColor_;
+            AlignData<4, float> fogFar_;
 
-      AlignData<12, glm::vec3> ambientColor_;
-      AlignData<4, float> exposure_ = 1.f;
+            AlignData<12, glm::vec3> ambientColor_;
+            AlignData<4, float> exposure_ = 60.f;
 
-      AlignData<12, glm::vec3> eyePos_;
-      AlignData<4, float> contrast_ = 1.f;
+            AlignData<12, glm::vec3> eyePos_;
+            AlignData<4, float> contrast_ = 12.f;
 
-      AlignData<16, GLuint> specularSamplingLevel = 40;
+            AlignData<4, GLuint> specularSamplingLevel_ = 40;
+            AlignData<4, float> aoRadius_ = 1.f;
+            AlignData<4, float> aoIntensity_ = 2.f;
+            AlignData<4, float> aoContrast_ = 1.f;
 
-      std::array<glm::vec4, 100> hammersley = Hammersley2D<100>();
-    } globalProperties_;
+            std::array<glm::vec4, 100> hammersley = Hammersley2D<100>();
+        } globalProperties_;
 
-    AlignData<16, Light> lights_[lightCount];
+        AlignData<16, Light> lights_[lightCount];
 
-  } shaderData_;
+    } shaderData_;
 
-  GLuint ssbo_ = 0;
-  std::bitset<lightCount> dirtyLights_;
-  bool dirtyGlobalProps_ = false;
+    GLuint ssbo_ = 0;
+    std::bitset<lightCount> dirtyLights_;
+    bool dirtyGlobalProps_ = false;
 };
 

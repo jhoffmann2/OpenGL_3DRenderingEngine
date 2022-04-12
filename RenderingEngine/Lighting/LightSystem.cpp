@@ -111,7 +111,31 @@ void LightSystem::SetSpecularSamplingLevel(int level)
 {
     LightSystem& instance = Instance();
     level = glm::clamp(level, 0, (int)MaxSpecularSamplingLevel());
-    instance.shaderData_.globalProperties_.specularSamplingLevel = level;
+    instance.shaderData_.globalProperties_.specularSamplingLevel_ = level;
+    instance.dirtyGlobalProps_ = true;
+}
+
+void LightSystem::SetAmbientOcclusionRadius(float radius)
+{
+    LightSystem& instance = Instance();
+    radius = glm::max(0.f, radius);
+    instance.shaderData_.globalProperties_.aoRadius_ = radius;
+    instance.dirtyGlobalProps_ = true;
+}
+
+void LightSystem::SetAmbientOcclusionIntensity(float intensity)
+{
+    LightSystem& instance = Instance();
+    intensity = glm::max(0.f, intensity);
+    instance.shaderData_.globalProperties_.aoIntensity_ = intensity;
+    instance.dirtyGlobalProps_ = true;
+}
+
+void LightSystem::SetAmbientOcclusionContrast(float contrast)
+{
+    LightSystem& instance = Instance();
+    contrast = glm::max(0.f, contrast);
+    instance.shaderData_.globalProperties_.aoContrast_ = contrast;
     instance.dirtyGlobalProps_ = true;
 }
 
@@ -166,10 +190,25 @@ size_t LightSystem::LightIndex(const Light& light)
 
 int LightSystem::GetSpecularSamplingLevel()
 {
-    return Instance().shaderData_.globalProperties_.specularSamplingLevel;
+    return Instance().shaderData_.globalProperties_.specularSamplingLevel_;
 }
 
 size_t LightSystem::MaxSpecularSamplingLevel()
 {
     return Instance().shaderData_.globalProperties_.hammersley.size();
+}
+
+float LightSystem::GetAmbientOcclusionRadius()
+{
+    return Instance().shaderData_.globalProperties_.aoRadius_;
+}
+
+float LightSystem::GetAmbientOcclusionIntensity()
+{
+    return Instance().shaderData_.globalProperties_.aoIntensity_;
+}
+
+float LightSystem::GetAmbientOcclusionContrast()
+{
+    return Instance().shaderData_.globalProperties_.aoContrast_;
 }

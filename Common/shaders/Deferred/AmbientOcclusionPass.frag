@@ -12,6 +12,8 @@ Creation date: 11/03/2020
 End Header --------------------------------------------------------*/ 
 #version 460
 #include ../Include/ShaderGlobals.glsl
+#include ../Include/lightingUniforms.glsl
+
 #define PI 3.14159265359f
 
 layout (location = 1) uniform sampler2D diffuseTex;  // = { kd.r, kd.g, kd.b, ks }
@@ -24,12 +26,9 @@ layout (location = 7) uniform uint height;
 in vec2 uv_frag;
 layout (location = 4) out vec4 ambientOcclusionOut;
 
-const int n = 40;
-const float R = 1.f; // world space range of influence
+const int n = 20;
 const float delta = 0.001f;
-const float c = 0.1f * R;
-const float s = 2.f;
-const float k = 1.f;
+const float c = 0.1f * aoRadius;
 
 void main(void)
 {
@@ -61,7 +60,7 @@ void main(void)
 	{
 		const float alpha = (i + 0.5f) / n;
 
-		const float h = alpha * R / d;
+		const float h = alpha * aoRadius / d;
 		const float theta = 2.f * PI * alpha * (7.f * n / 9.f) + phi;
 		rand[i] = clamp(nfc + h * vec2(cos(theta), sin(theta)), vec2(0,0), vec2(1,1));
 	}
@@ -82,12 +81,12 @@ void main(void)
 		const float d2 = -(camPos2).z;
 
 		vec4 omega = P2 - P;
-		const float H = ((R - length(omega)) < 0) ? 0 : 1;
+		const float H = ((aoRadius - length(omega)) < 0) ? 0 : 1;
 
 		S += (max(0.f, dot(N, omega) - delta * d2) * H) / max(c * c, dot(omega, omega));
 	}
 	S *= (2 * PI * c) / n;
 
-	ambientOcclusionOut = vec4(max(0, pow(1 - s * S, k)));
+	ambientOcclusionOut = vec4(max(0, pow(1 - aoIntensity * S, aoContrast)));
 
 }

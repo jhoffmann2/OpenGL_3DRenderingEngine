@@ -440,7 +440,6 @@ int MainScene::Init()
     }
 
 
-
     VertexNormalRender::setCamera(cam);
     FaceNormalRender::setCamera(cam);
 
@@ -494,30 +493,46 @@ int MainScene::Render()
         float contrast = LightSystem::GetContrast();
         int specularSampling = LightSystem::GetSpecularSamplingLevel();
 
-        ImGui::ColorEdit3("Ambient Color", data(ambientColor));
-        ImGui::ColorEdit3("Fog Color", data(fogColor));
+        if(ImGui::ColorEdit3("Ambient Color", data(ambientColor)))
+            LightSystem::SetAmbientColor(ambientColor);
+
+        if(ImGui::ColorEdit3("Fog Color", data(fogColor)))
+            LightSystem::SetFog(fogColor, range.first, range.second);
 
         ImGui::PushItemWidth(198);
-        ImGui::DragFloat("##minFogRange", &range.first, 0.01f, 0.f, range.second);
+        if(ImGui::DragFloat("##minFogRange", &range.first, 0.01f, 0.f, range.second))
+            LightSystem::SetFog(fogColor, range.first, range.second);
         ImGui::SameLine(210);
-        ImGui::DragFloat("Fog Range", &range.second, 0.01f, range.first, 100.f);
+        if(ImGui::DragFloat("Fog Range", &range.second, 0.01f, range.first, 100.f))
+            LightSystem::SetFog(fogColor, range.first, range.second);
         ImGui::PopItemWidth();
 
-        ImGui::DragFloat3("Light Attenuation", data(attenuation), 0.01f, 0.f, 2.f);
+        if(ImGui::DragFloat3("Light Attenuation", data(attenuation), 0.01f, 0.f, 2.f))
+            LightSystem::SetLightAttenuation(attenuation);
 
         ImGui::SliderInt("Shadow Blur", &shadowBlurRadius, 0, 64);
 
-        ImGui::DragFloat("Exposure", &exposure, 0.001f, 0.f, FLT_MAX, "%.3f");
-        ImGui::DragFloat("Contrast", &contrast, 0.001f, 0.f, FLT_MAX, "%.3f");
+        if(ImGui::DragFloat("Exposure", &exposure, 0.001f, 0.f, FLT_MAX, "%.3f"))
+            LightSystem::SetExposure(exposure);
+        if(ImGui::DragFloat("Contrast", &contrast, 0.001f, 0.f, FLT_MAX, "%.3f"))
+            LightSystem::SetContrast(contrast);
 
-        ImGui::SliderInt("Specular Sampling Level", &specularSampling, 0, LightSystem::MaxSpecularSamplingLevel());
+        if(ImGui::SliderInt("Specular Sampling Level", &specularSampling, 0, LightSystem::MaxSpecularSamplingLevel()))
+            LightSystem::SetSpecularSamplingLevel(specularSampling);
 
-        LightSystem::SetAmbientColor(ambientColor);
-        LightSystem::SetFog(fogColor, range.first, range.second);
-        LightSystem::SetLightAttenuation(attenuation);
-        LightSystem::SetExposure(exposure);
-        LightSystem::SetContrast(contrast);
-        LightSystem::SetSpecularSamplingLevel(specularSampling);
+        ImGui::Separator();
+        float aoRadius = LightSystem::GetAmbientOcclusionRadius();
+        float aoIntensity = LightSystem::GetAmbientOcclusionIntensity();
+        float aoConstrast = LightSystem::GetAmbientOcclusionContrast();
+
+        if (ImGui::SliderFloat("Ambient Occlusion Radius", &aoRadius, 0.f, 2.f))
+            LightSystem::SetAmbientOcclusionRadius(aoRadius);
+
+        if (ImGui::SliderFloat("Ambient Occlusion Intensity", &aoIntensity, 0.f, 2.f))
+            LightSystem::SetAmbientOcclusionIntensity(aoIntensity);
+
+        if (ImGui::SliderFloat("Ambient Occlusion Contrast", &aoConstrast, 0.f, 10.f))
+            LightSystem::SetAmbientOcclusionContrast(aoConstrast);
 
         ImGui::Separator();
 
@@ -654,13 +669,13 @@ int MainScene::Render()
     std::filesystem::path irradianceTexPath = environmentTex.Path();
     irradianceTexPath.replace_filename(
         irradianceTexPath.stem().string()
-        + ".irr"
-        + irradianceTexPath.extension().string()
+            + ".irr"
+            + irradianceTexPath.extension().string()
     );
     const Texture irradianceTex =
-        exists(irradianceTexPath)?
-        Texture(irradianceTexPath.string()) :
-        IrradianceMap::Generate(environmentTex.Path());
+        exists(irradianceTexPath) ?
+            Texture(irradianceTexPath.string()) :
+            IrradianceMap::Generate(environmentTex.Path());
 
 #if DEFERRED
     GBuffer::Bind();

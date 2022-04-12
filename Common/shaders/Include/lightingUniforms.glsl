@@ -26,6 +26,9 @@ layout (std140, binding = 0) buffer Lighting
 	vec3 eyePos;
 	float contrast;
 	uint specularSamplingLevel;
+	float aoRadius;
+	float aoIntensity;
+	float aoContrast;
 	vec4 hammersley[100];
 	Light lights[];
 };
